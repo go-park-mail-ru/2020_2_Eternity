@@ -3,26 +3,20 @@ package server
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/handlers"
 )
 
 type Server struct {
-	config *config.ConfServer
+	config *Config
 	router *gin.Engine
 }
 
-func New(config *config.ConfServer) *Server {
+func New(config *Config) *Server {
 	r := gin.Default()
 
 	// TODO func AddRoute
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(200, "pong")
 	})
-
-	r.POST("/user/signup", handlers.SignUp)
-	r.POST("/user/login", handlers.Login)
-	r.POST("/user/logout", handlers.AuthCheck(), handlers.Logout)
 
 	return &Server{
 		config: config,
