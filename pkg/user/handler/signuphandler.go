@@ -17,8 +17,6 @@ func NewHandler(users model.IUsers) *Handler {
 	return &Handler{users: users}
 }
 
-// Minimum eight characters, at least one uppercase letter, one lowercase letter and one number:
-
 func ValidProfile(profile model.SignUpUser) error {
 	return validation.ValidateStruct(&profile,
 		validation.Field(&profile.Email, validation.Required, is.EmailFormat),
@@ -30,7 +28,7 @@ func ValidProfile(profile model.SignUpUser) error {
 func (h *Handler) SignUp(c *gin.Context) {
 	profile := model.SignUpUser{}
 	if err := c.BindJSON(&profile); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
 	if err := ValidProfile(profile); err != nil {
@@ -46,11 +44,10 @@ func (h *Handler) SignUp(c *gin.Context) {
 	}
 
 	user := model.User{
-		ID: 0,
 		Username: profile.Username,
-		Email: profile.Email,
+		Email:    profile.Email,
 		Password: string(hash),
-		Age: profile.Age,
+		Age:      profile.Age,
 	}
 
 	if err := h.users.CreateUser(user); err != nil {

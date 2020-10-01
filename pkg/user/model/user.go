@@ -6,41 +6,36 @@ import (
 
 type SignUpUser struct {
 	Username string `json:"username"`
-	Email string `json:"email"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
-	Age int `json:"age"`
+	Age      int    `json:"age"`
 }
 
 type User struct {
-	ID int `json:"id"`
+	ID       int    `json:"id"`
 	Username string `json:"username"`
-	Email string `json:"email"`
+	Email    string `json:"email"`
 	Password string `json:"-"`
-	Age int `json:"age"`
+	Age      int    `json:"age"`
 }
-
 
 type IUsers interface {
 	CreateUser(User) error
-	CheckUser(User) error
 }
 
-
 type MockUsers struct {
-	mu *sync.Mutex
+	mu    *sync.Mutex
 	users map[int]*User
 }
 
 func NewMockUsers() *MockUsers {
 	return &MockUsers{
-		mu : &sync.Mutex{},
+		mu:    &sync.Mutex{},
 		users: make(map[int]*User, 0),
 	}
 }
 
-
 func (u *MockUsers) CheckUser(user User) error {
-
 	return nil
 }
 
