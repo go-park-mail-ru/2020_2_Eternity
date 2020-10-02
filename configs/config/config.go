@@ -1,9 +1,13 @@
 package config
 
 import (
-	"fmt"
 	"github.com/spf13/viper"
 	"log"
+)
+
+var (
+	Conf = newConfig()
+	Db   = newDatabase(&Conf.Db)
 )
 
 type Config struct {
@@ -33,7 +37,7 @@ type ConfServer struct {
 	Port    string `mapstructure:"port"`
 }
 
-func NewConfig() *Config {
+func newConfig() *Config {
 	setDefaultDb()
 	setDefaultWeb()
 
@@ -52,8 +56,6 @@ func NewConfig() *Config {
 	if er != nil {
 		log.Fatalf("Fatal error config file: %s \n", err)
 	}
-
-	fmt.Println(conf)
 
 	return conf
 }

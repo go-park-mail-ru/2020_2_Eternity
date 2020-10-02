@@ -1,12 +1,14 @@
 package config
 
 import (
+	"database/sql"
 	"fmt"
-	"github.com/jackc/pgx"
+	_ "github.com/lib/pq"
 )
 
 type Database struct {
-	config *ConfDB
+	config   *ConfDB
+	database *sql.DB
 }
 
 func newDatabase(config *ConfDB) *Database {
@@ -15,22 +17,29 @@ func newDatabase(config *ConfDB) *Database {
 	}
 }
 
-func (db *Database) Open() *pgx.Conn {
-	config, err := pgx.ParseConnectionString(
+func (d *Database) Open() error {
+	db, err := sql.Open(
+		d.config.Postgres.DriverName,
 		fmt.Sprintf(
 			"user=%s password=%s dbname=%s sslmode=%s",
-			db.config.Postgres.Username,
-			db.config.Postgres.Password,
-			db.config.Postgres.DbName,
-			db.config.Postgres.SslMode,
-		))
+			d.config.Postgres.Username,
+			d.config.Postgres.Password,
+			d.config.Postgres.DbName,
+			d.config.Postgres.SslMode))
 	if err != nil {
-		return nil
+		return err
 	}
 
-	database, err := pgx.Connect(config)
+	err = db.Ping()
 	if err != nil {
-		return nil
+		db.Close()
+		return err
 	}
-	return database
+
+	d.database = db
+	return nil
+}
+
+func (d *Database) Close() error {
+	return d.database.Close()
 }
