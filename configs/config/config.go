@@ -1,19 +1,14 @@
 package config
 
 import (
+	"fmt"
 	"github.com/spf13/viper"
 	"log"
 )
 
-var (
-	Conf = newConfig()
-	Db   = newDatabase(&Conf.Db).Open()
-)
-
 type Config struct {
-	Db    ConfDB    `mapstructure:"database"`
-	Web   ConfWeb   `mapstructure:"web"`
-	Token ConfToken `mapstructure:"token"`
+	Db  ConfDB  `mapstructure:"database"`
+	Web ConfWeb `mapstructure:"web"`
 }
 
 type ConfDB struct {
@@ -33,18 +28,12 @@ type ConfWeb struct {
 	Server ConfServer `mapstructure:"server"`
 }
 
-type ConfToken struct {
-	SecretName string `mapstructure:"secretname"`
-	CookieName string `mapstructure:"cookiename"`
-	Value      int    `mapstructure:"value"`
-}
-
 type ConfServer struct {
 	Address string `mapstructure:"address"`
 	Port    string `mapstructure:"port"`
 }
 
-func newConfig() *Config {
+func NewConfig() *Config {
 	setDefaultDb()
 	setDefaultWeb()
 
@@ -63,6 +52,8 @@ func newConfig() *Config {
 	if er != nil {
 		log.Fatalf("Fatal error config file: %s \n", err)
 	}
+
+	fmt.Println(conf)
 
 	return conf
 }

@@ -3,15 +3,16 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	_ "github.com/lib/pq"
 )
 
 type Database struct {
-	config   *Config
+	config   *config.ConfDB
 	database *sql.DB
 }
 
-func New(config *Config) *Database {
+func New(config *config.ConfDB) *Database {
 	return &Database{
 		config: config,
 	}
@@ -19,13 +20,13 @@ func New(config *Config) *Database {
 
 func (d *Database) Open() error {
 	db, err := sql.Open(
-		d.config.DriverName,
+		d.config.Postgres.DriverName,
 		fmt.Sprintf(
 			"user=%s password=%s dbname=%s sslmode=%s",
-			d.config.Username,
-			d.config.Password,
-			d.config.DbName,
-			d.config.SslMode))
+			d.config.Postgres.Username,
+			d.config.Postgres.Password,
+			d.config.Postgres.DbName,
+			d.config.Postgres.SslMode))
 	if err != nil {
 		return err
 	}

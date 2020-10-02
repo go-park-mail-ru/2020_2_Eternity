@@ -1,26 +1,29 @@
 package main
 
 import (
-	"fmt"
+	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/server"
+	"log"
 )
 
 func main() {
-	db := database.New(database.NewConfig())
+	conf := config.NewConfig()
+
+	db := database.New(&conf.Db)
 	if err := db.Open(); err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 		return
 	}
 
 	if err := db.Close(); err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 		return
 	}
 
-	srv := server.New(server.NewConfig())
+	srv := server.New(&conf.Web.Server)
 	if err := srv.Run(); err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 		return
 	}
 }

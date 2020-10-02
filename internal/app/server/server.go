@@ -3,14 +3,15 @@ package server
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 )
 
 type Server struct {
-	config *Config
+	config *config.ConfServer
 	router *gin.Engine
 }
 
-func New(config *Config) *Server {
+func New(config *config.ConfServer) *Server {
 	r := gin.Default()
 
 	// TODO func AddRoute
