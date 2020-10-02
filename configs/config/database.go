@@ -1,18 +1,17 @@
-package database
+package config
 
 import (
 	"database/sql"
 	"fmt"
-	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	_ "github.com/lib/pq"
 )
 
 type Database struct {
-	config   *config.ConfDB
+	config   *ConfDB
 	database *sql.DB
 }
 
-func New(config *config.ConfDB) *Database {
+func newDatabase(config *ConfDB) *Database {
 	return &Database{
 		config: config,
 	}
