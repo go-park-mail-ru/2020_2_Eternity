@@ -1,19 +1,14 @@
 package config
 
 import (
+	"fmt"
 	"github.com/spf13/viper"
 	"log"
 )
 
-var (
-	Conf = newConfig()
-	Db   = newDatabase(&Conf.Db).Open()
-)
-
 type Config struct {
-	Db    ConfDB    `mapstructure:"database"`
-	Web   ConfWeb   `mapstructure:"web"`
-	Token ConfToken `mapstructure:"token"`
+	Db  ConfDB  `mapstructure:"database"`
+	Web ConfWeb `mapstructure:"web"`
 }
 
 type ConfDB struct {
@@ -31,13 +26,6 @@ type ConfPostgres struct {
 
 type ConfWeb struct {
 	Server ConfServer `mapstructure:"server"`
-	Static ConfStatic `mapstructure:"static"`
-}
-
-type ConfToken struct {
-	SecretName string `mapstructure:"secretname"`
-	CookieName string `mapstructure:"cookiename"`
-	Value      int    `mapstructure:"value"`
 }
 
 type ConfServer struct {
@@ -45,15 +33,7 @@ type ConfServer struct {
 	Port    string `mapstructure:"port"`
 }
 
-type ConfStatic struct {
-	DirImg        string `mapstructure:"dir_img"`
-	UrlImg        string `mapstructure:"url_img"`
-	DirAvt        string `mapstructure:"dir_avt"`
-	DirDepth      int    `mapstructure:"dir_depth"`
-	DirNameLength int    `mapstructure:"dir_name_length"`
-}
-
-func newConfig() *Config {
+func NewConfig() *Config {
 	setDefaultDb()
 	setDefaultWeb()
 
@@ -73,6 +53,8 @@ func newConfig() *Config {
 		log.Fatalf("Fatal error config file: %s \n", err)
 	}
 
+	fmt.Println(conf)
+
 	return conf
 }
 
@@ -88,9 +70,4 @@ func setDefaultDb() {
 func setDefaultWeb() {
 	viper.SetDefault("web.server.address", "")
 	viper.SetDefault("web.server.port", "0000")
-	viper.SetDefault("web.static.dir_img", "img")
-	viper.SetDefault("web.static.url_img", "img")
-	viper.SetDefault("web.static.dir_avt", "/static/avatar/")
-	viper.SetDefault("web.static.dir_name_length", 1)
-	viper.SetDefault("web.static.dir_depth", 5)
 }

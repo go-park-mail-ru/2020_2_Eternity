@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	pinhandlers "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/handlers"
-	userhandlers "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/handlers"
 )
 
 type Server struct {
@@ -13,28 +11,16 @@ type Server struct {
 	router *gin.Engine
 }
 
-func New(config *config.Config) *Server {
+func New(config *config.ConfServer) *Server {
 	r := gin.Default()
 
-	r.Static(config.Web.Static.UrlImg, config.Web.Static.DirImg)
-
-	r.POST("/user/signup", userhandlers.SignUp)
-	r.POST("/user/login", userhandlers.Login)
-	r.GET("/images/avatar/:file", userhandlers.GetAvatar)
-
-	r.POST("/user/logout", userhandlers.AuthCheck(), userhandlers.Logout)
-	r.POST("/user/pin", userhandlers.AuthCheck(), pinhandlers.CreatePin)
-	r.GET("/user/pin", userhandlers.AuthCheck(), pinhandlers.GetPin)
-	r.GET("/user/profile", userhandlers.AuthCheck(), userhandlers.GetProfile)
-
-	r.PUT("/user/profile/password", userhandlers.AuthCheck(), userhandlers.UpdatePassword)
-	r.PUT("/user/profile/", userhandlers.AuthCheck(), userhandlers.UpdateUser)
-
-	r.MaxMultipartMemory = 8 << 20
-	r.POST("/user/profile/avatar", userhandlers.AuthCheck(), userhandlers.SetAvatar)
+	// TODO func AddRoute
+	r.GET("/ping", func(c *gin.Context) {
+		c.String(200, "pong")
+	})
 
 	return &Server{
-		config: &config.Web.Server,
+		config: config,
 		router: r,
 	}
 }

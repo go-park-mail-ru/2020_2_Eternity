@@ -2,25 +2,26 @@ package main
 
 import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/server"
 	"log"
 )
 
-func Close() {
-	if err := config.Db.Close(); err != nil {
+func main() {
+	conf := config.NewConfig()
+
+	db := database.New(&conf.Db)
+	if err := db.Open(); err != nil {
 		log.Fatal(err)
 		return
 	}
-}
 
-func main() {
-	if conn := config.Db; conn == nil {
-		log.Fatal("Connection refused")
+	if err := db.Close(); err != nil {
+		log.Fatal(err)
 		return
 	}
 
-	defer Close()
-	srv := server.New(config.Conf)
+	srv := server.New(&conf.Web.Server)
 	if err := srv.Run(); err != nil {
 		log.Fatal(err)
 		return
