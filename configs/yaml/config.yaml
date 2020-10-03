@@ -1,0 +1,17 @@
+database: {
+  postgres: {
+    driver_name: "postgres",
+    username: "pinterest_user",
+    password: "662f2710-4e08-4be7-a278-a53ae86ba7f6",
+    db_name: "pinterest_db",
+    ssl_mode: "disable",
+    host: "localhost"
+  }
+}
+
+web: {
+  server: {
+    address: "localhost",
+    port: "8008",
+  }
+}
