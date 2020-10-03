@@ -12,11 +12,12 @@ func main() {
 		return
 	}
 
-	if err := config.Db.Close(); err != nil {
-		log.Fatal(err)
-		return
-	}
-
+	defer func() {
+		if err := config.Db.Close(); err != nil {
+			log.Fatal(err)
+			return
+		}
+	}()
 	srv := server.New(&config.Conf.Web.Server, config.Db)
 	if err := srv.Run(); err != nil {
 		log.Fatal(err)

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	"github.com/go-park-mail-ru/2020_2_Eternity/internal/pkg/handlers"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/handlers"
 )
 
 type Server struct {
@@ -15,6 +15,7 @@ type Server struct {
 func New(config *config.ConfServer, db *config.Database) *Server {
 	r := gin.Default()
 
+	//r.Use()
 	// TODO func AddRoute
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(200, "pong")
@@ -22,6 +23,8 @@ func New(config *config.ConfServer, db *config.Database) *Server {
 	handler := handlers.NewHandler(db)
 
 	r.POST("/user/signup", handler.SignUp)
+	r.POST("/user/login", handler.Login)
+	r.POST("/user/logout", handler.Logout)
 
 	return &Server{
 		config: config,
