@@ -1,4 +1,4 @@
-package handler
+package signup
 
 import (
 	"github.com/gin-gonic/gin"
@@ -17,7 +17,7 @@ func NewHandler(users model.IUsers) *Handler {
 	return &Handler{users: users}
 }
 
-func ValidProfile(profile model.SignUpUser) error {
+func ValidProfile(profile UserSignUp) error {
 	return validation.ValidateStruct(&profile,
 		validation.Field(&profile.Email, validation.Required, is.EmailFormat),
 		validation.Field(&profile.Username, validation.Required, validation.Length(5, 50), is.Alphanumeric),
@@ -26,21 +26,18 @@ func ValidProfile(profile model.SignUpUser) error {
 }
 
 func (h *Handler) SignUp(c *gin.Context) {
-	profile := model.SignUpUser{}
+	profile := UserSignUp{}
 	if err := c.BindJSON(&profile); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
-		return
 	}
 	if err := ValidProfile(profile); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
-		return
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(profile.Password), 7)
 
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
-		return
 	}
 
 	user := model.User{
@@ -52,7 +49,6 @@ func (h *Handler) SignUp(c *gin.Context) {
 
 	if err := h.users.CreateUser(user); err != nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, err)
-		return
 	}
 
 	c.JSON(http.StatusOK, user)
