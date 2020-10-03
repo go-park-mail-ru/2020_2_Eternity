@@ -17,7 +17,7 @@ func main() {
 		return
 	}
 
-	srv := server.New(&config.Conf.Web.Server)
+	srv := server.New(&config.Conf.Web.Server, config.Db)
 	if err := srv.Run(); err != nil {
 		log.Fatal(err)
 		return
