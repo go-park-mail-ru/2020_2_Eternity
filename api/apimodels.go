@@ -1,8 +1,13 @@
-package signup
+package api
 
-type UserSignUp struct {
+type SignUp struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	Age      int    `json:"age"`
+}
+
+type Login struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }

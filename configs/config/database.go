@@ -16,26 +16,26 @@ func newDatabase(config *ConfDB) *Database {
 	}
 }
 
-func (d *Database) Open() error {
+func (db *Database) Open() error {
 	config, err := pgx.ParseConnectionString(
 		fmt.Sprintf(
 			"user=%s password=%s dbname=%s sslmode=%s",
-			d.config.Postgres.Username,
-			d.config.Postgres.Password,
-			d.config.Postgres.DbName,
-			d.config.Postgres.SslMode,
+			db.config.Postgres.Username,
+			db.config.Postgres.Password,
+			db.config.Postgres.DbName,
+			db.config.Postgres.SslMode,
 			))
 	if err != nil {
 		return err
 	}
 
-	d.database, err = pgx.Connect(config)
+	db.database, err = pgx.Connect(config)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (d *Database) Close() error {
-	return d.database.Close()
+func (db *Database) Close() error {
+	return db.database.Close()
 }
