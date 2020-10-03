@@ -45,10 +45,10 @@ func (h *Handler) SignUp(c *gin.Context) {
 	}
 
 	user := model.User{
-		Username: profile.Username,
-		Email:    profile.Email,
-		Password: string(hash),
-		Age:      profile.Age,
+		Username:  profile.Username,
+		Email:     profile.Email,
+		Password:  string(hash),
+		BirthDate: profile.BirthDate,
 	}
 
 	if err := h.users.CreateUser(user); err != nil {
