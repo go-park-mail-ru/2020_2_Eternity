@@ -10,14 +10,6 @@ import (
 	"net/http"
 )
 
-type Handler struct {
-	users model.IUsers
-}
-
-func NewHandler(users model.IUsers) *Handler {
-	return &Handler{users: users}
-}
-
 func ValidProfile(profile api.SignUp) error {
 	return validation.ValidateStruct(&profile,
 		validation.Field(&profile.Email, validation.Required, is.EmailFormat),

@@ -15,11 +15,6 @@ type User struct {
 	BirthDate int    `json:"date"`
 }
 
-type IUsers interface {
-	CreateUser(User) error
-	CheckUser(string, string) (int, bool)
-}
-
 func (u *User) CreateUser() error {
 	_, err := config.Db.Exec("insert into users(username, email, password, age, reg_date) values($1, $2, $3, $4, $5)",
 		u.Username, u.Email, u.Password, u.BirthDate, time.Now())

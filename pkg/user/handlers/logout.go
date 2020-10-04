@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
@@ -11,6 +12,11 @@ func Logout(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
+	}
+
+	if claims, ok := c.Get("info"); ok {
+		claims := claims.(Claims)
+		fmt.Println(claims.Username, claims.Id)
 	}
 
 	cookie := http.Cookie{
