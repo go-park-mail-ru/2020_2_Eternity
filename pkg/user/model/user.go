@@ -3,20 +3,19 @@ package model
 import (
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	"golang.org/x/crypto/bcrypt"
 	"time"
 )
 
 type User struct {
-	ID        int    `json:"id"`
-	Username  string `json:"username"`
-	Email     string `json:"email"`
-	Password  string `json:"-"`
-	BirthDate int    `json:"date"`
+	ID        int       `json:"id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	Password  string    `json:"-"`
+	BirthDate time.Time `json:"date"`
 }
 
 func (u *User) CreateUser() error {
-	_, err := config.Db.Exec("insert into users(username, email, password, age, reg_date) values($1, $2, $3, $4, $5)",
+	_, err := config.Db.Exec("insert into users(username, email, password, birthdate, reg_date) values($1, $2, $3, $4, $5)",
 		u.Username, u.Email, u.Password, u.BirthDate, time.Now())
 	if err != nil {
 		fmt.Println(err)
@@ -25,17 +24,11 @@ func (u *User) CreateUser() error {
 	return nil
 }
 
-func (u *User) CheckUser() (int, bool) {
-	row := config.Db.QueryRow("select id, password from users where username=$1", u.Username)
-	var id int
-	var hash string
-	if err := row.Scan(&id, &hash); err != nil {
+func (u *User) GetUser() bool {
+	row := config.Db.QueryRow("select id, password, email, birthdate from users where username=$1", u.Username)
+	if err := row.Scan(&u.ID, &u.Password, &u.Email, &u.BirthDate); err != nil {
 		fmt.Println(err)
-		return -1, false
+		return false
 	}
-	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(u.Password)); err != nil {
-		fmt.Println(hash, u.Password)
-		return -1, false
-	}
-	return id, true
+	return true
 }
