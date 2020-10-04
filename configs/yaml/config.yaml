@@ -15,3 +15,9 @@ web: {
     port: "8008",
   }
 }
+
+token: {
+  secretname: "SECRET",
+  cookiename: "eternity",
+  value: 7,
+}
