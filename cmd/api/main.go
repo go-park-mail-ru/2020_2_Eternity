@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
-	if err := config.Db.Open(); err != nil {
-		log.Fatal(err)
+	if conn := config.Db; conn == nil {
+		log.Fatal("Connection refused")
 		return
 	}
 
@@ -18,7 +18,7 @@ func main() {
 			return
 		}
 	}()
-	srv := server.New(&config.Conf.Web.Server, config.Db)
+	srv := server.New(&config.Conf.Web.Server)
 	if err := srv.Run(); err != nil {
 		log.Fatal(err)
 		return

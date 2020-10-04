@@ -6,8 +6,7 @@ import (
 )
 
 type Database struct {
-	config   *ConfDB
-	database *pgx.Conn
+	config *ConfDB
 }
 
 func newDatabase(config *ConfDB) *Database {
@@ -16,7 +15,7 @@ func newDatabase(config *ConfDB) *Database {
 	}
 }
 
-func (db *Database) Open() error {
+func (db *Database) Open() *pgx.Conn {
 	config, err := pgx.ParseConnectionString(
 		fmt.Sprintf(
 			"user=%s password=%s dbname=%s sslmode=%s",
@@ -24,18 +23,14 @@ func (db *Database) Open() error {
 			db.config.Postgres.Password,
 			db.config.Postgres.DbName,
 			db.config.Postgres.SslMode,
-			))
+		))
 	if err != nil {
-		return err
+		return nil
 	}
 
-	db.database, err = pgx.Connect(config)
+	database, err := pgx.Connect(config)
 	if err != nil {
-		return err
+		return nil
 	}
-	return nil
-}
-
-func (db *Database) Close() error {
-	return db.database.Close()
+	return database
 }

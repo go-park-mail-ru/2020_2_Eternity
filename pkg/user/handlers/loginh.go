@@ -4,6 +4,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/model"
 	"net/http"
 	"time"
 )
@@ -21,7 +22,7 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func (h *Handler) Login(c *gin.Context) {
+func Login(c *gin.Context) {
 	form := api.Login{}
 
 	if err := c.BindJSON(&form); err != nil {
@@ -29,7 +30,12 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	id, exists := h.users.CheckUser(form.Username, form.Password)
+	user := model.User{
+		Username: form.Username,
+		Password: form.Password,
+	}
+
+	id, exists := user.CheckUser()
 	if !exists {
 		c.AbortWithStatusJSON(http.StatusBadRequest, Error{"invalid login or password"})
 		return

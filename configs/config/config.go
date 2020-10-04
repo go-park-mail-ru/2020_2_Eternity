@@ -7,7 +7,7 @@ import (
 
 var (
 	Conf = newConfig()
-	Db   = newDatabase(&Conf.Db)
+	Db   = newDatabase(&Conf.Db).Open()
 )
 
 type Config struct {

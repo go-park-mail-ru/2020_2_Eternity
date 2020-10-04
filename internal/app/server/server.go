@@ -12,7 +12,7 @@ type Server struct {
 	router *gin.Engine
 }
 
-func New(config *config.ConfServer, db *config.Database) *Server {
+func New(config *config.ConfServer) *Server {
 	r := gin.Default()
 
 	//r.Use()
@@ -20,11 +20,10 @@ func New(config *config.ConfServer, db *config.Database) *Server {
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(200, "pong")
 	})
-	handler := handlers.NewHandler(db)
 
-	r.POST("/user/signup", handler.SignUp)
-	r.POST("/user/login", handler.Login)
-	r.POST("/user/logout", handler.Logout)
+	r.POST("/user/signup", handlers.SignUp)
+	r.POST("/user/login", handlers.Login)
+	r.POST("/user/logout", handlers.Logout)
 
 	return &Server{
 		config: config,
