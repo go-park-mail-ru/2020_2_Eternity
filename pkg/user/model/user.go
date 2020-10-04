@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"time"
@@ -18,8 +19,7 @@ func (u *User) CreateUser() error {
 	_, err := config.Db.Exec("insert into users(username, email, password, birthdate, reg_date) values($1, $2, $3, $4, $5)",
 		u.Username, u.Email, u.Password, u.BirthDate, time.Now())
 	if err != nil {
-		fmt.Println(err)
-		return err
+		return errors.New("user exists")
 	}
 	return nil
 }
