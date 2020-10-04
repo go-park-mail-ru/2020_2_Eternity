@@ -1,4 +1,5 @@
 CREATE USER pinterest_user WITH password '662f2710-4e08-4be7-a278-a53ae86ba7f6';
+
 create database pinterest_db
 	with owner pinterest_user
 	encoding 'utf8'
