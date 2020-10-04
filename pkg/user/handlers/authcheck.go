@@ -1,26 +1,21 @@
 package handlers
 
 import (
-	"errors"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"net/http"
 )
 
 func AuthCheck() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		cookie, err := c.Cookie(cookiename)
+		cookie, err := c.Cookie(config.Conf.Token.CookieName)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, Error{"bad cookie"})
 			return
 		}
-		claims := Claims{}
-		token, err := jwt.ParseWithClaims(cookie, &claims, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, errors.New("bad token signing method")
-			}
-			return []byte(secretkey), nil
-		})
+		claims := jwthelper.Claims{}
+		token, err := jwthelper.ParseToken(cookie, &claims)
 		if token == nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, Error{"bad token"})
 			return
