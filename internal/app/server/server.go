@@ -23,7 +23,7 @@ func New(config *config.ConfServer) *Server {
 
 	r.POST("/user/signup", handlers.SignUp)
 	r.POST("/user/login", handlers.Login)
-	r.POST("/user/logout", handlers.Logout)
+	r.POST("/user/logout", handlers.AuthCheck(), handlers.Logout)
 
 	return &Server{
 		config: config,
