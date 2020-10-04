@@ -33,7 +33,7 @@ func SignUp(c *gin.Context) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(profile.Password), config.Conf.Token.Value)
 
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -45,7 +45,7 @@ func SignUp(c *gin.Context) {
 	}
 
 	if err := user.CreateUser(); err != nil {
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, err)
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, Error{err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, user)
