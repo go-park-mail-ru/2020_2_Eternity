@@ -22,18 +22,18 @@ func ValidProfile(profile api.SignUp) error {
 func SignUp(c *gin.Context) {
 	profile := api.SignUp{}
 	if err := c.BindJSON(&profile); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, Error{"[BindJSON]: " + err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
 	if err := ValidProfile(profile); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, Error{"[ValidProfile]: " + err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(profile.Password), config.Conf.Token.Value)
 
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, Error{"[GenerateFromPassword]: " + err.Error()})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -45,7 +45,7 @@ func SignUp(c *gin.Context) {
 	}
 
 	if err := user.CreateUser(); err != nil {
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, Error{"[CreateUser]: " + err.Error()})
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, Error{err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, user)
