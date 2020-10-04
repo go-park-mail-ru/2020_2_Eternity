@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func (h *Handler) Logout(c *gin.Context) {
+func Logout(c *gin.Context) {
 	ss, err := c.Cookie(cookiename)
 	if err != nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
@@ -16,7 +16,7 @@ func (h *Handler) Logout(c *gin.Context) {
 	cookie := http.Cookie{
 		Name:     cookiename,
 		Value:    ss,
-		Expires:  time.Now().Add(-10 * time.Hour),
+		Expires:  time.Now().Add(-24 * time.Hour),
 		HttpOnly: true,
 		Path:     "/",
 	}

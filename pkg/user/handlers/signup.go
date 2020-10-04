@@ -26,7 +26,7 @@ func ValidProfile(profile api.SignUp) error {
 	)
 }
 
-func (h *Handler) SignUp(c *gin.Context) {
+func SignUp(c *gin.Context) {
 	profile := api.SignUp{}
 	if err := c.BindJSON(&profile); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
@@ -51,10 +51,9 @@ func (h *Handler) SignUp(c *gin.Context) {
 		BirthDate: profile.BirthDate,
 	}
 
-	if err := h.users.CreateUser(user); err != nil {
+	if err := user.CreateUser(); err != nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, err)
 		return
 	}
-
 	c.JSON(http.StatusOK, user)
 }
