@@ -20,7 +20,7 @@ func New(config *config.ConfServer) *Server {
 		c.String(200, "pong")
 	})
 
-
+	r.GET("/user/profile", handlers.AuthCheck(), handlers.GetProfile)
 	r.POST("/user/signup", handlers.SignUp)
 	r.POST("/user/login", handlers.Login)
 	r.POST("/user/logout", handlers.AuthCheck(), handlers.Logout)
