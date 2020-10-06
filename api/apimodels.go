@@ -13,3 +13,8 @@ type Login struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
+
+type CreatePinApi struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+}

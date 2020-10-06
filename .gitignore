@@ -22,3 +22,6 @@
 
 #IDE
 .idea/
+
+#static
+static/
