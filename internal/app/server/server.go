@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/handlers"
+	pinhandlers "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/handlers"
+	userhandlers "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/handlers"
 )
 
 type Server struct {
@@ -20,10 +21,10 @@ func New(config *config.ConfServer) *Server {
 		c.String(200, "pong")
 	})
 
-
-	r.POST("/user/signup", handlers.SignUp)
-	r.POST("/user/login", handlers.Login)
-	r.POST("/user/logout", handlers.AuthCheck(), handlers.Logout)
+	r.POST("/user/signup", userhandlers.SignUp)
+	r.POST("/user/login", userhandlers.Login)
+	r.POST("/user/logout", userhandlers.AuthCheck(), userhandlers.Logout)
+	r.POST("/user/pin", userhandlers.AuthCheck(), pinhandlers.CreatePin) // CreatePin
 
 	return &Server{
 		config: config,

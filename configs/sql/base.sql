@@ -8,8 +8,10 @@ create table users(
 );
 
 create table pins(
-	pin_id serial primary key,
+	id serial primary key,
+	title varchar(255) not null,
+	content text not null,
+	img_link varchar(255) not null,
 	user_id integer not null,
-	data text not null,
 	foreign key(user_id) references users(id)
 );
