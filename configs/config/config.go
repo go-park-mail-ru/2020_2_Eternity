@@ -30,11 +30,18 @@ type ConfPostgres struct {
 
 type ConfWeb struct {
 	Server ConfServer `mapstructure:"server"`
+	Static ConfStatic `mapstructure:"static"`
 }
 
 type ConfServer struct {
 	Address string `mapstructure:"address"`
 	Port    string `mapstructure:"port"`
+}
+
+type ConfStatic struct {
+	DirImg string `mapstructure:"dir_img"`
+	DirDepth int  `mapstructure:"dir_depth"`
+	DirNameLength int  `mapstructure:"dir_name_length"`
 }
 
 func newConfig() *Config {
@@ -72,4 +79,7 @@ func setDefaultDb() {
 func setDefaultWeb() {
 	viper.SetDefault("web.server.address", "")
 	viper.SetDefault("web.server.port", "0000")
+	viper.SetDefault("web.static.dir_img", "img")
+	viper.SetDefault("web.static.dir_name_length", 1)
+	viper.SetDefault("web.static.dir_depth", 5)
 }
