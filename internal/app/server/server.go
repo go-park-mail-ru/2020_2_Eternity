@@ -27,6 +27,9 @@ func New(config *config.ConfServer) *Server {
 	r.PUT("/user/profile", handlers.AuthCheck(), handlers.UpdateUser)
 	r.PUT("/user/profile/password", handlers.AuthCheck(), handlers.UpdatePassword)
 
+	r.MaxMultipartMemory = 8 << 20
+	r.POST("/user/profile/avatar", handlers.AuthCheck(), handlers.SetAvatar)
+	r.GET("/user/profile/avatar", handlers.AuthCheck(), handlers.GetAvatar)
 	return &Server{
 		config: config,
 		router: r,

@@ -65,6 +65,7 @@ func UpdatePassword(c *gin.Context) {
 
 	if err := user.UpdatePassword(string(hash)); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, Error{err.Error()})
+		return
 	}
 	c.JSON(http.StatusOK, user)
 }
