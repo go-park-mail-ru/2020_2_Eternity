@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/model"
 	"net/http"
@@ -26,5 +27,12 @@ func GetProfile(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	profile := api.GetProfileApi{
+		Id:        user.ID,
+		Username:  user.Username,
+		Email:     user.Email,
+		BirthDate: user.BirthDate,
+	}
+
+	c.JSON(http.StatusOK, profile)
 }

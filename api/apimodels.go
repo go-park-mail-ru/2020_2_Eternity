@@ -2,6 +2,13 @@ package api
 
 import "time"
 
+type GetProfileApi struct {
+	Id        int       `json:"id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	BirthDate time.Time `json:"date"`
+}
+
 type SignUp struct {
 	Username  string    `json:"username"`
 	Email     string    `json:"email"`

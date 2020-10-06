@@ -6,7 +6,6 @@ import (
 	"log"
 )
 
-
 func Close() {
 	if err := config.Db.Close(); err != nil {
 		log.Fatal(err)
@@ -19,7 +18,7 @@ func main() {
 		log.Fatal("Connection refused")
 		return
 	}
-  
+
 	defer Close()
 	srv := server.New(&config.Conf.Web.Server)
 	if err := srv.Run(); err != nil {
