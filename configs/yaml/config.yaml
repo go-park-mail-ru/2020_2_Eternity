@@ -13,7 +13,12 @@ web: {
   server: {
     address: "localhost",
     port: "8008",
-  }
+  },
+  static: {
+    dir_img: "static/img",
+    dir_depth: 5,
+    dir_name_length: 1,
+  },
 }
 
 token: {
