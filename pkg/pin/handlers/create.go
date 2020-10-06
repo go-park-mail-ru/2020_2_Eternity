@@ -1,118 +1,114 @@
 package handlers
 
 import (
-	"encoding/json"
+	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/go-park-mail-ru/2020_2_Eternity/api"
-	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/model"
-	h "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/handlers"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
-	"log"
+	"github.com/google/uuid"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
+func randomUuid() (string, error) {
+	u, err := uuid.NewRandom()
+	if err != nil {
+		return "", err
+	} else {
+		return u.String(), err
+	}
+}
+
 func generateRelPath(filename string) string {
 	fn := []rune(filename)
 
-	depth := config.Conf.Web.Static.DirDepth
-	dirNameLen := config.Conf.Web.Static.DirNameLength
+	const Depth int = 5  // to config
+	const DirNameLen int = 1 // to config
 
-	if depth*dirNameLen > len(fn) {
-		depth = 2
-		dirNameLen = 1
+	var realDepth int
+	if Depth * DirNameLen > len(fn) {
+		realDepth = len(fn) / DirNameLen
+	} else {
+		realDepth = Depth / DirNameLen
 	}
 
-	if depth <= 0 {
-		depth = 2
-	}
-
-	if dirNameLen <= 0 {
-		dirNameLen = 1
+	if realDepth <= 0 {
+		realDepth = 1
 	}
 
 	dirs := []string{}
-	for i := 0; i < depth; i += dirNameLen {
-		dirs = append(dirs, string(fn[i:i+dirNameLen]))
+	for i := 0; i < realDepth; i += DirNameLen {
+		dirs = append(dirs, string(fn[i:i+DirNameLen]))
 	}
 
-	res := strings.Join(dirs, "/") + "/" + filename
-	log.Print("[generateRelPath]: ", res)
-	return res
+	return strings.Join(dirs, "/") + "/" + filename
 }
 
-func prepareFileStorage() (relPath string, err error) {
-	u, err := utils.RandomUuid()
+
+
+func prepareFileStorage() (filePath string, err error) {
+	u, err := randomUuid()
 	if err != nil {
 		return "", err
 	}
 
-	relPath = generateRelPath(u)
-	path := config.Conf.Web.Static.DirImg + "/" + relPath
-	err = os.MkdirAll(filepath.Dir(path), os.ModePerm|os.ModeDir)
+	relPath := generateRelPath(u)
+	err = os.MkdirAll(filepath.Dir(relPath), os.ModeDir)
 	if err != nil {
 		return "", err
 	}
 
-	return relPath, nil
+	const StaticDir = ""  // config
+
+	return StaticDir + "/" + relPath, nil
 }
+
 
 func CreatePin(c *gin.Context) {
 	claims, ok := c.Get("info")
 	if !ok {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, h.Error{"can't get key"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, errors.New("can't get key"))
 		return
 	}
 
 	requester, ok := claims.(jwthelper.Claims)
 	if !ok {
-		c.AbortWithStatusJSON(http.StatusBadRequest, h.Error{"can't lead claims"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, errors.New("can't lead claims"))
 		return
 	}
 
-	file, err := c.FormFile("img") // config
+
+	file, err := c.FormFile("file") // ???
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, h.Error{"[FormFile] :" + err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
 
-	relPath, err := prepareFileStorage()
+	//filename := filepath.Base(file.Filename)
+	filePath, err := prepareFileStorage()
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, h.Error{"[prepareFileStorage]: " + err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
 
-	if err := c.SaveUploadedFile(file, config.Conf.Web.Static.DirImg+"/"+relPath); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, h.Error{"[SaveUploadedFile]: " + err.Error()})
+	if err := c.SaveUploadedFile(file, filePath); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
 
-	pinApi := api.CreatePinApi{}
-	jsonStr := c.PostForm("data") // config
-	log.Print(jsonStr)
-
-	if err := json.Unmarshal([]byte(jsonStr), &pinApi); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, h.Error{"[Unmarshal]: " + err.Error()})
+	pin := model.Pin{}
+	if err := c.BindJSON(&pin); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
 
-	pin := model.Pin{
-		Title:   pinApi.Title,
-		Content: pinApi.Content,
-		ImgLink: config.Conf.Web.Static.UrlImg + "/" + relPath,
-		UserId:  requester.Id,
-	}
-
+	pin.UserId = requester.Id
 	if err := pin.CreatePin(); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, h.Error{"[CreatePin]: " + err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
 
-	log.Printf("pin{%v %v %v %v %v}", pin.Id, pin.Title, pin.Content, pin.ImgLink, pin.UserId)
-
-	c.JSON(http.StatusOK, "")
+	c.JSON(http.StatusOK, "{}") // return ID?
 }

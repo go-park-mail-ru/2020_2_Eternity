@@ -6,17 +6,20 @@ import (
 	"log"
 )
 
-func main() {
-	if err := config.Db.Open(); err != nil {
-		log.Fatal(err)
-		return
-	}
-
+func Close() {
 	if err := config.Db.Close(); err != nil {
 		log.Fatal(err)
 		return
 	}
+}
 
+func main() {
+	if conn := config.Db; conn == nil {
+		log.Fatal("Connection refused")
+		return
+	}
+
+	defer Close()
 	srv := server.New(&config.Conf.Web.Server)
 	if err := srv.Run(); err != nil {
 		log.Fatal(err)
