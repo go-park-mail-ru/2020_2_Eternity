@@ -5,10 +5,14 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
+	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/model"
 	"net/http"
+	"time"
 )
+
+// будет работать, если меняем и email, и username
 
 func ValidUpdate(profile api.UpdateUser) error {
 	return validation.ValidateStruct(&profile,
@@ -45,7 +49,21 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	// TODO: Сгенерировать новый токен, если имя пользователя поменялось
+	ss, err := jwthelper.CreateJwtToken(user.ID, user.Username)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, Error{"cannot create token"})
+		return
+	}
+
+	cookie := http.Cookie{
+		Name:     config.Conf.Token.CookieName,
+		Value:    ss,
+		Expires:  time.Now().Add(5 * time.Minute),
+		HttpOnly: true,
+		Path:     "/",
+	}
+
+	http.SetCookie(c.Writer, &cookie)
 
 	c.JSON(http.StatusOK, user)
 }
