@@ -14,7 +14,7 @@ type Pin struct {
 }
 
 func (p *Pin) CreatePin() error {
-	 err := config.Db.QueryRow("insert into pins(title, content, img_link, user_id) values($1, $2, $3, $4) returning id",
+	err := config.Db.QueryRow("insert into pins(title, content, img_link, user_id) values($1, $2, $3, $4) returning id",
 		p.Title, p.Content, p.ImgLink, p.UserId).Scan(&p.Id)
 
 	if err != nil {
