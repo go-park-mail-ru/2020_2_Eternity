@@ -44,9 +44,7 @@ func UpdatePassword(c *gin.Context) {
 		Username: claims.(jwthelper.Claims).Username,
 	}
 
-	exists := user.GetUser()
-
-	if !exists {
+	if !user.GetUser() {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, Error{"user doesnt exist"})
 		return
 	}

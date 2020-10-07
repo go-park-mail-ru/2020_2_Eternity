@@ -8,22 +8,13 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/model"
 	h "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/handlers"
-	"github.com/google/uuid"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 )
-
-func randomUuid() (string, error) {
-	u, err := uuid.NewRandom()
-	if err != nil {
-		return "", err
-	} else {
-		return u.String(), err
-	}
-}
 
 func generateRelPath(filename string) string {
 	fn := []rune(filename)
@@ -55,7 +46,7 @@ func generateRelPath(filename string) string {
 }
 
 func prepareFileStorage() (relPath string, err error) {
-	u, err := randomUuid()
+	u, err := utils.RandomUuid()
 	if err != nil {
 		return "", err
 	}

@@ -2,12 +2,14 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/model"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path/filepath"
+	"strconv"
 )
 
 func SetAvatar(c *gin.Context) {
@@ -29,24 +31,25 @@ func SetAvatar(c *gin.Context) {
 		Username: claims.(jwthelper.Claims).Username,
 	}
 
-	filename := filepath.Base(file.Filename)
-
 	root, err := os.Getwd()
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, Error{"server env error"})
 		return
 	}
 
-	// TODO: Сгенерировать уникальное имя файла
+	filename, err := utils.RandomUuid()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, Error{"Random cant generate UUID"})
+	}
 
-	path := root + "/static/avatar/" + filename
+	path := root + config.Conf.Web.Static.DirAvt + filename
 
 	if err := c.SaveUploadedFile(file, path); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, Error{"Upload error"})
 		return
 	}
 
-	if err := user.UpdateAvatar(filename); err != nil {
+	if err := user.UpdateAvatar(utils.GenerateUrlAvatar(filename)); err != nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, err)
 		return
 	}
@@ -55,33 +58,22 @@ func SetAvatar(c *gin.Context) {
 }
 
 func GetAvatar(c *gin.Context) {
-	claims, ok := c.Get("info")
-	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, Error{"invalid token"})
-		return
-	}
-	user := model.User{
-		ID:       claims.(jwthelper.Claims).Id,
-		Username: claims.(jwthelper.Claims).Username,
-	}
-	if err := user.GetAvatar(); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, Error{err.Error()})
-		return
-	}
-
 	root, err := os.Getwd()
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, Error{"server env error"})
 		return
 	}
-	path := root + "/static/avatar/" + user.Avatar
+	filename := c.Param("file")
+
+	path := root + config.Conf.Web.Static.DirAvt + filename
 
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, Error{"Error reading file"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, Error{"Error filename"})
 		return
 	}
-	c.Header("Content-type", "image/jpeg")
+	c.Header("Content-Type", "image/jpeg")
+	c.Header("Content-Length", strconv.Itoa(len(data)))
 	_, err = c.Writer.Write(data)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, Error{"Error write to response"})

@@ -17,6 +17,7 @@ web: {
   static: {
     dir_img: "static/img",
     url_img: "/static/img",
+    dir_avt: "/static/avatar/",
     dir_depth: 5,
     dir_name_length: 1,
   },

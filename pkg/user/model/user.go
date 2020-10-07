@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"time"
@@ -13,7 +14,7 @@ type User struct {
 	Email     string    `json:"email"`
 	Password  string    `json:"-"`
 	BirthDate time.Time `json:"date"`
-	Avatar    string    `json:"-"`
+	Avatar    string    `json:"avatar"`
 }
 
 func (u *User) CreateUser() error {
@@ -26,8 +27,9 @@ func (u *User) CreateUser() error {
 }
 
 func (u *User) GetUser() bool {
-	row := config.Db.QueryRow("select id, password, email, birthdate from users where username=$1", u.Username)
-	if err := row.Scan(&u.ID, &u.Password, &u.Email, &u.BirthDate); err != nil {
+	row := config.Db.QueryRow("select id, password, email, birthdate, avatar from users where username=$1", u.Username)
+	if err := row.Scan(&u.ID, &u.Password, &u.Email, &u.BirthDate, &u.Avatar); err != nil {
+		fmt.Println(err)
 		return false
 	}
 	return true
