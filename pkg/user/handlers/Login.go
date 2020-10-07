@@ -27,9 +27,7 @@ func Login(c *gin.Context) {
 		Username: form.Username,
 	}
 
-	exists := user.GetUser()
-
-	if !exists {
+	if !user.GetUser() {
 		c.AbortWithStatusJSON(http.StatusBadRequest, Error{"invalid username"})
 		return
 	}
