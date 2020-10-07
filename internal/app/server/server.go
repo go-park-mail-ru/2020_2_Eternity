@@ -21,10 +21,13 @@ func New(config *config.ConfServer) *Server {
 		c.String(200, "pong")
 	})
 
+
 	r.POST("/user/signup", userhandlers.SignUp)
 	r.POST("/user/login", userhandlers.Login)
 	r.POST("/user/logout", userhandlers.AuthCheck(), userhandlers.Logout)
-	r.POST("/user/pin", userhandlers.AuthCheck(), pinhandlers.CreatePin) // CreatePin
+	r.POST("/user/pin", userhandlers.AuthCheck(), pinhandlers.CreatePin)
+	r.GET("/user/profile", userhandlers.AuthCheck(), userhandlers.GetProfile)
+
 
 	return &Server{
 		config: config,
