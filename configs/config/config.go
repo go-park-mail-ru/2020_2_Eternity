@@ -48,6 +48,7 @@ type ConfServer struct {
 type ConfStatic struct {
 	DirImg        string `mapstructure:"dir_img"`
 	UrlImg        string `mapstructure:"url_img"`
+	DirAvt        string `mapstructure:"dir_avt"`
 	DirDepth      int    `mapstructure:"dir_depth"`
 	DirNameLength int    `mapstructure:"dir_name_length"`
 }
@@ -89,6 +90,7 @@ func setDefaultWeb() {
 	viper.SetDefault("web.server.port", "0000")
 	viper.SetDefault("web.static.dir_img", "img")
 	viper.SetDefault("web.static.url_img", "img")
+	viper.SetDefault("web.static.dir_avt", "/static/avatar/")
 	viper.SetDefault("web.static.dir_name_length", 1)
 	viper.SetDefault("web.static.dir_depth", 5)
 }

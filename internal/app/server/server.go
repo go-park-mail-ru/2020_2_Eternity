@@ -20,6 +20,8 @@ func New(config *config.Config) *Server {
 
 	r.POST("/user/signup", userhandlers.SignUp)
 	r.POST("/user/login", userhandlers.Login)
+	r.GET("/images/avatar/:file", userhandlers.GetAvatar)
+
 	r.POST("/user/logout", userhandlers.AuthCheck(), userhandlers.Logout)
 	r.POST("/user/pin", userhandlers.AuthCheck(), pinhandlers.CreatePin)
 	r.GET("/user/pin", userhandlers.AuthCheck(), pinhandlers.GetPin)
@@ -28,7 +30,6 @@ func New(config *config.Config) *Server {
 
 	r.MaxMultipartMemory = 8 << 20
 	r.POST("/user/profile/avatar", userhandlers.AuthCheck(), userhandlers.SetAvatar)
-	r.GET("/user/profile/avatar", userhandlers.AuthCheck(), userhandlers.GetAvatar)
 
 	return &Server{
 		config: &config.Web.Server,
