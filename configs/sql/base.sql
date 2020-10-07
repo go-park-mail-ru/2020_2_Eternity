@@ -4,7 +4,8 @@ create table users(
 	email text unique not null,
 	password text not null,
 	birthdate date,
-	reg_date timestamp
+	reg_date timestamp,
+	avatar text
 );
 
 create table pins(
