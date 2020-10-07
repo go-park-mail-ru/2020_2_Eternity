@@ -31,8 +31,7 @@ func generateRelPath(filename string) string {
 	depth := config.Conf.Web.Static.DirDepth
 	dirNameLen := config.Conf.Web.Static.DirNameLength
 
-
-	if depth * dirNameLen > len(fn) {
+	if depth*dirNameLen > len(fn) {
 		depth = 2
 		dirNameLen = 1
 	}
@@ -113,7 +112,7 @@ func CreatePin(c *gin.Context) {
 	pin := model.Pin{
 		Title:   pinApi.Title,
 		Content: pinApi.Content,
-		ImgLink: relPath,
+		ImgLink: config.Conf.Web.Static.UrlImg + "/" + relPath,
 		UserId:  requester.Id,
 	}
 

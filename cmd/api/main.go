@@ -20,7 +20,7 @@ func main() {
 	}
 
 	defer Close()
-	srv := server.New(&config.Conf.Web.Server)
+	srv := server.New(config.Conf)
 	if err := srv.Run(); err != nil {
 		log.Fatal(err)
 		return

@@ -13,28 +13,25 @@ type Server struct {
 	router *gin.Engine
 }
 
-func New(config *config.ConfServer) *Server {
+func New(config *config.Config) *Server {
 	r := gin.Default()
 
-	// TODO func AddRoute
-	r.GET("/ping", func(c *gin.Context) {
-		c.String(200, "pong")
-	})
+	r.Static(config.Web.Static.UrlImg, config.Web.Static.DirImg)
 
 	r.POST("/user/signup", userhandlers.SignUp)
 	r.POST("/user/login", userhandlers.Login)
 	r.POST("/user/logout", userhandlers.AuthCheck(), userhandlers.Logout)
 	r.POST("/user/pin", userhandlers.AuthCheck(), pinhandlers.CreatePin)
+	r.GET("/user/pin", userhandlers.AuthCheck(), pinhandlers.GetPin)
 	r.GET("/user/profile", userhandlers.AuthCheck(), userhandlers.GetProfile)
 	r.PUT("/user/profile/password", userhandlers.AuthCheck(), userhandlers.UpdatePassword)
-
 
 	r.MaxMultipartMemory = 8 << 20
 	r.POST("/user/profile/avatar", userhandlers.AuthCheck(), userhandlers.SetAvatar)
 	r.GET("/user/profile/avatar", userhandlers.AuthCheck(), userhandlers.GetAvatar)
 
 	return &Server{
-		config: config,
+		config: &config.Web.Server,
 		router: r,
 	}
 }
