@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"log"
 )
@@ -33,4 +34,28 @@ func (p *Pin) GetPin() bool {
 	}
 
 	return true
+}
+
+func GetPinList(userId int) ([]api.GetPinApi, error) {
+	rows, err := config.Db.Query("select id, title, content, img_link, user_id from pins where user_id=$1", userId)
+	if err != nil {
+		return nil, err
+	}
+
+	pins := []api.GetPinApi{}
+	for rows.Next() {
+		pin := Pin{}
+		if err := rows.Scan(&pin.Id, &pin.Title, &pin.Content, &pin.ImgLink, &pin.UserId); err != nil {
+			return nil, err
+		}
+		pins = append(pins, api.GetPinApi{
+			Id:      pin.Id,
+			Title:   pin.Title,
+			Content: pin.Content,
+			ImgLink: pin.ImgLink,
+			UserId:  pin.UserId,
+		})
+	}
+
+	return pins, nil
 }
