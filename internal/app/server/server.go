@@ -26,7 +26,9 @@ func New(config *config.Config) *Server {
 	r.POST("/user/pin", userhandlers.AuthCheck(), pinhandlers.CreatePin)
 	r.GET("/user/pin", userhandlers.AuthCheck(), pinhandlers.GetPin)
 	r.GET("/user/profile", userhandlers.AuthCheck(), userhandlers.GetProfile)
+
 	r.PUT("/user/profile/password", userhandlers.AuthCheck(), userhandlers.UpdatePassword)
+	r.PUT("/user/profile/", userhandlers.AuthCheck(), userhandlers.UpdateUser)
 
 	r.MaxMultipartMemory = 8 << 20
 	r.POST("/user/profile/avatar", userhandlers.AuthCheck(), userhandlers.SetAvatar)

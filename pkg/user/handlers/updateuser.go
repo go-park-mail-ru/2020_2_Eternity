@@ -30,6 +30,7 @@ func UpdateUser(c *gin.Context) {
 
 	if err := ValidUpdate(profile); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
 	}
 
 	claims, ok := c.Get("info")
