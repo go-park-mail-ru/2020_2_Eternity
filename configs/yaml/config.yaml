@@ -22,3 +22,9 @@ web: {
     dir_name_length: 1,
   },
 }
+
+token: {
+  secretname: "SECRET",
+  cookiename: "eternity",
+  value: 7,
+}

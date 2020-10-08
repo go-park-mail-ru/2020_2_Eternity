@@ -19,7 +19,7 @@ type User struct {
 
 func (u *User) CreateUser() error {
 	_, err := config.Db.Exec("insert into users(username, email, password, birthdate, reg_date, avatar) values($1, $2, $3, $4, $5, $6)",
-		u.Username, u.Email, u.Password, u.BirthDate, time.Now(), "default.jpeg")
+		u.Username, u.Email, u.Password, u.BirthDate, time.Now(), "http://127.0.0.1:8008/images/avatar/default.jpeg")
 	if err != nil {
 		return errors.New("user exists")
 	}
@@ -56,6 +56,7 @@ func (u *User) UpdatePassword(psswd string) error {
 
 func (u *User) UpdateAvatar(avatar string) error {
 	if _, err := config.Db.Exec("update users set avatar=$1 where id=$2", avatar, u.ID); err != nil {
+		fmt.Println(err)
 		return errors.New("avatar doesnt update")
 	}
 	u.Avatar = avatar

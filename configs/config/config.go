@@ -7,12 +7,13 @@ import (
 
 var (
 	Conf = newConfig()
-	Db   = newDatabase(&Conf.Db)
+	Db   = newDatabase(&Conf.Db).Open()
 )
 
 type Config struct {
-	Db  ConfDB  `mapstructure:"database"`
-	Web ConfWeb `mapstructure:"web"`
+	Db    ConfDB    `mapstructure:"database"`
+	Web   ConfWeb   `mapstructure:"web"`
+	Token ConfToken `mapstructure:"token"`
 }
 
 type ConfDB struct {
@@ -31,6 +32,12 @@ type ConfPostgres struct {
 type ConfWeb struct {
 	Server ConfServer `mapstructure:"server"`
 	Static ConfStatic `mapstructure:"static"`
+}
+
+type ConfToken struct {
+	SecretName string `mapstructure:"secretname"`
+	CookieName string `mapstructure:"cookiename"`
+	Value      int    `mapstructure:"value"`
 }
 
 type ConfServer struct {
