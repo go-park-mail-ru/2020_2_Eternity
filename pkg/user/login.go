@@ -1,11 +1,10 @@
-package handlers
+package user
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/model"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
@@ -23,7 +22,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	user := model.User{
+	user := User{
 		Username: form.Username,
 	}
 

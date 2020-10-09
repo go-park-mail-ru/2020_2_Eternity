@@ -1,9 +1,8 @@
-package handlers
+package user
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/model"
 	"net/http"
 )
 
@@ -20,7 +19,7 @@ func GetProfile(c *gin.Context) {
 		return
 	}
 
-	user := model.User{Username: claims.Username}
+	user := User{Username: claims.Username}
 	if !user.GetUser() {
 		c.AbortWithStatusJSON(http.StatusBadRequest, Error{"user not found"})
 		return

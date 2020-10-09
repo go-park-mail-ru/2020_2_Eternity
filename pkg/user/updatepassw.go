@@ -1,4 +1,4 @@
-package handlers
+package user
 
 import (
 	"github.com/gin-gonic/gin"
@@ -7,7 +7,6 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/model"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 )
@@ -39,7 +38,7 @@ func UpdatePassword(c *gin.Context) {
 		return
 	}
 
-	user := model.User{
+	user := User{
 		ID:       claims.(jwthelper.Claims).Id,
 		Username: claims.(jwthelper.Claims).Username,
 	}

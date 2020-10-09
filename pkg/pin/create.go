@@ -6,7 +6,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
-	h "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/handlers"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"log"
 	"net/http"
@@ -63,30 +63,30 @@ func prepareFileStorage() (relPath string, err error) {
 func CreatePin(c *gin.Context) {
 	claims, ok := c.Get("info")
 	if !ok {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, h.Error{"can't get key"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, user.Error{"can't get key"})
 		return
 	}
 
 	requester, ok := claims.(jwthelper.Claims)
 	if !ok {
-		c.AbortWithStatusJSON(http.StatusBadRequest, h.Error{"can't lead claims"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, user.Error{"can't lead claims"})
 		return
 	}
 
 	file, err := c.FormFile("img") // config
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, h.Error{"[FormFile] :" + err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, user.Error{"[FormFile] :" + err.Error()})
 		return
 	}
 
 	relPath, err := prepareFileStorage()
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, h.Error{"[prepareFileStorage]: " + err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, user.Error{"[prepareFileStorage]: " + err.Error()})
 		return
 	}
 
 	if err := c.SaveUploadedFile(file, config.Conf.Web.Static.DirImg+"/"+relPath); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, h.Error{"[SaveUploadedFile]: " + err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, user.Error{"[SaveUploadedFile]: " + err.Error()})
 		return
 	}
 
@@ -95,7 +95,7 @@ func CreatePin(c *gin.Context) {
 	log.Print(jsonStr)
 
 	if err := json.Unmarshal([]byte(jsonStr), &pinApi); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, h.Error{"[Unmarshal]: " + err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, user.Error{"[Unmarshal]: " + err.Error()})
 		return
 	}
 
@@ -107,7 +107,7 @@ func CreatePin(c *gin.Context) {
 	}
 
 	if err := pin.CreatePin(); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, h.Error{"[CreatePin]: " + err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, user.Error{"[CreatePin]: " + err.Error()})
 		return
 	}
 
