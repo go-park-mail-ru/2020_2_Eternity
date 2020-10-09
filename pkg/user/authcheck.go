@@ -29,7 +29,7 @@ func AuthCheck() gin.HandlerFunc {
 	}
 }
 
-func isAuthorised(c *gin.Context) (*jwthelper.Claims, bool) {
+func GetClaims(c *gin.Context) (*jwthelper.Claims, bool) {
 	claimsInt, ok := c.Get("info")
 	if !ok {
 		return nil, false

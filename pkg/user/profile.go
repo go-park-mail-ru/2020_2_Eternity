@@ -6,7 +6,7 @@ import (
 )
 
 func GetProfile(c *gin.Context) {
-	claims, ok := isAuthorised(c)
+	claims, ok := GetClaims(c)
 	if !ok {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, Error{"can't get key"})
 		return
