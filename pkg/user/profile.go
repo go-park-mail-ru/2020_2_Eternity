@@ -2,20 +2,13 @@ package user
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"net/http"
 )
 
 func GetProfile(c *gin.Context) {
-	claimsInt, ok := c.Get("info")
+	claims, ok := isAuthorised(c)
 	if !ok {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, Error{"can't get key"})
-		return
-	}
-
-	claims, ok := claimsInt.(jwthelper.Claims)
-	if !ok {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, Error{"can't lead claims type"})
 		return
 	}
 

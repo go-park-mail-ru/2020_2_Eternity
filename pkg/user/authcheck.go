@@ -28,3 +28,17 @@ func AuthCheck() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+func isAuthorised(c *gin.Context) (*jwthelper.Claims, bool) {
+	claimsInt, ok := c.Get("info")
+	if !ok {
+		return nil, false
+	}
+
+	claims, ok := claimsInt.(jwthelper.Claims)
+	if !ok {
+		return nil, false
+	}
+
+	return &claims, true
+}
