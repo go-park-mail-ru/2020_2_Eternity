@@ -1,4 +1,4 @@
-package handlers
+package pin
 
 import (
 	"encoding/json"
@@ -6,7 +6,6 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/model"
 	h "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/handlers"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"log"
@@ -100,7 +99,7 @@ func CreatePin(c *gin.Context) {
 		return
 	}
 
-	pin := model.Pin{
+	pin := Pin{
 		Title:   pinApi.Title,
 		Content: pinApi.Content,
 		ImgLink: config.Conf.Web.Static.UrlImg + "/" + relPath,

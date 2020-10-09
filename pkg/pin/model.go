@@ -1,4 +1,4 @@
-package model
+package pin
 
 import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"

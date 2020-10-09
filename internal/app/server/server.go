@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	pinhandlers "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/handlers"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin"
 	userhandlers "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/handlers"
 )
 
@@ -23,8 +23,8 @@ func New(config *config.Config) *Server {
 	r.GET("/images/avatar/:file", userhandlers.GetAvatar)
 
 	r.POST("/user/logout", userhandlers.AuthCheck(), userhandlers.Logout)
-	r.POST("/user/pin", userhandlers.AuthCheck(), pinhandlers.CreatePin)
-	r.GET("/user/pin", userhandlers.AuthCheck(), pinhandlers.GetPin)
+	r.POST("/user/pin", userhandlers.AuthCheck(), pin.CreatePin)
+	r.GET("/user/pin", userhandlers.AuthCheck(), pin.GetPin)
 	r.GET("/user/profile", userhandlers.AuthCheck(), userhandlers.GetProfile)
 
 	r.PUT("/user/profile/password", userhandlers.AuthCheck(), userhandlers.UpdatePassword)
