@@ -21,29 +21,34 @@ type FormCreatePin struct {
 func CreatePin(c *gin.Context) {
 	claims, ok := user.GetClaims(c)
 	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, user.Error{"can't get key"})
+		c.AbortWithStatus(http.StatusUnauthorized)
+		log.Println("[CreatePin]: Can't get claims")
 		return
 	}
 
 	formPin := FormCreatePin{}
 	if err := c.Bind(&formPin); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, user.Error{"[Bind] :" + err.Error()})
+		c.AbortWithStatus(http.StatusBadRequest)
+		log.Println("[CreatePin]-[Bind] :" + err.Error())
 		return
 	}
 
 	fileName, err := utils.RandomUuid()
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, user.Error{"[prepareFileStorage]: " + err.Error()})
+		c.AbortWithStatus(http.StatusBadRequest)
+		log.Println("[CreatePin]-[RandomUuid] :" + err.Error())
 		return
 	}
 
 	if err := os.MkdirAll(config.Conf.Web.Static.DirImg, 0777|os.ModeDir); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, user.Error{"[MkAllDir]: " + err.Error()})
+		c.AbortWithStatus(http.StatusInternalServerError)
+		log.Println("[CreatePin]-[MkAllDir] :" + err.Error())
 		return
 	}
 
 	if err := c.SaveUploadedFile(formPin.Avatar, config.Conf.Web.Static.DirImg+"/"+fileName); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, user.Error{"[SaveUploadedFile]: " + err.Error()})
+		c.AbortWithStatus(http.StatusInternalServerError)
+		log.Println("[CreatePin]-[SaveUploadedFile] :" + err.Error())
 		return
 	}
 
@@ -55,11 +60,12 @@ func CreatePin(c *gin.Context) {
 	}
 
 	if err := pin.CreatePin(); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, user.Error{"[CreatePin]: " + err.Error()})
+		c.AbortWithStatus(http.StatusInternalServerError)
+		log.Println("[CreatePin]-[CreatePin] :" + err.Error())
 		return
 	}
 
-	log.Printf("pin{%v %v %v %v %v}", pin.Id, pin.Title, pin.Content, pin.PictureName, pin.UserId)
+	log.Printf("[CreatePin]: pin{%v %v %v %v %v}", pin.Id, pin.Title, pin.Content, pin.PictureName, pin.UserId)
 
 	c.JSON(http.StatusOK, api.GetPinApi{
 		Id:      pin.Id,
