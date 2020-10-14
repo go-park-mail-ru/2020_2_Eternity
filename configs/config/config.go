@@ -3,6 +3,8 @@ package config
 import (
 	"github.com/spf13/viper"
 	"log"
+	"os"
+	"path/filepath"
 )
 
 var (
@@ -26,7 +28,7 @@ type ConfPostgres struct {
 	Password   string `mapstructure:"password"`
 	DbName     string `mapstructure:"db_name"`
 	SslMode    string `mapstructure:"ssl_mode"`
-	Host       string `mapstructure:"host"`  // TODO (PavelS) Remove or redone
+	Host       string `mapstructure:"host"` // TODO (PavelS) Remove or redone
 }
 
 type ConfWeb struct {
@@ -46,9 +48,9 @@ type ConfServer struct {
 }
 
 type ConfStatic struct {
-	DirImg        string `mapstructure:"dir_img"`
-	UrlImg        string `mapstructure:"url_img"`
-	DirAvt        string `mapstructure:"dir_avt"`
+	DirImg string `mapstructure:"dir_img"`
+	UrlImg string `mapstructure:"url_img"`
+	DirAvt string `mapstructure:"dir_avt"`
 }
 
 func newConfig() *Config {
@@ -57,7 +59,13 @@ func newConfig() *Config {
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./configs/yaml")
+
+	rootDir, exists := os.LookupEnv("ROOT_DIR")
+	if exists {
+		viper.AddConfigPath(filepath.Join(rootDir, "/configs/yaml"))
+	} else {
+		viper.AddConfigPath("./configs/yaml")
+	}
 
 	err := viper.ReadInConfig()
 	if err != nil {

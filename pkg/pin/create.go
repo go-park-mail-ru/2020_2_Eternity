@@ -1,16 +1,22 @@
 package pin
 
 import (
-	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"log"
+	"mime/multipart"
 	"net/http"
+	"os"
+	"path/filepath"
 )
 
+type FormCreatePin struct {
+	CreatePinApi *api.CreatePinApi     `form:"data" binding:"required"`
+	Avatar       *multipart.FileHeader `form:"img" binding:"required"`
+}
 
 func CreatePin(c *gin.Context) {
 	claims, ok := user.GetClaims(c)
@@ -19,9 +25,9 @@ func CreatePin(c *gin.Context) {
 		return
 	}
 
-	file, err := c.FormFile("img") // config
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, user.Error{"[FormFile] :" + err.Error()})
+	formPin := FormCreatePin{}
+	if err := c.Bind(&formPin); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, user.Error{"[Bind] :" + err.Error()})
 		return
 	}
 
@@ -31,33 +37,35 @@ func CreatePin(c *gin.Context) {
 		return
 	}
 
-	if err := c.SaveUploadedFile(file, config.Conf.Web.Static.DirImg+"/"+fileName); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, user.Error{"[SaveUploadedFile]: " + err.Error()})
+	if err := os.MkdirAll(config.Conf.Web.Static.DirImg, 0777|os.ModeDir); err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, user.Error{"[MkAllDir]: " + err.Error()})
 		return
 	}
 
-	pinApi := api.CreatePinApi{}
-	jsonStr := c.PostForm("data") // config
-	log.Print(jsonStr)
-
-	if err := json.Unmarshal([]byte(jsonStr), &pinApi); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, user.Error{"[Unmarshal]: " + err.Error()})
+	if err := c.SaveUploadedFile(formPin.Avatar, config.Conf.Web.Static.DirImg+"/"+fileName); err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, user.Error{"[SaveUploadedFile]: " + err.Error()})
 		return
 	}
 
 	pin := Pin{
-		Title:   pinApi.Title,
-		Content: pinApi.Content,
-		ImgLink: config.Conf.Web.Static.UrlImg + "/" + fileName,
-		UserId:  claims.Id,
+		Title:       formPin.CreatePinApi.Title,
+		Content:     formPin.CreatePinApi.Content,
+		PictureName: fileName,
+		UserId:      claims.Id,
 	}
 
 	if err := pin.CreatePin(); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, user.Error{"[CreatePin]: " + err.Error()})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, user.Error{"[CreatePin]: " + err.Error()})
 		return
 	}
 
-	log.Printf("pin{%v %v %v %v %v}", pin.Id, pin.Title, pin.Content, pin.ImgLink, pin.UserId)
+	log.Printf("pin{%v %v %v %v %v}", pin.Id, pin.Title, pin.Content, pin.PictureName, pin.UserId)
 
-	c.JSON(http.StatusOK, "")
+	c.JSON(http.StatusOK, api.GetPinApi{
+		Id:      pin.Id,
+		Title:   pin.Title,
+		Content: pin.Content,
+		ImgLink: filepath.Join(config.Conf.Web.Static.UrlImg, pin.PictureName), // TODO full path
+		UserId:  pin.UserId,
+	})
 }
