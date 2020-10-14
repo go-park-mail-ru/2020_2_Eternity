@@ -34,10 +34,9 @@ func setupServer() *gin.Engine {
 
 func createClaims(c *gin.Context) {
 	claims := jwthelper.Claims{
-		Id:       u.ID,
-		Username: u.Username,
+		Id: u.ID,
 	}
-	c.Set("info", claims)
+	c.Set("info", claims.Id)
 	c.Next()
 }
 
