@@ -24,21 +24,20 @@ func AuthCheck() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, Error{"fake token"})
 			return
 		}
-		c.Set("info", claims)
+		c.Set("info", claims.Id)
 		c.Next()
 	}
 }
 
-func GetClaims(c *gin.Context) (*jwthelper.Claims, bool) {
-	claimsInt, ok := c.Get("info")
+func GetClaims(c *gin.Context) (int, bool) {
+	claims, ok := c.Get("info")
 	if !ok {
-		return nil, false
+		return -1, false
 	}
 
-	claims, ok := claimsInt.(jwthelper.Claims)
+	claimsId, ok := claims.(int)
 	if !ok {
-		return nil, false
+		return -1, false
 	}
-
-	return &claims, true
+	return claimsId, true
 }

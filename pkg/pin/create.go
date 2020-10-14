@@ -19,7 +19,7 @@ type FormCreatePin struct {
 }
 
 func CreatePin(c *gin.Context) {
-	claims, ok := user.GetClaims(c)
+	claimsId, ok := user.GetClaims(c)
 	if !ok {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		log.Println("[CreatePin]: Can't get claims")
@@ -56,7 +56,7 @@ func CreatePin(c *gin.Context) {
 		Title:       formPin.CreatePinApi.Title,
 		Content:     formPin.CreatePinApi.Content,
 		PictureName: fileName,
-		UserId:      claims.Id,
+		UserId:      claimsId,
 	}
 
 	if err := pin.CreatePin(); err != nil {

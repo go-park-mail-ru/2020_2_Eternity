@@ -27,9 +27,16 @@ func (u *User) CreateUser() error {
 }
 
 func (u *User) GetUser() bool {
-	row := config.Db.QueryRow("select id, password, email, birthdate, avatar from users where username=$1", u.Username)
+	row := config.Db.QueryRow("select username, password, email, birthdate, avatar from users where id=$1", u.ID)
+	if err := row.Scan(&u.Username, &u.Password, &u.Email, &u.BirthDate, &u.Avatar); err != nil {
+		return false
+	}
+	return true
+}
+
+func (u *User) GetUserByName() bool {
+	row := config.Db.QueryRow("select id, password, email, birthdate, avatar from users where id=$1", u.Username)
 	if err := row.Scan(&u.ID, &u.Password, &u.Email, &u.BirthDate, &u.Avatar); err != nil {
-		fmt.Println(err)
 		return false
 	}
 	return true

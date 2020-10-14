@@ -3,7 +3,6 @@ package user
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"io/ioutil"
 	"net/http"
@@ -18,7 +17,7 @@ func SetAvatar(c *gin.Context) {
 		return
 	}
 
-	claims, ok := c.Get("info")
+	claimsId, ok := GetClaims(c)
 
 	if !ok {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, Error{"invalid token"})
@@ -26,8 +25,7 @@ func SetAvatar(c *gin.Context) {
 	}
 
 	user := User{
-		ID:       claims.(jwthelper.Claims).Id,
-		Username: claims.(jwthelper.Claims).Username,
+		ID: claimsId,
 	}
 
 	root, err := os.Getwd()

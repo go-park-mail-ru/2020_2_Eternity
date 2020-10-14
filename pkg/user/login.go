@@ -26,7 +26,7 @@ func Login(c *gin.Context) {
 		Username: form.Username,
 	}
 
-	if !user.GetUser() {
+	if !user.GetUserByName() {
 		c.AbortWithStatusJSON(http.StatusBadRequest, Error{"invalid username"})
 		return
 	}
@@ -36,7 +36,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	ss, err := jwthelper.CreateJwtToken(user.ID, form.Username)
+	ss, err := jwthelper.CreateJwtToken(user.ID)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, Error{"cannot create token"})
 		return

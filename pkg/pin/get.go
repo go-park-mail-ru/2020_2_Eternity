@@ -8,14 +8,14 @@ import (
 )
 
 func GetPin(c *gin.Context) {
-	claims, ok := user.GetClaims(c)
+	claimsId, ok := user.GetClaims(c)
 	if !ok {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		log.Println("[GetPin]: Can't get claims")
 		return
 	}
 
-	pins, err := GetPinList(claims.Id)
+	pins, err := GetPinList(claimsId)
 	if err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		log.Println("[GetPin]-[GetPinList]: " + err.Error())

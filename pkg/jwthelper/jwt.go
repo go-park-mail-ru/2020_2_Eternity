@@ -7,16 +7,14 @@ import (
 )
 
 type Claims struct {
-	Id       int    `json:"id"`
-	Username string `json:"username"`
+	Id int `json:"id"`
 	jwt.StandardClaims
 }
 
-func CreateJwtToken(id int, username string) (string, error) {
+func CreateJwtToken(id int) (string, error) {
 	SecretKey := []byte(config.Conf.Token.SecretName)
 	claims := Claims{
-		Id:       id,
-		Username: username,
+		Id: id,
 		StandardClaims: jwt.StandardClaims{
 			Issuer: "server",
 		},

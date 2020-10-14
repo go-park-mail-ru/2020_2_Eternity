@@ -6,13 +6,13 @@ import (
 )
 
 func GetProfile(c *gin.Context) {
-	claims, ok := GetClaims(c)
+	claimsId, ok := GetClaims(c)
 	if !ok {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, Error{"can't get key"})
 		return
 	}
 
-	user := User{Username: claims.Username}
+	user := User{ID: claimsId}
 	if !user.GetUser() {
 		c.AbortWithStatusJSON(http.StatusBadRequest, Error{"user not found"})
 		return
