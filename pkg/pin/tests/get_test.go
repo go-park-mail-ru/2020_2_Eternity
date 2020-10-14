@@ -89,10 +89,10 @@ func cleanupGetPin(t *testing.T) {
 	}
 }
 
-func createPinsApi() []api.GetPinApi {
-	pinsApi := []api.GetPinApi{}
+func createPinsApi() []api.GetPin {
+	pinsApi := []api.GetPin{}
 	for _, p := range pinsGet {
-		pinsApi = append(pinsApi, api.GetPinApi{
+		pinsApi = append(pinsApi, api.GetPin{
 			Id:      p.Id,
 			Title:   p.Title,
 			Content: p.Content,

@@ -47,7 +47,7 @@ func (p *Pin) GetPin(id int) error {
 	return nil
 }
 
-func GetPinList(userId int) ([]api.GetPinApi, error) {
+func GetPinList(userId int) ([]api.GetPin, error) {
 	rows, err := config.Db.Query(
 		"select pins.id, title, content, name, user_id "+
 			"from pins join pin_images "+
@@ -58,13 +58,13 @@ func GetPinList(userId int) ([]api.GetPinApi, error) {
 		return nil, err
 	}
 
-	pins := []api.GetPinApi{}
+	pins := []api.GetPin{}
 	for rows.Next() {
 		pin := Pin{}
 		if err := rows.Scan(&pin.Id, &pin.Title, &pin.Content, &pin.PictureName, &pin.UserId); err != nil {
 			return nil, err
 		}
-		pins = append(pins, api.GetPinApi{
+		pins = append(pins, api.GetPin{
 			Id:      pin.Id,
 			Title:   pin.Title,
 			Content: pin.Content,

@@ -14,7 +14,7 @@ import (
 )
 
 type FormCreatePin struct {
-	CreatePinApi *api.CreatePinApi     `form:"data" binding:"required"`
+	CreatePinApi *api.CreatePin        `form:"data" binding:"required"`
 	Avatar       *multipart.FileHeader `form:"img" binding:"required"`
 }
 
@@ -67,7 +67,7 @@ func CreatePin(c *gin.Context) {
 
 	log.Printf("[CreatePin]: pin{%v %v %v %v %v}", pin.Id, pin.Title, pin.Content, pin.PictureName, pin.UserId)
 
-	c.JSON(http.StatusOK, api.GetPinApi{
+	c.JSON(http.StatusOK, api.GetPin{
 		Id:      pin.Id,
 		Title:   pin.Title,
 		Content: pin.Content,
