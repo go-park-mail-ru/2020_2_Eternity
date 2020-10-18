@@ -22,17 +22,21 @@ func New(config *config.Config) *Server {
 	r.POST("/user/login", user.Login)
 	r.GET("/images/avatar/:file", user.GetAvatar)
 
-	r.POST("/user/logout", user.AuthCheck(), user.Logout)
-	r.POST("/user/pin", user.AuthCheck(), pin.CreatePin)
-	r.GET("/user/pin", user.AuthCheck(), pin.GetPin)
-	r.GET("/user/profile", user.AuthCheck(), user.GetProfile)
+	r.Use(user.AuthCheck())
 
-	r.PUT("/user/profile/password", user.AuthCheck(), user.UpdatePassword)
-	r.PUT("/user/profile/", user.AuthCheck(), user.UpdateUser)
+	r.POST("/user/logout", user.Logout)
+	r.POST("/user/pin", pin.CreatePin)
+	r.GET("/user/pin", pin.GetPin)
+	r.GET("/user/profile", user.GetProfile)
+
+	r.PUT("/user/profile/password", user.UpdatePassword)
+	r.PUT("/user/profile/", user.UpdateUser)
 
 	r.MaxMultipartMemory = 8 << 20
-	r.POST("/user/profile/avatar", user.AuthCheck(), user.SetAvatar)
-
+	r.POST("/user/profile/avatar", user.SetAvatar)
+	// experimental
+	r.POST("/follow", user.Follow)
+	r.POST("/unfollow", user.Unfollow)
 	return &Server{
 		config: &config.Web.Server,
 		router: r,

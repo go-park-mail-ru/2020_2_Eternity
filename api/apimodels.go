@@ -44,3 +44,7 @@ type GetPin struct {
 	ImgLink string `json:"img_link"`
 	UserId  int    `json:"user_id"`
 }
+
+type Follow struct {
+	Username string `json:"username"`
+}

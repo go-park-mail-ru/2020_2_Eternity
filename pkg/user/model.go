@@ -35,8 +35,9 @@ func (u *User) GetUser() bool {
 }
 
 func (u *User) GetUserByName() bool {
-	row := config.Db.QueryRow("select id, password, email, birthdate, avatar from users where id=$1", u.Username)
+	row := config.Db.QueryRow("select id, password, email, birthdate, avatar from users where username=$1", u.Username)
 	if err := row.Scan(&u.ID, &u.Password, &u.Email, &u.BirthDate, &u.Avatar); err != nil {
+		fmt.Println(err)
 		return false
 	}
 	return true
@@ -79,5 +80,22 @@ func (u *User) GetAvatar() error {
 }
 
 func (u *User) DeleteByName(username string) error {
+	return nil
+}
+
+func (u *User) Follow(id int) error {
+	// вставить строку, если не существует такая(todo: проверку на существование)
+	if _, err := config.Db.Exec("insert into follows(id1, id2) values($1, $2)", u.ID, id); err != nil {
+		fmt.Println(err)
+		return err
+	}
+	return nil
+}
+
+func (u *User) UnFollow(id int) error {
+	if _, err := config.Db.Exec("delete from follows where id1=$1 and id2=$2", u.ID, id); err != nil {
+		fmt.Println(err)
+		return err
+	}
 	return nil
 }
