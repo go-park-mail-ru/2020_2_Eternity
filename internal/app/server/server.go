@@ -6,11 +6,24 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
+	"log"
 )
 
 type Server struct {
 	config *config.ConfServer
 	router *gin.Engine
+}
+
+func TestMw() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Next()
+		status, ok := c.Get("status")
+		if !ok {
+			log.Println("ERRORR")
+			return
+		}
+		log.Println(status)
+	}
 }
 
 func New(config *config.Config) *Server {
@@ -35,7 +48,7 @@ func New(config *config.Config) *Server {
 	r.MaxMultipartMemory = 8 << 20
 	r.POST("/user/profile/avatar", user.SetAvatar)
 	// experimental
-	r.POST("/follow", user.Follow)
+	r.POST("/follow", TestMw(), user.Follow)
 	r.POST("/unfollow", user.Unfollow)
 	return &Server{
 		config: &config.Web.Server,

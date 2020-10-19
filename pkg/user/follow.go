@@ -10,24 +10,28 @@ func Follow(c *gin.Context) {
 	followingUser, followedUser, status, err := PrepareFollow(c)
 	if err != nil {
 		c.AbortWithStatusJSON(status, err)
+		return
 	}
 	if err := followingUser.Follow(followedUser.ID); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, Error{Error: "Already Followed"})
 		return
 	}
 	c.Status(http.StatusOK)
+	c.Set("status", 200)
 }
 
 func Unfollow(c *gin.Context) {
 	followingUser, followedUser, status, err := PrepareFollow(c)
 	if err != nil {
 		c.AbortWithStatusJSON(status, err)
+		return
 	}
 	if err := followingUser.UnFollow(followedUser.ID); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, Error{Error: "Already Followed"})
 		return
 	}
 	c.Status(http.StatusOK)
+
 }
 
 func PrepareFollow(c *gin.Context) (*User, *User, int, *Error) {
