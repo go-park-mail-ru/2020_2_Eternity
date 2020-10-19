@@ -25,3 +25,6 @@
 
 #static
 static/
+
+#deploy
+deploy/*.pem

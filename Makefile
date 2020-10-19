@@ -1,6 +1,6 @@
 # Create pinterest user with password and grant all privileges
 .PHONY: dbinit
-dbsetup:
+dbinit:
 	sudo -u postgres psql -f configs/sql/init.sql;
 
 
