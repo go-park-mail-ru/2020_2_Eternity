@@ -9,7 +9,10 @@ require (
 	github.com/go-ozzo/ozzo-validation/v4 v4.2.2
 	github.com/google/uuid v1.1.2
 	github.com/jackc/pgx v3.6.2+incompatible
+	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
+	github.com/sirupsen/logrus v1.2.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.4.0
+	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 	golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5
 )

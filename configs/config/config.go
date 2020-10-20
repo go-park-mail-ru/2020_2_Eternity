@@ -2,9 +2,10 @@ package config
 
 import (
 	"github.com/spf13/viper"
-	"log"
 	"os"
 	"path/filepath"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -13,9 +14,10 @@ var (
 )
 
 type Config struct {
-	Db    ConfDB    `mapstructure:"database"`
-	Web   ConfWeb   `mapstructure:"web"`
-	Token ConfToken `mapstructure:"token"`
+	Db     ConfDB     `mapstructure:"database"`
+	Web    ConfWeb    `mapstructure:"web"`
+	Token  ConfToken  `mapstructure:"token"`
+	Logger ConfLogger `mapstructure:"logger"`
 }
 
 type ConfDB struct {
@@ -53,9 +55,18 @@ type ConfStatic struct {
 	DirAvt string `mapstructure:"dir_avt"`
 }
 
+type ConfLogger struct {
+	GinFilePath    string `mapstructure:"gin_file"`
+	CommonFilePath string `mapstructure:"common_file"`
+	GinLevel       string `mapstructure:"gin_level"`
+	CommonLevel    string `mapstructure:"common_level"`
+	StdoutLog      bool   `mapstructure:"stdout_log"`
+}
+
 func newConfig() *Config {
 	setDefaultDb()
 	setDefaultWeb()
+	setDefaultLog()
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
@@ -97,4 +108,12 @@ func setDefaultWeb() {
 	viper.SetDefault("web.static.dir_img", "img")
 	viper.SetDefault("web.static.url_img", "img")
 	viper.SetDefault("web.static.dir_avt", "/static/avatar/")
+}
+
+func setDefaultLog() {
+	viper.SetDefault("logger.gin_file", "/var/log/pinterest/gin.log")
+	viper.SetDefault("logger.common_file", "/var/log/pinterest/common.log")
+	viper.SetDefault("logger.gin_level", "trace")
+	viper.SetDefault("logger.common_level", "debug")
+	viper.SetDefault("logger.stdout_log", true)
 }
