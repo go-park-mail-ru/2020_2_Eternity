@@ -18,3 +18,8 @@ dbclear:
 	PGPASSWORD='662f2710-4e08-4be7-a278-a53ae86ba7f6' psql -U pinterest_user -h 127.0.0.1 -d pinterest_db -f configs/sql/2.sql -w;
 	rm configs/sql/1.sql configs/sql/2.sql;
 
+
+# Build target api
+.PHONY: build
+build:
+	go build -o build/bin/api ./cmd/api/main.go
