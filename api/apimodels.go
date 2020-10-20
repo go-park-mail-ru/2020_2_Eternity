@@ -2,7 +2,7 @@ package api
 
 import "time"
 
-type GetProfileApi struct {
+type GetProfile struct {
 	Id        int       `json:"id"`
 	Username  string    `json:"username"`
 	Email     string    `json:"email"`
@@ -21,7 +21,7 @@ type Login struct {
 	Password string `json:"password"`
 }
 
-type CreatePinApi struct {
+type CreatePin struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
 }
@@ -37,7 +37,7 @@ type UpdatePassword struct {
 	NewPassword string `json:"newpassword"`
 }
 
-type GetPinApi struct {
+type GetPin struct {
 	Id      int    `json:"id"`
 	Title   string `json:"title"`
 	Content string `json:"content"`

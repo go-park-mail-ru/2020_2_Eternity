@@ -1,4 +1,4 @@
-package handlers
+package user
 
 import (
 	"github.com/gin-gonic/gin"
@@ -24,7 +24,20 @@ func AuthCheck() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, Error{"fake token"})
 			return
 		}
-		c.Set("info", claims)
+		c.Set("info", claims.Id)
 		c.Next()
 	}
+}
+
+func GetClaims(c *gin.Context) (int, bool) {
+	claims, ok := c.Get("info")
+	if !ok {
+		return -1, false
+	}
+
+	claimsId, ok := claims.(int)
+	if !ok {
+		return -1, false
+	}
+	return claimsId, true
 }

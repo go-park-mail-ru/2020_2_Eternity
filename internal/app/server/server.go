@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	pinhandlers "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/handlers"
-	userhandlers "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/handlers"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
 )
 
 type Server struct {
@@ -18,20 +18,20 @@ func New(config *config.Config) *Server {
 
 	r.Static(config.Web.Static.UrlImg, config.Web.Static.DirImg)
 
-	r.POST("/user/signup", userhandlers.SignUp)
-	r.POST("/user/login", userhandlers.Login)
-	r.GET("/images/avatar/:file", userhandlers.GetAvatar)
+	r.POST("/user/signup", user.SignUp)
+	r.POST("/user/login", user.Login)
+	r.GET("/images/avatar/:file", user.GetAvatar)
 
-	r.POST("/user/logout", userhandlers.AuthCheck(), userhandlers.Logout)
-	r.POST("/user/pin", userhandlers.AuthCheck(), pinhandlers.CreatePin)
-	r.GET("/user/pin", userhandlers.AuthCheck(), pinhandlers.GetPin)
-	r.GET("/user/profile", userhandlers.AuthCheck(), userhandlers.GetProfile)
+	r.POST("/user/logout", user.AuthCheck(), user.Logout)
+	r.POST("/user/pin", user.AuthCheck(), pin.CreatePin)
+	r.GET("/user/pin", user.AuthCheck(), pin.GetPin)
+	r.GET("/user/profile", user.AuthCheck(), user.GetProfile)
 
-	r.PUT("/user/profile/password", userhandlers.AuthCheck(), userhandlers.UpdatePassword)
-	r.PUT("/user/profile/", userhandlers.AuthCheck(), userhandlers.UpdateUser)
+	r.PUT("/user/profile/password", user.AuthCheck(), user.UpdatePassword)
+	r.PUT("/user/profile/", user.AuthCheck(), user.UpdateUser)
 
 	r.MaxMultipartMemory = 8 << 20
-	r.POST("/user/profile/avatar", userhandlers.AuthCheck(), userhandlers.SetAvatar)
+	r.POST("/user/profile/avatar", user.AuthCheck(), user.SetAvatar)
 
 	return &Server{
 		config: &config.Web.Server,

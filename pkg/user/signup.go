@@ -1,4 +1,4 @@
-package handlers
+package user
 
 import (
 	"github.com/gin-gonic/gin"
@@ -6,7 +6,6 @@ import (
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/model"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 )
@@ -37,7 +36,7 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	user := model.User{
+	user := User{
 		Username:  profile.Username,
 		Email:     profile.Email,
 		Password:  string(hash),
