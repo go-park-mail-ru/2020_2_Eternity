@@ -3,6 +3,7 @@ package pin
 import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	"net/url"
 	"path/filepath"
 )
 
@@ -67,11 +68,18 @@ func GetPinList(userId int) ([]api.GetPin, error) {
 		if err := rows.Scan(&pin.Id, &pin.Title, &pin.Content, &pin.PictureName, &pin.UserId); err != nil {
 			return nil, err
 		}
+
+		imgUrl := url.URL{
+			Scheme: config.Conf.Web.Server.Protocol,
+			Host:   config.Conf.Web.Server.Host,
+			Path:   filepath.Join(config.Conf.Web.Static.UrlImg, pin.PictureName),
+		}
+
 		pins = append(pins, api.GetPin{
 			Id:      pin.Id,
 			Title:   pin.Title,
 			Content: pin.Content,
-			ImgLink: filepath.Join(config.Conf.Web.Static.UrlImg, pin.PictureName), // TODO full path
+			ImgLink: imgUrl.String(),
 			UserId:  pin.UserId,
 		})
 	}

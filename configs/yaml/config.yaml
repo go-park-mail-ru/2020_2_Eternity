@@ -13,6 +13,8 @@ web: {
   server: {
     address: "localhost",
     port: "8008",
+    host: "pinterest-tp.tk",
+    protocol: "http",
   },
   static: {
     dir_img: "static/img",

@@ -8,6 +8,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 )
@@ -66,11 +67,18 @@ func CreatePin(c *gin.Context) {
 
 	config.Lg("pin", "CreatePin").
 		Infof("Created pin {%v %v %v %v %v}", pin.Id, pin.Title, pin.Content, pin.PictureName, pin.UserId)
+
+	imgUrl := url.URL{
+		Scheme: config.Conf.Web.Server.Protocol,
+		Host:   config.Conf.Web.Server.Host,
+		Path:   filepath.Join(config.Conf.Web.Static.UrlImg, pin.PictureName),
+	}
+
 	c.JSON(http.StatusOK, api.GetPin{
 		Id:      pin.Id,
 		Title:   pin.Title,
 		Content: pin.Content,
-		ImgLink: filepath.Join(config.Conf.Web.Static.UrlImg, pin.PictureName), // TODO full path
+		ImgLink: imgUrl.String(),
 		UserId:  pin.UserId,
 	})
 }

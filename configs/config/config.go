@@ -43,8 +43,10 @@ type ConfToken struct {
 }
 
 type ConfServer struct {
-	Address string `mapstructure:"address"`
-	Port    string `mapstructure:"port"`
+	Address  string `mapstructure:"address"`
+	Port     string `mapstructure:"port"`
+	Host     string `mapstructure:"host"`
+	Protocol string `mapstructure:"protocol"`
 }
 
 type ConfStatic struct {
@@ -103,6 +105,8 @@ func setDefaultDb() {
 func setDefaultWeb() {
 	viper.SetDefault("web.server.address", "")
 	viper.SetDefault("web.server.port", "0000")
+	viper.SetDefault("web.server.host", "pinterest-tp.tk")
+	viper.SetDefault("web.server.protocol", "http://")
 	viper.SetDefault("web.static.dir_img", "img")
 	viper.SetDefault("web.static.url_img", "img")
 	viper.SetDefault("web.static.dir_avt", "/static/avatar/")
@@ -111,7 +115,7 @@ func setDefaultWeb() {
 func setDefaultLog() {
 	viper.SetDefault("logger.gin_file", "/var/log/pinterest/gin.log")
 	viper.SetDefault("logger.common_file", "/var/log/pinterest/common.log")
-	viper.SetDefault("logger.gin_level", "trace")
+	viper.SetDefault("logger.gin_level", "debug")
 	viper.SetDefault("logger.common_level", "debug")
 	viper.SetDefault("logger.stdout_log", true)
 }
