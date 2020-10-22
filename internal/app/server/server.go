@@ -60,18 +60,18 @@ func (s *Server) Run() {
 			log.Fatalf("listen: %s\n", err)
 		}
 	}()
-	log.Info("Server listening on " + s.server.Addr)
+	config.Lg("server", "Run").Info("Server listening on " + s.server.Addr)
 
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	log.Info("Shutting down server...")
+	config.Lg("server", "Run").Info("Shutting down server...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := s.server.Shutdown(ctx); err != nil {
-		log.Fatal("Server forced to shutdown:", err)
+		config.Lg("server", "Run").Fatal("Server forced to shutdown:", err)
 	}
 }
 
@@ -90,7 +90,7 @@ func setupGinLogger() *os.File {
 	if !config.Conf.Logger.StdoutLog {
 		file, err := os.OpenFile(config.Conf.Logger.GinFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
-			log.Error("Failed to log to file, using default stderr")
+			config.Lg("server", "setupGinLogger").Fatal("Failed to log to file, using default stderr")
 			return nil
 		}
 

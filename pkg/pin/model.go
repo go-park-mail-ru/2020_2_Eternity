@@ -3,7 +3,6 @@ package pin
 import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	"log"
 	"path/filepath"
 )
 
@@ -24,6 +23,7 @@ func (p *Pin) CreatePin() error {
 		p.Title, p.Content, p.UserId, p.PictureName).Scan(&p.Id)
 
 	if err != nil {
+		config.Lg("pin", "pin.CreatePin").Error(err.Error())
 		return err
 	}
 
@@ -39,7 +39,7 @@ func (p *Pin) GetPin(id int) error {
 		id)
 
 	if err := row.Scan(&p.Id, &p.Title, &p.Content, &p.PictureName, &p.UserId); err != nil {
-		log.Print(err)
+		config.Lg("pin", "pin.GetPin").Error(err.Error())
 		return err
 	}
 
@@ -55,8 +55,11 @@ func GetPinList(userId int) ([]api.GetPin, error) {
 			"where user_id=$1;",
 		userId)
 	if err != nil {
+		config.Lg("pin", "pin.GetPinList").Error(err.Error())
 		return nil, err
 	}
+
+	defer rows.Close()
 
 	pins := []api.GetPin{}
 	for rows.Next() {

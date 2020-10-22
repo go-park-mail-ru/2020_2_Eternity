@@ -25,12 +25,15 @@ func (db *Database) Open() *pgx.Conn {
 			db.config.Postgres.SslMode,
 		))
 	if err != nil {
+		Lg("config", "Database.Open").Error(err)
 		return nil
 	}
 
 	database, err := pgx.Connect(config)
 	if err != nil {
+		Lg("config", "Database.Open").Error(err)
 		return nil
 	}
+
 	return database
 }

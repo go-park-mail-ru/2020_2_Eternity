@@ -4,8 +4,6 @@ import (
 	"github.com/spf13/viper"
 	"os"
 	"path/filepath"
-
-	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -80,14 +78,14 @@ func newConfig() *Config {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatalf("Fatal error config file: %s \n", err)
+		Lg("config", "newConfig").Fatal("Fatal error config file ", err)
 	}
 
 	conf := new(Config)
 
 	er := viper.Unmarshal(conf)
 	if er != nil {
-		log.Fatalf("Fatal error config file: %s \n", err)
+		Lg("config", "newConfig").Fatal("Fatal error config file:", err)
 	}
 
 	return conf

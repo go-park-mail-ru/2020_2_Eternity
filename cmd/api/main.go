@@ -11,7 +11,7 @@ func Close() {
 		log.Fatal(err)
 		return
 	}
-	log.Info("DB connection closed")
+	config.Lg("main", "Close").Info("DB connection closed")
 }
 
 func main() {
@@ -21,18 +21,15 @@ func main() {
 
 	defer Close()
 
-	log.Info("ConfLogger started")
-	log.WithFields(log.Fields{"jopa": "benis"}).Info("Benis")
-
 	if conn := config.Db; conn == nil {
-		log.Fatal("Connection refused")
+		config.Lg("main", "main").Fatal("Connection refused")
 		return
 	}
-	log.Info("Connected to DB")
+	config.Lg("main", "main").Info("Connected to DB")
 
 	srv := server.New(config.Conf)
 
 	srv.Run()
 
-	log.Info("Server exiting")
+	config.Lg("main", "main").Info("Server stopped")
 }
