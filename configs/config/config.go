@@ -2,6 +2,7 @@ package config
 
 import (
 	"flag"
+	"github.com/jackc/pgx"
 	"github.com/spf13/viper"
 	"os"
 	"path/filepath"
@@ -9,8 +10,8 @@ import (
 )
 
 var (
-	Conf = newConfig()
-	Db   = newDatabase(&Conf.Db).Open()
+	Conf *Config
+	Db   *pgx.Conn
 )
 
 type Config struct {
@@ -65,7 +66,7 @@ type ConfLogger struct {
 	StdoutLog      bool   `mapstructure:"stdout_log"`
 }
 
-func newConfig() *Config {
+func NewConfig() *Config {
 	setDefaultDb()
 	setDefaultWeb()
 	setDefaultLog()
@@ -87,11 +88,12 @@ func newConfig() *Config {
 
 	er := viper.Unmarshal(conf)
 	if er != nil {
-		Lg("config", "newConfig").Fatal("Fatal error config file:", err)
+		Lg("config", "newConfig").Fatal("Fatal error config file:", er)
 	}
 
 	return conf
 }
+
 
 func setDefaultDb() {
 	viper.SetDefault("database.postgres.driver_name", "default")
@@ -121,19 +123,16 @@ func setDefaultLog() {
 }
 
 func getConfPath() string {
-	// NOTE (Paul S) Have to set CONF_PATH env var to run tests
-	// export CONF_PATH=/absolute/path/to/config.yaml
-	// TODO (Pavel S) Call newConfig from main and implement newConfigTest to call it before testing ?
-	if confPath, ok := os.LookupEnv("CONF_PATH"); ok {
-		return confPath
-	}
-
 	argPath := ""
 	flag.StringVar(&argPath, "config", "", "Specify config path")
 	flag.Parse()
 
 	if argPath != "" {
 		return argPath
+	}
+
+	if confPath, ok := os.LookupEnv("CONF_PATH"); ok {
+		return confPath
 	}
 
 	return "./configs/yaml/config.yaml"

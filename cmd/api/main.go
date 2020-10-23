@@ -6,12 +6,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func Close() {
-	if err := config.Db.Close(); err != nil {
-		log.Fatal(err)
-		return
-	}
-	config.Lg("main", "Close").Info("DB connection closed")
+
+func init() {
+	config.Conf = config.NewConfig()
+	config.Db = config.NewDatabase(&config.Conf.Db).Open()
 }
 
 func main() {
@@ -32,4 +30,12 @@ func main() {
 	srv.Run()
 
 	config.Lg("main", "main").Info("Server stopped")
+}
+
+func Close() {
+	if err := config.Db.Close(); err != nil {
+		log.Fatal(err)
+		return
+	}
+	config.Lg("main", "Close").Info("DB connection closed")
 }

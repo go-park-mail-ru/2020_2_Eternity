@@ -9,7 +9,7 @@ type Database struct {
 	config *ConfDB
 }
 
-func newDatabase(config *ConfDB) *Database {
+func NewDatabase(config *ConfDB) *Database {
 	return &Database{
 		config: config,
 	}
