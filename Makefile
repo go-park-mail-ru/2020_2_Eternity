@@ -22,4 +22,4 @@ dbclear:
 # Build target api
 .PHONY: build
 build:
-	go build -o build/bin/api ./cmd/api/main.go
+	go build -o /bin/pinterest/api ./cmd/api/main.go

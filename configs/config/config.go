@@ -1,9 +1,11 @@
 package config
 
 import (
+	"flag"
 	"github.com/spf13/viper"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 var (
@@ -68,15 +70,13 @@ func newConfig() *Config {
 	setDefaultWeb()
 	setDefaultLog()
 
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
+	confDir, confFile, confExt := splitPath(getConfPath())
+	Lg("config", "newConfig").
+		Infof("Config dir: '%s', config file name: '%s', config ext: '%s'", confDir, confFile, confExt)
 
-	rootDir, exists := os.LookupEnv("ROOT_DIR")
-	if exists {
-		viper.AddConfigPath(filepath.Join(rootDir, "/configs/yaml"))
-	} else {
-		viper.AddConfigPath("./configs/yaml")
-	}
+	viper.SetConfigName(confFile)
+	viper.SetConfigType(confExt)
+	viper.AddConfigPath(confDir)
 
 	err := viper.ReadInConfig()
 	if err != nil {
@@ -118,4 +118,36 @@ func setDefaultLog() {
 	viper.SetDefault("logger.gin_level", "debug")
 	viper.SetDefault("logger.common_level", "debug")
 	viper.SetDefault("logger.stdout_log", true)
+}
+
+func getConfPath() string {
+	// NOTE (Paul S) Have to set CONF_PATH env var to run tests
+	// export CONF_PATH=/absolute/path/to/config.yaml
+	// TODO (Pavel S) Call newConfig from main and implement newConfigTest to call it before testing ?
+	if confPath, ok := os.LookupEnv("CONF_PATH"); ok {
+		return confPath
+	}
+
+	argPath := ""
+	flag.StringVar(&argPath, "config", "", "Specify config path")
+	flag.Parse()
+
+	if argPath != "" {
+		return argPath
+	}
+
+	return "./configs/yaml/config.yaml"
+}
+
+func splitPath(path string) (dir, fileName, ext string) {
+	dir, file := filepath.Split(path)
+	strs := strings.Split(file, ".")
+
+	if len(strs) == 2 {
+		return dir, strs[0], strs[1]
+	} else if len(strs) == 1 {
+		return dir, strs[0], ""
+	} else {
+		return dir, "", ""
+	}
 }
