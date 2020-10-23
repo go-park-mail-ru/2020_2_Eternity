@@ -6,9 +6,9 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
-	"log"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 )
@@ -22,33 +22,33 @@ func CreatePin(c *gin.Context) {
 	claimsId, ok := user.GetClaims(c)
 	if !ok {
 		c.AbortWithStatus(http.StatusUnauthorized)
-		log.Println("[CreatePin]: Can't get claims")
+		config.Lg("pin", "CreatePin").Error("Can't get claims")
 		return
 	}
 
 	formPin := FormCreatePin{}
 	if err := c.Bind(&formPin); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
-		log.Println("[CreatePin]-[Bind] :" + err.Error())
+		config.Lg("pin", "CreatePin").Error("Bind: ", err.Error())
 		return
 	}
 
 	fileName, err := utils.RandomUuid()
 	if err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
-		log.Println("[CreatePin]-[RandomUuid] :" + err.Error())
+		config.Lg("pin", "CreatePin").Error("RandomUuid: ", err.Error())
 		return
 	}
 
 	if err := os.MkdirAll(config.Conf.Web.Static.DirImg, 0777|os.ModeDir); err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
-		log.Println("[CreatePin]-[MkAllDir] :" + err.Error())
+		config.Lg("pin", "CreatePin").Error("MkAllDir: ", err.Error())
 		return
 	}
 
 	if err := c.SaveUploadedFile(formPin.Avatar, config.Conf.Web.Static.DirImg+"/"+fileName); err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
-		log.Println("[CreatePin]-[SaveUploadedFile] :" + err.Error())
+		config.Lg("pin", "CreatePin").Error("SaveFile: ", err.Error())
 		return
 	}
 
@@ -61,17 +61,24 @@ func CreatePin(c *gin.Context) {
 
 	if err := pin.CreatePin(); err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
-		log.Println("[CreatePin]-[CreatePin] :" + err.Error())
+		config.Lg("pin", "CreatePin").Error("pin.CreatePin: ", err.Error())
 		return
 	}
 
-	log.Printf("[CreatePin]: pin{%v %v %v %v %v}", pin.Id, pin.Title, pin.Content, pin.PictureName, pin.UserId)
+	config.Lg("pin", "CreatePin").
+		Infof("Created pin {%v %v %v %v %v}", pin.Id, pin.Title, pin.Content, pin.PictureName, pin.UserId)
+
+	imgUrl := url.URL{
+		Scheme: config.Conf.Web.Server.Protocol,
+		Host:   config.Conf.Web.Server.Host,
+		Path:   filepath.Join(config.Conf.Web.Static.UrlImg, pin.PictureName),
+	}
 
 	c.JSON(http.StatusOK, api.GetPin{
 		Id:      pin.Id,
 		Title:   pin.Title,
 		Content: pin.Content,
-		ImgLink: filepath.Join(config.Conf.Web.Static.UrlImg, pin.PictureName), // TODO full path
+		ImgLink: imgUrl.String(),
 		UserId:  pin.UserId,
 	})
 }
