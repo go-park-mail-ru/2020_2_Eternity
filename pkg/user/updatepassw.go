@@ -6,6 +6,8 @@ import (
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 )
@@ -30,9 +32,9 @@ func UpdatePassword(c *gin.Context) {
 		return
 	}
 
-	claimsId, ok := GetClaims(c)
+	claimsId, ok := auth.GetClaims(c)
 	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, Error{"invalid token"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "invalid token"})
 		return
 	}
 
@@ -41,12 +43,12 @@ func UpdatePassword(c *gin.Context) {
 	}
 
 	if !user.GetUser() {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, Error{"user doesnt exist"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "user doesnt exist"})
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(psswds.OldPassword)); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, Error{"bad password"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "bad password"})
 		return
 	}
 
@@ -58,7 +60,7 @@ func UpdatePassword(c *gin.Context) {
 	}
 
 	if err := user.UpdatePassword(string(hash)); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, Error{err.Error()})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{Error: err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, user)

@@ -5,6 +5,8 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"net/http"
 )
 
@@ -29,10 +31,10 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	claimsId, ok := GetClaims(c)
+	claimsId, ok := auth.GetClaims(c)
 
 	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, Error{"invalid token"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{"invalid token"})
 		return
 	}
 
@@ -41,7 +43,7 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	if err := user.UpdateUser(&profile); err != nil {
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, Error{err.Error()})
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, utils.Error{Error: err.Error()})
 		return
 	}
 

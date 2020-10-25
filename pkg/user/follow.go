@@ -3,6 +3,8 @@ package user
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"net/http"
 )
 
@@ -13,7 +15,7 @@ func Follow(c *gin.Context) {
 		return
 	}
 	if err := followingUser.Follow(followedUser.ID); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, Error{Error: "Already Followed"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Already Followed"})
 		return
 	}
 	c.Status(http.StatusOK)
@@ -27,24 +29,24 @@ func Unfollow(c *gin.Context) {
 		return
 	}
 	if err := followingUser.UnFollow(followedUser.ID); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, Error{Error: "Already Followed"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Already Followed"})
 		return
 	}
 	c.Status(http.StatusOK)
 
 }
 
-func PrepareFollow(c *gin.Context) (*User, *User, int, *Error) {
+func PrepareFollow(c *gin.Context) (*User, *User, int, *utils.Error) {
 	followed := api.Follow{}
 
 	if err := c.BindJSON(&followed); err != nil {
-		return nil, nil, http.StatusBadRequest, &Error{"bad json"}
+		return nil, nil, http.StatusBadRequest, &utils.Error{"bad json"}
 	}
 
-	claimsId, ok := GetClaims(c)
+	claimsId, ok := auth.GetClaims(c)
 
 	if !ok {
-		return nil, nil, http.StatusUnauthorized, &Error{Error: "invalid token"}
+		return nil, nil, http.StatusUnauthorized, &utils.Error{Error: "invalid token"}
 	}
 
 	followedUser := User{
@@ -52,7 +54,7 @@ func PrepareFollow(c *gin.Context) (*User, *User, int, *Error) {
 	}
 
 	if !followedUser.GetUserByName() {
-		return nil, nil, http.StatusBadRequest, &Error{Error: "User not found"}
+		return nil, nil, http.StatusBadRequest, &utils.Error{Error: "User not found"}
 	}
 
 	followingUser := User{

@@ -6,6 +6,7 @@ import (
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 )
@@ -21,18 +22,18 @@ func ValidProfile(profile api.SignUp) error {
 func SignUp(c *gin.Context) {
 	profile := api.SignUp{}
 	if err := c.BindJSON(&profile); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, Error{"[BindJSON]: " + err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "[BindJSON]: " + err.Error()})
 		return
 	}
 	if err := ValidProfile(profile); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, Error{"[ValidProfile]: " + err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "[ValidProfile]: " + err.Error()})
 		return
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(profile.Password), config.Conf.Token.Value)
 
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, Error{"[GenerateFromPassword]: " + err.Error()})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{Error: "[GenerateFromPassword]: " + err.Error()})
 		return
 	}
 
@@ -44,7 +45,7 @@ func SignUp(c *gin.Context) {
 	}
 
 	if err := user.CreateUser(); err != nil {
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, Error{"[CreateUser]: " + err.Error()})
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, utils.Error{Error: "[CreateUser]: " + err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, user)

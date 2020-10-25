@@ -5,14 +5,11 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
 )
-
-type Error struct {
-	Error string `json:"error"`
-}
 
 func Login(c *gin.Context) {
 	form := api.Login{}
@@ -27,18 +24,18 @@ func Login(c *gin.Context) {
 	}
 
 	if !user.GetUserByName() {
-		c.AbortWithStatusJSON(http.StatusBadRequest, Error{"invalid username"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "invalid username"})
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(form.Password)); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, Error{"bad password"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "bad password"})
 		return
 	}
 
 	ss, err := jwthelper.CreateJwtToken(user.ID)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, Error{"cannot create token"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{Error: "cannot create token"})
 		return
 	}
 

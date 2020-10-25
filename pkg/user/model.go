@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	"log"
 	"time"
 )
 
@@ -15,6 +16,8 @@ type User struct {
 	Password  string    `json:"-"`
 	BirthDate time.Time `json:"date"`
 	Avatar    string    `json:"avatar"`
+	Followers int       `json:"followers"`
+	Following int       `json:"following"`
 }
 
 func (u *User) CreateUser() error {
@@ -95,6 +98,15 @@ func (u *User) Follow(id int) error {
 func (u *User) UnFollow(id int) error {
 	if _, err := config.Db.Exec("delete from follows where id1=$1 and id2=$2", u.ID, id); err != nil {
 		fmt.Println(err)
+		return err
+	}
+	return nil
+}
+
+func (u *User) GetUserByNameWithFollowers() error {
+	row := config.Db.QueryRow("select users.id, avatar, followers, following from users join stats on users.id = stats.id where username=$1", u.Username)
+	if err := row.Scan(&u.ID, &u.Avatar, &u.Followers, &u.Following); err != nil {
+		log.Println(err)
 		return err
 	}
 	return nil
