@@ -7,6 +7,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/websockets"
 	"log"
 )
 
@@ -15,19 +16,28 @@ type Server struct {
 	router *gin.Engine
 }
 
-func TestMw() gin.HandlerFunc {
+func TestMwWs(ws *websockets.WebSocketPool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
 		status, ok := c.Get("status")
 		if !ok {
-			log.Println("ERRORR")
+			log.Println("STATUS")
 			return
 		}
-		log.Println(status)
+		uid, ok := c.Get("follow_id")
+		if !ok {
+			log.Println("ID IS NOT SET")
+			return
+		}
+		ws.Send(uid.(int), []byte("kto-to podpisalsya grats!"))
+		log.Println(status, uid)
 	}
 }
 
 func New(config *config.Config) *Server {
+
+	ws := websockets.NewPool()
+
 	r := gin.Default()
 
 	r.Static(config.Web.Static.UrlImg, config.Web.Static.DirImg)
@@ -36,6 +46,7 @@ func New(config *config.Config) *Server {
 	r.POST("/user/login", user.Login)
 	r.GET("/images/avatar/:file", user.GetAvatar)
 	r.GET("/profile/:username", user.GetUserPage)
+	r.GET("/ws", ws.Add)
 
 	r.Use(auth.AuthCheck())
 
@@ -50,7 +61,7 @@ func New(config *config.Config) *Server {
 	r.MaxMultipartMemory = 8 << 20
 	r.POST("/user/profile/avatar", user.SetAvatar)
 	// experimental
-	r.POST("/follow", TestMw(), user.Follow)
+	r.POST("/follow", TestMwWs(ws), user.Follow)
 	r.POST("/unfollow", user.Unfollow)
 	return &Server{
 		config: &config.Web.Server,
