@@ -7,14 +7,23 @@ import (
 )
 
 type Comment struct {
-	Id int
-	Path []int32
+	Id      int
+	Path    []int32
 	Content string
-	PinId int
-	UserId int
+	PinId   int
+	UserId  int
 }
 
-func (c *Comment) CreateChildComment(parentId int) error {
+type RepoComment interface {
+	CreateChildComment(c *Comment, parentId int) error
+	CreateRootComment(c *Comment) error
+	GetComment(id int) (Comment, error)
+	GetAllComments(pinId int) ([]Comment, error)
+}
+
+type RepoCommentInstance struct{}
+
+func (rc *RepoCommentInstance) CreateChildComment(c *Comment, parentId int) error {
 	err := config.Db.QueryRow(
 		"insert into comments (path, content, pin_id, user_id) "+
 			"values("+
@@ -44,7 +53,7 @@ func (c *Comment) CreateChildComment(parentId int) error {
 	return nil
 }
 
-func (c *Comment) CreateRootComment() error {
+func (rc *RepoCommentInstance) CreateRootComment(c *Comment) error {
 	err := config.Db.QueryRow(
 		"insert into comments (path, content, pin_id, user_id) "+
 			"values("+
@@ -61,8 +70,8 @@ func (c *Comment) CreateRootComment() error {
 	return nil
 }
 
-
-func (c *Comment) GetComment(id int) error {
+func (rc *RepoCommentInstance) GetComment(id int) (Comment, error) {
+	c := Comment{}
 	err := config.Db.QueryRow(
 		"select id, path, content, pin_id, user_id "+
 			"from comments "+
@@ -71,18 +80,17 @@ func (c *Comment) GetComment(id int) error {
 
 	if err != nil {
 		config.Lg("comment", "comment.GetComment").Error(err.Error())
-		return err
+		return Comment{}, err
 	}
 
-	return nil
+	return Comment{}, nil
 }
 
-
-func GetAllComments(pinId int) ([]Comment, error) {
+func (rc *RepoCommentInstance) GetAllComments(pinId int) ([]Comment, error) {
 	rows, err := config.Db.Query(
 		"select id, path, content, pin_id, user_id "+
 			"from comments "+
-			"where pin_id = $1 " +
+			"where pin_id = $1 "+
 			"order by path",
 		pinId)
 

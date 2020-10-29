@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
 	log "github.com/sirupsen/logrus"
@@ -39,6 +40,11 @@ func New(config *config.Config) *Server {
 
 	r.PUT("/user/profile/password", user.AuthCheck(), user.UpdatePassword)
 	r.PUT("/user/profile/", user.AuthCheck(), user.UpdateUser)
+
+	rpd := comment.NewResponder()
+	r.POST("/pin/comments", user.AuthCheck(), rpd.CreateComment)
+	r.GET(fmt.Sprintf("/pin/:%s/comments", comment.PinIdParam), rpd.GetComments)
+	r.GET(fmt.Sprintf("/comment/:%s", comment.CommentIdParam), rpd.GetCommentById)
 
 	r.MaxMultipartMemory = 8 << 20
 	r.POST("/user/profile/avatar", user.AuthCheck(), user.SetAvatar)

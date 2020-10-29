@@ -94,7 +94,6 @@ func NewConfig() *Config {
 	return conf
 }
 
-
 func setDefaultDb() {
 	viper.SetDefault("database.postgres.driver_name", "default")
 	viper.SetDefault("database.postgres.username", "default")

@@ -6,7 +6,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-
 func init() {
 	config.Conf = config.NewConfig()
 	config.Db = config.NewDatabase(&config.Conf.Db).Open()
