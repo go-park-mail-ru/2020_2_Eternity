@@ -44,3 +44,18 @@ type GetPin struct {
 	ImgLink string `json:"img_link"`
 	UserId  int    `json:"user_id"`
 }
+
+type CreateComment struct {
+	IsRoot   bool   `json:"is_root"` // NOTE (Pavel S) if true, ParentId is not checked
+	ParentId int    `json:"parent_id"`
+	Content  string `json:"content"`
+	PinId    int    `json:"pin_id"`
+}
+
+type GetComment struct {
+	Id      int     `json:"id"`
+	Path    []int32 `json:"path"`
+	Content string  `json:"content"`
+	PinId   int     `json:"pin_id"`
+	UserId  int     `json:"user_id"`
+}

@@ -3,7 +3,7 @@ package pin
 import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	"log"
+	"net/url"
 	"path/filepath"
 )
 
@@ -24,6 +24,7 @@ func (p *Pin) CreatePin() error {
 		p.Title, p.Content, p.UserId, p.PictureName).Scan(&p.Id)
 
 	if err != nil {
+		config.Lg("pin", "pin.CreatePin").Error(err.Error())
 		return err
 	}
 
@@ -39,7 +40,7 @@ func (p *Pin) GetPin(id int) error {
 		id)
 
 	if err := row.Scan(&p.Id, &p.Title, &p.Content, &p.PictureName, &p.UserId); err != nil {
-		log.Print(err)
+		config.Lg("pin", "pin.GetPin").Error(err.Error())
 		return err
 	}
 
@@ -55,8 +56,11 @@ func GetPinList(userId int) ([]api.GetPin, error) {
 			"where user_id=$1;",
 		userId)
 	if err != nil {
+		config.Lg("pin", "pin.GetPinList").Error(err.Error())
 		return nil, err
 	}
+
+	defer rows.Close()
 
 	pins := []api.GetPin{}
 	for rows.Next() {
@@ -64,11 +68,18 @@ func GetPinList(userId int) ([]api.GetPin, error) {
 		if err := rows.Scan(&pin.Id, &pin.Title, &pin.Content, &pin.PictureName, &pin.UserId); err != nil {
 			return nil, err
 		}
+
+		imgUrl := url.URL{
+			Scheme: config.Conf.Web.Server.Protocol,
+			Host:   config.Conf.Web.Server.Host,
+			Path:   filepath.Join(config.Conf.Web.Static.UrlImg, pin.PictureName),
+		}
+
 		pins = append(pins, api.GetPin{
 			Id:      pin.Id,
 			Title:   pin.Title,
 			Content: pin.Content,
-			ImgLink: filepath.Join(config.Conf.Web.Static.UrlImg, pin.PictureName), // TODO full path
+			ImgLink: imgUrl.String(),
 			UserId:  pin.UserId,
 		})
 	}

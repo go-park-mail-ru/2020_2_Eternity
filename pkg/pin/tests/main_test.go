@@ -2,6 +2,7 @@ package pintests
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
@@ -41,6 +42,9 @@ func createClaims(c *gin.Context) {
 }
 
 func TestMain(m *testing.M) {
+	config.Conf = config.NewConfigTst()
+	config.Db = config.NewDatabase(&config.Conf.Db).Open()
+
 	code := m.Run()
 	ts.Close()
 	os.Exit(code)
