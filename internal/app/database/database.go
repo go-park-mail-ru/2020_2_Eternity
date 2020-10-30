@@ -51,13 +51,13 @@ func (db *DB) Begin(ctx context.Context) (pgx.Tx, error) {
 }
 
 func (db *DB) Exec(ctx context.Context, sql string, arguments ...interface{}) (pgconn.CommandTag, error) {
-	return db.dbPool.Exec(ctx, sql, arguments)
+	return db.dbPool.Exec(ctx, sql, arguments...)
 }
 
 func (db *DB) Query(ctx context.Context, sql string, optionsAndArgs ...interface{}) (pgx.Rows, error) {
-	return db.dbPool.Query(ctx, sql, optionsAndArgs)
+	return db.dbPool.Query(ctx, sql, optionsAndArgs...)
 }
 
 func (db *DB) QueryRow(ctx context.Context, sql string, optionsAndArgs ...interface{}) pgx.Row {
-	return db.dbPool.QueryRow(ctx, sql, optionsAndArgs)
+	return db.dbPool.QueryRow(ctx, sql, optionsAndArgs...)
 }
