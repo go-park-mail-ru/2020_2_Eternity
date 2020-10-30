@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/models"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	"log"
 	"time"
 )
@@ -21,8 +21,8 @@ func NewRepo(d database.IDbConn) *Repository {
 	}
 }
 
-func (r *Repository) CreateUser(user *api.SignUp) (*models.User, error) {
-	u := &models.User{}
+func (r *Repository) CreateUser(user *api.SignUp) (*domain.User, error) {
+	u := &domain.User{}
 	if _, err := r.dbConn.Exec(context.Background(), "insert into users(username, email, password, birthdate, reg_date, avatar) values($1, $2, $3, $4, $5, $6)",
 		user.Username, user.Email, user.Password, user.BirthDate, time.Now(), "http://127.0.0.1:8008/images/avatar/default.jpeg"); err != nil {
 		return u, errors.New("user exists")
@@ -30,8 +30,8 @@ func (r *Repository) CreateUser(user *api.SignUp) (*models.User, error) {
 	return u, nil
 }
 
-func (r *Repository) GetUser(id int) (*models.User, error) {
-	u := &models.User{}
+func (r *Repository) GetUser(id int) (*domain.User, error) {
+	u := &domain.User{}
 	row := r.dbConn.QueryRow(context.Background(), "select username, password, email, birthdate, avatar from users where id=$1", id)
 	if err := row.Scan(&u.Username, &u.Password, &u.Email, &u.BirthDate, &u.Avatar); err != nil {
 		return u, err
@@ -39,8 +39,8 @@ func (r *Repository) GetUser(id int) (*models.User, error) {
 	return u, nil
 }
 
-func (r *Repository) GetUserByName(username string) (*models.User, error) {
-	u := &models.User{
+func (r *Repository) GetUserByName(username string) (*domain.User, error) {
+	u := &domain.User{
 		Username: username,
 	}
 	row := r.dbConn.QueryRow(context.Background(), "select id, password, email, birthdate, avatar from users where username=$1", username)
@@ -51,8 +51,8 @@ func (r *Repository) GetUserByName(username string) (*models.User, error) {
 	return u, nil
 }
 
-func (r *Repository) UpdateUser(id int, profile *api.UpdateUser) (*models.User, error) {
-	u := &models.User{}
+func (r *Repository) UpdateUser(id int, profile *api.UpdateUser) (*domain.User, error) {
+	u := &domain.User{}
 	if _, err := r.dbConn.Exec(context.Background(), "update users set username=$1, email=$2, birthdate=$3 where id=$4",
 		profile.Username, profile.Email, profile.BirthDate, id); err != nil {
 		return u, errors.New("username or email exists")
@@ -109,8 +109,8 @@ func (r *Repository) UnFollow(unfollowing int, id int) error {
 	return nil
 }
 
-func (r *Repository) GetUserByNameWithFollowers(username string) (*models.User, error) {
-	u := &models.User{
+func (r *Repository) GetUserByNameWithFollowers(username string) (*domain.User, error) {
+	u := &domain.User{
 		Username: username,
 	}
 

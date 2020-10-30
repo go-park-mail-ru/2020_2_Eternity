@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/models"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
 )
 
@@ -16,23 +16,23 @@ func NewUsecase(repo user.IRepository) *UserUsecase {
 	}
 }
 
-func (uc *UserUsecase) CreateUser(user *api.SignUp) (*models.User, error) {
+func (uc *UserUsecase) CreateUser(user *api.SignUp) (*domain.User, error) {
 	return uc.repo.CreateUser(user)
 }
 
-func (uc *UserUsecase) GetUser(id int) (*models.User, error) {
+func (uc *UserUsecase) GetUser(id int) (*domain.User, error) {
 	return uc.repo.GetUser(id)
 }
 
-func (uc *UserUsecase) GetUserByName(username string) (*models.User, error) {
+func (uc *UserUsecase) GetUserByName(username string) (*domain.User, error) {
 	return uc.repo.GetUserByName(username)
 }
 
-func (uc *UserUsecase) GetUserByNameWithFollowers(username string) (*models.User, error) {
+func (uc *UserUsecase) GetUserByNameWithFollowers(username string) (*domain.User, error) {
 	return uc.repo.GetUserByName(username)
 }
 
-func (uc *UserUsecase) UpdateUser(id int, profile *api.UpdateUser) (*models.User, error) {
+func (uc *UserUsecase) UpdateUser(id int, profile *api.UpdateUser) (*domain.User, error) {
 	return uc.repo.UpdateUser(id, profile)
 }
 func (uc *UserUsecase) UpdatePassword(id int, psswd string) error {

@@ -1,6 +1,9 @@
 package api
 
-import "time"
+import (
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
+	"time"
+)
 
 type GetProfile struct {
 	Id        int       `json:"id"`
@@ -21,11 +24,6 @@ type Login struct {
 	Password string `json:"password"`
 }
 
-type CreatePin struct {
-	Title   string `json:"title"`
-	Content string `json:"content"`
-}
-
 type UpdateUser struct {
 	Username  string    `json:"username"`
 	Email     string    `json:"email"`
@@ -35,14 +33,6 @@ type UpdateUser struct {
 type UpdatePassword struct {
 	OldPassword string `json:"oldpassword"`
 	NewPassword string `json:"newpassword"`
-}
-
-type GetPin struct {
-	Id      int    `json:"id"`
-	Title   string `json:"title"`
-	Content string `json:"content"`
-	ImgLink string `json:"img_link"`
-	UserId  int    `json:"user_id"`
 }
 
 type CreateComment struct {
@@ -65,8 +55,8 @@ type Follow struct {
 }
 
 type UserPage struct {
-	Username  string   `json:"username"`
-	Followers int      `json:"followers"`
-	Following int      `json:"following"`
-	PinsList  []GetPin `json:"pins_list"`
+	Username  string           `json:"username"`
+	Followers int              `json:"followers"`
+	Following int              `json:"following"`
+	PinsList  []domain.PinResp `json:"pins_list"`
 }

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	pin_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/delivery/http"
 	user_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/delivery"
 
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
@@ -36,14 +36,10 @@ func New(config *config.Config, db database.IDbConn) *Server {
 	r.Static(config.Web.Static.UrlImg, config.Web.Static.DirImg)
 
 	ws := websockets.NewPool()
-
-	user_delivery.AddUserRoutes(r, db, ws)
-
 	r.GET("/ws", ws.Add)
 
-	//r.Use(auth.AuthCheck())
-	r.POST("/user/pin", auth.AuthCheck(), pin.CreatePin)
-	r.GET("/user/pin", auth.AuthCheck(), pin.GetPin)
+	user_delivery.AddUserRoutes(r, db, ws)
+	pin_delivery.AddPinRoutes(r, db, config)
 
 	rpd := comment.NewResponder()
 	r.POST("/pin/comments", auth.AuthCheck(), rpd.CreateComment)

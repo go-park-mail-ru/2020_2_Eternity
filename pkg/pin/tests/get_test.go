@@ -90,8 +90,8 @@ func cleanupGetPin(t *testing.T) {
 	}
 }
 
-func createPinsApi() []api.GetPin {
-	pinsApi := []api.GetPin{}
+func createPinsApi() []api.PinResp {
+	pinsApi := []api.PinResp{}
 
 	for _, p := range pinsGet {
 		imgUrl := url.URL{
@@ -100,7 +100,7 @@ func createPinsApi() []api.GetPin {
 			Path:   filepath.Join(config.Conf.Web.Static.UrlImg, p.PictureName),
 		}
 
-		pinsApi = append(pinsApi, api.GetPin{
+		pinsApi = append(pinsApi, api.PinResp{
 			Id:      p.Id,
 			Title:   p.Title,
 			Content: p.Content,
