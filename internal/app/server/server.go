@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/delivery"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/repository"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/usecase"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/websockets"
 	"log"
 )
@@ -34,35 +37,40 @@ func TestMwWs(ws *websockets.WebSocketPool) gin.HandlerFunc {
 	}
 }
 
-func New(config *config.Config) *Server {
+func New(config *config.Config, db database.DBInterface) *Server {
 
 	ws := websockets.NewPool()
+
+	rep := repository.NewRepo(db)
+	uc := usecase.NewUsecase(rep)
+
+	handler := delivery.NewHandler(uc)
 
 	r := gin.Default()
 
 	r.Static(config.Web.Static.UrlImg, config.Web.Static.DirImg)
 
-	r.POST("/user/signup", user.SignUp)
-	r.POST("/user/login", user.Login)
-	r.GET("/images/avatar/:file", user.GetAvatar)
-	r.GET("/profile/:username", user.GetUserPage)
+	r.POST("/user/signup", handler.SignUp)
+	r.POST("/user/login", handler.Login)
+	r.GET("/images/avatar/:file", handler.GetAvatar)
+	//r.GET("/profile/:username", handler.GetUserPage)
 	r.GET("/ws", ws.Add)
 
 	r.Use(auth.AuthCheck())
 
-	r.POST("/user/logout", user.Logout)
+	r.POST("/user/logout", handler.Logout)
 	r.POST("/user/pin", pin.CreatePin)
 	r.GET("/user/pin", pin.GetPin)
-	r.GET("/user/profile", user.GetProfile)
+	r.GET("/user/profile", handler.GetProfile)
 
-	r.PUT("/user/profile/password", user.UpdatePassword)
-	r.PUT("/user/profile/", user.UpdateUser)
+	r.PUT("/user/profile/password", handler.UpdatePassword)
+	r.PUT("/user/profile/", handler.UpdateUser)
 
 	r.MaxMultipartMemory = 8 << 20
-	r.POST("/user/profile/avatar", user.SetAvatar)
+	r.POST("/user/profile/avatar", handler.SetAvatar)
 	// experimental
-	r.POST("/follow", TestMwWs(ws), user.Follow)
-	r.POST("/unfollow", user.Unfollow)
+	r.POST("/follow", TestMwWs(ws), handler.Follow)
+	r.POST("/unfollow", handler.Unfollow)
 	return &Server{
 		config: &config.Web.Server,
 		router: r,

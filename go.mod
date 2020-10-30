@@ -12,9 +12,10 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
 	github.com/jackc/pgx v3.6.2+incompatible
+	github.com/jackc/pgx/v4 v4.9.0
 	github.com/lib/pq v1.8.0 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/spf13/viper v1.7.1
-	github.com/stretchr/testify v1.4.0
-	golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5
+	github.com/stretchr/testify v1.5.1
+	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 )

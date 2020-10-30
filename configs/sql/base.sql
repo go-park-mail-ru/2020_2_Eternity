@@ -27,7 +27,8 @@ create table follows (
 	id1 int not null,
 	id2 int not null,
 	foreign key (id1) references users(id),
-	foreign key (id1) references users(id)
+	foreign key (id2) references users(id),
+	unique (id1, id2)
 )
 
 create table stats (
