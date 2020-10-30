@@ -55,9 +55,10 @@ func GetPinList(userId int) ([]api.GetPin, error) {
 			"where user_id=$1;",
 		userId)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
-
+	defer rows.Close()
 	pins := []api.GetPin{}
 	for rows.Next() {
 		pin := Pin{}

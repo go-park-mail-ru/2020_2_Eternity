@@ -28,7 +28,8 @@ type ConfPostgres struct {
 	Password   string `mapstructure:"password"`
 	DbName     string `mapstructure:"db_name"`
 	SslMode    string `mapstructure:"ssl_mode"`
-	Host       string `mapstructure:"host"` // TODO (PavelS) Remove or redone
+	Host       string `mapstructure:"host"`
+	MaxConn    string `mapstructure:"max_conn"` // TODO (PavelS) Remove or redone
 }
 
 type ConfWeb struct {

@@ -44,3 +44,14 @@ type GetPin struct {
 	ImgLink string `json:"img_link"`
 	UserId  int    `json:"user_id"`
 }
+
+type Follow struct {
+	Username string `json:"username"`
+}
+
+type UserPage struct {
+	Username  string   `json:"username"`
+	Followers int      `json:"followers"`
+	Following int      `json:"following"`
+	PinsList  []GetPin `json:"pins_list"`
+}

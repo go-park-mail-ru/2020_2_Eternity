@@ -5,7 +5,8 @@ database: {
     password: "662f2710-4e08-4be7-a278-a53ae86ba7f6",
     db_name: "pinterest_db",
     ssl_mode: "disable",
-    host: "localhost"
+    host: "localhost",
+    max_conn: 10
   }
 }
 
