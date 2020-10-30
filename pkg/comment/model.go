@@ -83,7 +83,7 @@ func (rc *RepoCommentInstance) GetComment(id int) (Comment, error) {
 		return Comment{}, err
 	}
 
-	return Comment{}, nil
+	return c, nil
 }
 
 func (rc *RepoCommentInstance) GetAllComments(pinId int) ([]Comment, error) {

@@ -2,11 +2,12 @@ package main
 
 import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/server"
-	log "github.com/sirupsen/logrus"
 )
 
 func init() {
+	// NOTE (Pavel S) Temporary
 	config.Conf = config.NewConfig()
 	config.Db = config.NewDatabase(&config.Conf.Db).Open()
 }
@@ -16,25 +17,19 @@ func main() {
 	logger.Init()
 	defer logger.Cleanup()
 
-	defer Close()
+	defer config.Db.Close() // NOTE (Pavel S) Temporary
 
-	if conn := config.Db; conn == nil {
+	dbConn := database.NewDB(&config.Conf.Db)
+	if err := dbConn.Open(); err != nil {
 		config.Lg("main", "main").Fatal("Connection refused")
 		return
 	}
+	defer dbConn.Close()
 	config.Lg("main", "main").Info("Connected to DB")
 
-	srv := server.New(config.Conf)
+	srv := server.New(config.Conf, dbConn)
 
 	srv.Run()
 
 	config.Lg("main", "main").Info("Server stopped")
-}
-
-func Close() {
-	if err := config.Db.Close(); err != nil {
-		log.Fatal(err)
-		return
-	}
-	config.Lg("main", "Close").Info("DB connection closed")
 }

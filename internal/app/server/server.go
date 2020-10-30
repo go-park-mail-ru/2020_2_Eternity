@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	user_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/delivery"
+
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
@@ -16,6 +17,10 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/websockets"
 )
 
 type Server struct {
@@ -23,31 +28,27 @@ type Server struct {
 	server  *http.Server
 }
 
-func New(config *config.Config) *Server {
+func New(config *config.Config, db database.IDbConn) *Server {
 	logFile := setupGinLogger()
-	r := gin.Default()
 
+	r := gin.Default()
+	r.MaxMultipartMemory = 8 << 20
 	r.Static(config.Web.Static.UrlImg, config.Web.Static.DirImg)
 
-	r.POST("/user/signup", user.SignUp)
-	r.POST("/user/login", user.Login)
-	r.GET("/images/avatar/:file", user.GetAvatar)
+	ws := websockets.NewPool()
 
-	r.POST("/user/logout", user.AuthCheck(), user.Logout)
-	r.POST("/user/pin", user.AuthCheck(), pin.CreatePin)
-	r.GET("/user/pin", user.AuthCheck(), pin.GetPin)
-	r.GET("/user/profile", user.AuthCheck(), user.GetProfile)
+	user_delivery.AddUserRoutes(r, db, ws)
 
-	r.PUT("/user/profile/password", user.AuthCheck(), user.UpdatePassword)
-	r.PUT("/user/profile/", user.AuthCheck(), user.UpdateUser)
+	r.GET("/ws", ws.Add)
+
+	//r.Use(auth.AuthCheck())
+	r.POST("/user/pin", auth.AuthCheck(), pin.CreatePin)
+	r.GET("/user/pin", auth.AuthCheck(), pin.GetPin)
 
 	rpd := comment.NewResponder()
-	r.POST("/pin/comments", user.AuthCheck(), rpd.CreateComment)
+	r.POST("/pin/comments", auth.AuthCheck(), rpd.CreateComment)
 	r.GET(fmt.Sprintf("/pin/:%s/comments", comment.PinIdParam), rpd.GetComments)
 	r.GET(fmt.Sprintf("/comment/:%s", comment.CommentIdParam), rpd.GetCommentById)
-
-	r.MaxMultipartMemory = 8 << 20
-	r.POST("/user/profile/avatar", user.AuthCheck(), user.SetAvatar)
 
 	return &Server{
 		logFile: logFile,

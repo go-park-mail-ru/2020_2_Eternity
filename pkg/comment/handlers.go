@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"net/http"
 )
@@ -31,7 +31,7 @@ func NewResponder() *ResponderComment {
 }
 
 func (rc *ResponderComment) CreateComment(c *gin.Context) {
-	claimsId, ok := user.GetClaims(c)
+	claimsId, ok := auth.GetClaims(c)
 	if !ok {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		config.Lg("comment", "CreateComment").Error("Can't get claims")
