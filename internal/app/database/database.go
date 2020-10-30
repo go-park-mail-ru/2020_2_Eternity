@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	configDB "github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -42,4 +44,20 @@ func (db *DB) Open() error {
 
 func (db *DB) Close() {
 	db.dbPool.Close()
+}
+
+func (db *DB) Begin(ctx context.Context) (pgx.Tx, error) {
+	return db.dbPool.Begin(ctx)
+}
+
+func (db *DB) Exec(ctx context.Context, sql string, arguments ...interface{}) (pgconn.CommandTag, error) {
+	return db.dbPool.Exec(ctx, sql, arguments)
+}
+
+func (db *DB) Query(ctx context.Context, sql string, optionsAndArgs ...interface{}) (pgx.Rows, error) {
+	return db.dbPool.Query(ctx, sql, optionsAndArgs)
+}
+
+func (db *DB) QueryRow(ctx context.Context, sql string, optionsAndArgs ...interface{}) pgx.Row {
+	return db.dbPool.QueryRow(ctx, sql, optionsAndArgs)
 }

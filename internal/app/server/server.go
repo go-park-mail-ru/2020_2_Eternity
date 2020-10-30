@@ -37,7 +37,7 @@ func TestMwWs(ws *websockets.WebSocketPool) gin.HandlerFunc {
 	}
 }
 
-func New(config *config.Config, db database.DBInterface) *Server {
+func New(config *config.Config, db database.IDbConn) *Server {
 
 	ws := websockets.NewPool()
 
