@@ -126,7 +126,7 @@ func TestCreatePin(t *testing.T) {
 		assert.Fail(t, "Error while Readall")
 	}
 
-	recvPinApi := api.GetPin{}
+	recvPinApi := api.PinResp{}
 	if err := json.Unmarshal(recBody, &recvPinApi); err != nil {
 		assert.Fail(t, "Error while unmarshal")
 	}

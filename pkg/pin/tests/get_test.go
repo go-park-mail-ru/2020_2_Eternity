@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"path/filepath"
 	"testing"
 	"time"
@@ -89,15 +90,22 @@ func cleanupGetPin(t *testing.T) {
 	}
 }
 
-func createPinsApi() []api.GetPin {
-	pinsApi := []api.GetPin{}
+func createPinsApi() []api.PinResp {
+	pinsApi := []api.PinResp{}
+
 	for _, p := range pinsGet {
-		pinsApi = append(pinsApi, api.GetPin{
+		imgUrl := url.URL{
+			Scheme: config.Conf.Web.Server.Protocol,
+			Host:   config.Conf.Web.Server.Host,
+			Path:   filepath.Join(config.Conf.Web.Static.UrlImg, p.PictureName),
+		}
+
+		pinsApi = append(pinsApi, api.PinResp{
 			Id:      p.Id,
 			Title:   p.Title,
 			Content: p.Content,
 			UserId:  p.UserId,
-			ImgLink: filepath.Join(config.Conf.Web.Static.UrlImg, p.PictureName),
+			ImgLink: imgUrl.String(),
 		})
 	}
 	return pinsApi

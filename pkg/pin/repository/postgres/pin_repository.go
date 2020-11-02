@@ -1,22 +1,25 @@
-package pin
+package postgres
 
 import (
-	"github.com/go-park-mail-ru/2020_2_Eternity/api"
+	"context"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	"log"
-	"path/filepath"
+	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 )
 
-type Pin struct {
-	Id          int    `json:"id"`
-	Title       string `json:"title"`
-	Content     string `json:"content"`
-	PictureName string `json:"picture_name"`
-	UserId      int    `json:"user_id"`
+type Repository struct {
+	dbConn database.IDbConn
 }
 
-func (p *Pin) CreatePin() error {
-	err := config.Db.QueryRow(
+func NewRepo(d database.IDbConn) *Repository {
+	return &Repository{
+		dbConn: d,
+	}
+}
+
+func (r *Repository) StorePin(p *domain.Pin) error {
+	err := r.dbConn.QueryRow(
+		context.Background(),
 		"with rows as "+
 			"(insert into pins (title, content, user_id) "+
 			"values($1, $2, $3) returning id) "+
@@ -24,53 +27,55 @@ func (p *Pin) CreatePin() error {
 		p.Title, p.Content, p.UserId, p.PictureName).Scan(&p.Id)
 
 	if err != nil {
+		config.Lg("pin", "pin.StorePin").Error(err.Error())
 		return err
 	}
 
 	return nil
 }
 
-func (p *Pin) GetPin(id int) error {
-	row := config.Db.QueryRow(
+func (r *Repository) GetPin(id int) (domain.Pin, error) {
+	row := r.dbConn.QueryRow(
+		context.Background(),
 		"select id, title, content, name, user_id "+
 			"from pins join pin_images "+
 			"on pins.id = pin_images.pin_id "+
 			"where pins.id=$1;",
 		id)
 
+	p := domain.Pin{}
 	if err := row.Scan(&p.Id, &p.Title, &p.Content, &p.PictureName, &p.UserId); err != nil {
-		log.Print(err)
-		return err
+		config.Lg("pin", "pin.GetPin").Error(err.Error())
+		return domain.Pin{}, err
 	}
-
 	p.Id = id
-	return nil
+
+	return p, nil
 }
 
-func GetPinList(userId int) ([]api.GetPin, error) {
-	rows, err := config.Db.Query(
+func (r *Repository) GetPinList(userId int) ([]domain.Pin, error) {
+	rows, err := r.dbConn.Query(
+		context.Background(),
 		"select pins.id, title, content, name, user_id "+
 			"from pins join pin_images "+
 			"on pins.id = pin_images.pin_id "+
 			"where user_id=$1;",
 		userId)
 	if err != nil {
+		config.Lg("pin", "pin.GetPinList").Error(err.Error())
 		return nil, err
 	}
 
-	pins := []api.GetPin{}
+	defer rows.Close()
+
+	pins := []domain.Pin{}
 	for rows.Next() {
-		pin := Pin{}
+		pin := domain.Pin{}
 		if err := rows.Scan(&pin.Id, &pin.Title, &pin.Content, &pin.PictureName, &pin.UserId); err != nil {
 			return nil, err
 		}
-		pins = append(pins, api.GetPin{
-			Id:      pin.Id,
-			Title:   pin.Title,
-			Content: pin.Content,
-			ImgLink: filepath.Join(config.Conf.Web.Static.UrlImg, pin.PictureName), // TODO full path
-			UserId:  pin.UserId,
-		})
+
+		pins = append(pins, pin)
 	}
 
 	return pins, nil

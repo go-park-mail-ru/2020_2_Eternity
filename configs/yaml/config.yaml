@@ -5,7 +5,8 @@ database: {
     password: "662f2710-4e08-4be7-a278-a53ae86ba7f6",
     db_name: "pinterest_db",
     ssl_mode: "disable",
-    host: "localhost"
+    host: "localhost",
+    max_conn: 10
   }
 }
 
@@ -13,6 +14,8 @@ web: {
   server: {
     address: "localhost",
     port: "8008",
+    host: "pinterest-tp.tk",
+    protocol: "http",
   },
   static: {
     dir_img: "static/img",
@@ -26,3 +29,12 @@ token: {
   cookiename: "eternity",
   value: 7,
 }
+
+logger: {
+  gin_file:  "/var/log/pinterest/gin.log",
+  gin_level: "debug",  # (release|test|debug)
+  common_file: "/var/log/pinterest/common.log",
+  common_level: "debug",  # (panic|fatal|error|warn|info|debug|trace)
+  stdout_log: "true",
+}
+
