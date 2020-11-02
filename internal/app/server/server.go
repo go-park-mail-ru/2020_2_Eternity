@@ -6,9 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	pin_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/delivery/http"
+	comment_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/delivery/http"
 	user_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/delivery"
 
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/websockets"
 )
 
@@ -40,11 +39,12 @@ func New(config *config.Config, db database.IDbConn) *Server {
 
 	user_delivery.AddUserRoutes(r, db, ws)
 	pin_delivery.AddPinRoutes(r, db, config)
+	comment_delivery.AddCommentRoutes(r, db)
 
-	rpd := comment.NewResponder()
-	r.POST("/pin/comments", auth.AuthCheck(), rpd.CreateComment)
-	r.GET(fmt.Sprintf("/pin/:%s/comments", comment.PinIdParam), rpd.GetComments)
-	r.GET(fmt.Sprintf("/comment/:%s", comment.CommentIdParam), rpd.GetCommentById)
+	//rpd := comment.NewResponder()
+	//r.POST("/pin/comments", auth.AuthCheck(), rpd.CreateComment)
+	//r.GET(fmt.Sprintf("/pin/:%s/comments", comment.PinIdParam), rpd.GetComments)
+	//r.GET(fmt.Sprintf("/comment/:%s", comment.CommentIdParam), rpd.GetCommentById)
 
 	return &Server{
 		logFile: logFile,

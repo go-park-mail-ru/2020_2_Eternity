@@ -1,30 +1,29 @@
-package comment
+package postgres
 
 import (
+	"context"
 	"errors"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	"strconv"
 )
 
-type Comment struct {
-	Id      int
-	Path    []int32
-	Content string
-	PinId   int
-	UserId  int
+type Repository struct {
+	dbConn database.IDbConn
 }
 
-type RepoComment interface {
-	CreateChildComment(c *Comment, parentId int) error
-	CreateRootComment(c *Comment) error
-	GetComment(id int) (Comment, error)
-	GetAllComments(pinId int) ([]Comment, error)
+func NewRepo(d database.IDbConn) *Repository {
+	return &Repository{
+		dbConn: d,
+	}
 }
 
-type RepoCommentInstance struct{}
 
-func (rc *RepoCommentInstance) CreateChildComment(c *Comment, parentId int) error {
-	err := config.Db.QueryRow(
+func (r *Repository) StoreChildComment(c *domain.Comment, parentId int) error {
+	// TODO (Pavel S) query should check if parent comment exists
+	err := r.dbConn.QueryRow(
+		context.Background(),
 		"insert into comments (path, content, pin_id, user_id) "+
 			"values("+
 			"(select path from comments where id = $1) || (select currval('comments_id_seq')::integer), "+
@@ -33,28 +32,29 @@ func (rc *RepoCommentInstance) CreateChildComment(c *Comment, parentId int) erro
 		parentId, c.Content, c.PinId, c.UserId).Scan(&c.Id, &c.Path)
 
 	if len(c.Path) < 2 {
-		if _, err := config.Db.Exec("delete from comments where id = $1", c.Id); err != nil {
-			config.Lg("comment", "comment.CreateComment").
+		if _, err := r.dbConn.Exec(context.Background(),"delete from comments where id = $1", c.Id); err != nil {
+			config.Lg("comment_postgres", "StoreChildComment").
 				Error("Can't delete wrongly created comment")
 
 			return errors.New("Can't delete wrongly created comment")
 		}
 
-		config.Lg("comment", "comment.CreateComment").
+		config.Lg("comment_postgres", "StoreChildComment").
 			Error("Given parent id not found in table")
 		return errors.New("Given parent id not found in table")
 	}
 
 	if err != nil {
-		config.Lg("comment", "comment.CreateChildComment").Error(err.Error())
+		config.Lg("comment_postgres", "StoreChildComment").Error(err.Error())
 		return err
 	}
 
 	return nil
 }
 
-func (rc *RepoCommentInstance) CreateRootComment(c *Comment) error {
-	err := config.Db.QueryRow(
+func (r *Repository) StoreRootComment(c *domain.Comment) error {
+	err := r.dbConn.QueryRow(
+		context.Background(),
 		"insert into comments (path, content, pin_id, user_id) "+
 			"values("+
 			"ARRAY(select currval('comments_id_seq')::integer), "+
@@ -63,31 +63,33 @@ func (rc *RepoCommentInstance) CreateRootComment(c *Comment) error {
 		c.Content, c.PinId, c.UserId).Scan(&c.Id, &c.Path)
 
 	if err != nil {
-		config.Lg("comment", "comment.CreateRootComment").Error(err.Error())
+		config.Lg("comment_postgres", "StoreRootComment").Error(err.Error())
 		return err
 	}
 
 	return nil
 }
 
-func (rc *RepoCommentInstance) GetComment(id int) (Comment, error) {
-	c := Comment{}
-	err := config.Db.QueryRow(
+func (r *Repository) GetComment(commentId int) (domain.Comment, error) {
+	c := domain.Comment{}
+	err := r.dbConn.QueryRow(
+		context.Background(),
 		"select id, path, content, pin_id, user_id "+
 			"from comments "+
 			"where id = $1",
-		id).Scan(&c.Id, &c.Path, &c.Content, &c.PinId, &c.UserId)
+		commentId).Scan(&c.Id, &c.Path, &c.Content, &c.PinId, &c.UserId)
 
 	if err != nil {
-		config.Lg("comment", "comment.GetComment").Error(err.Error())
-		return Comment{}, err
+		config.Lg("comment_postgres", "GetComment").Error(err.Error())
+		return domain.Comment{}, err
 	}
 
 	return c, nil
 }
 
-func (rc *RepoCommentInstance) GetAllComments(pinId int) ([]Comment, error) {
-	rows, err := config.Db.Query(
+func (r *Repository) GetPinComments(pinId int) ([]domain.Comment, error) {
+	rows, err := r.dbConn.Query(
+		context.Background(),
 		"select id, path, content, pin_id, user_id "+
 			"from comments "+
 			"where pin_id = $1 "+
@@ -95,19 +97,19 @@ func (rc *RepoCommentInstance) GetAllComments(pinId int) ([]Comment, error) {
 		pinId)
 
 	if err != nil {
-		config.Lg("comment", "comment.GetAllComments").Error(err.Error())
+		config.Lg("comment_postgres", "GetPinComments").Error(err.Error())
 		return nil, err
 	}
 
 	defer rows.Close()
 
-	comments := []Comment{}
+	comments := []domain.Comment{}
 	for rows.Next() {
-		c := Comment{}
+		c := domain.Comment{}
 		err := rows.Scan(&c.Id, &c.Path, &c.Content, &c.PinId, &c.UserId)
 
 		if err != nil {
-			config.Lg("comment", "comment.GetAllComments").Error(err.Error())
+			config.Lg("comment_postgres", "GetPinComments").Error(err.Error())
 			return nil, err
 		}
 
@@ -115,13 +117,13 @@ func (rc *RepoCommentInstance) GetAllComments(pinId int) ([]Comment, error) {
 	}
 
 	if rows.Err() != nil {
-		config.Lg("comment", "comment.GetAllComments").Error(rows.Err())
+		config.Lg("comment_postgres", "GetPinComments").Error(rows.Err())
 		return nil, rows.Err()
 	}
 
 	// TODO (Pavel S) Is it an error?
 	if len(comments) == 0 {
-		config.Lg("comment", "comment.GetAllComments").
+		config.Lg("comment_postgres", "GetPinComments").
 			Error("Comments not found for given id ", pinId)
 		return nil, errors.New("Comments not found for given id " + strconv.Itoa(pinId))
 	}
