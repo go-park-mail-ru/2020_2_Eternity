@@ -1,6 +1,7 @@
 package websockets
 
 import (
+	"container/list"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"log"
@@ -10,13 +11,13 @@ import (
 
 type WebSocketPool struct {
 	upgrader websocket.Upgrader
-	clients  map[int][]*websocket.Conn
+	clients  map[int]*list.List //*websocket.Conn
 	mutex    *sync.Mutex
 }
 
 func NewPool() *WebSocketPool {
 	return &WebSocketPool{
-		clients: make(map[int][]*websocket.Conn, 0),
+		clients: make(map[int]*list.List, 0),
 		upgrader: websocket.Upgrader{
 			WriteBufferSize: 1024,
 			ReadBufferSize:  1024,
@@ -29,9 +30,10 @@ func NewPool() *WebSocketPool {
 }
 
 func (wsPool *WebSocketPool) Add(c *gin.Context) {
-	_, ok := c.Get("id") // надо выставлять после проверки аутентификации, т.е использовать с auth mw
+	id, ok := c.Get("id") // надо выставлять после проверки аутентификации, т.е использовать с auth mw
 	if !ok {
-		log.Println("SAMO SOBOY BEZ MW ZHE")
+		log.Println("ID doesnt set")
+		//return
 	}
 
 	wsPool.mutex.Lock()
@@ -40,17 +42,52 @@ func (wsPool *WebSocketPool) Add(c *gin.Context) {
 		log.Println(err)
 		return
 	}
-	wsPool.clients[1] = append(wsPool.clients[1], conn) // сюда не 1, а id из get
+	id = 1
+	if _, ok := wsPool.clients[id.(int)]; !ok {
+		wsPool.clients[id.(int)] = list.New()
+	}
+
+	wsPool.clients[id.(int)].PushFront(conn)
+	//wsPool.clients[id.(int)].PushFront() = //append(wsPool.clients[id.(int)], conn) // сюда не 1, а id из get
 	wsPool.mutex.Unlock()
 }
 
 func (wsPool *WebSocketPool) Send(uid int, message []byte) {
-	for _, client := range wsPool.clients[uid] {
-		err := client.WriteMessage(websocket.TextMessage, message)
-		if err != nil {
-			log.Println(err)
-		}
-		log.Println(err)
+	l, ok := wsPool.clients[uid]
+	if !ok {
+		log.Println("Empty")
+		return
 	}
-	log.Println(" len is ", len(wsPool.clients))
+	for e := l.Front(); e != nil; e = e.Next() {
+		if err := e.Value.(*websocket.Conn).WriteMessage(websocket.PingMessage, []byte{}); err != nil {
+			log.Println(err)
+			err = e.Value.(*websocket.Conn).Close()
+			if err != nil {
+				log.Println(err)
+			}
+			wsPool.mutex.Lock()
+			l.Remove(e)
+			wsPool.mutex.Unlock()
+			continue
+		}
+
+		if err := e.Value.(*websocket.Conn).WriteMessage(websocket.TextMessage, message); err != nil {
+			log.Println(err)
+			err = e.Value.(*websocket.Conn).Close()
+			if err != nil {
+				log.Println(err)
+			}
+			wsPool.mutex.Lock()
+			l.Remove(e)
+			wsPool.mutex.Unlock()
+		}
+	}
+
+	if _, ok := wsPool.clients[uid]; ok && wsPool.clients[uid].Len() == 0 {
+		wsPool.mutex.Lock()
+		delete(wsPool.clients, uid)
+		// удалить id клиента из мапы под мьютексом
+		log.Println("DELETE NEED")
+		wsPool.mutex.Unlock()
+	}
 }
