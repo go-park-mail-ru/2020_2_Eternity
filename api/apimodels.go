@@ -71,6 +71,6 @@ type AttachDetachPin struct {
 }
 
 type GetBoardPins struct {
-	BoardID   int `json:"board_id"`
-	LastPinId int `json:"pin_id"`
+	BoardID int `json:"board_id"`
+	//LastPinId int `json:"pin_id"`
 }

@@ -90,3 +90,24 @@ func (u *Usecase) GetPinList(userId int) ([]domain.PinResp, error) {
 
 	return pinsResp, nil
 }
+
+func (u *Usecase) GetPinBoardList(boardId int) ([]domain.PinResp, error) {
+	pins, err := u.repository.GetPinBoardList(boardId)
+	if err != nil {
+		config.Lg("pin_usecase", "GetPinList").Error("Repo: ", err.Error())
+		return nil, err
+	}
+
+	var pinsResp []domain.PinResp
+	for _, p := range pins {
+		pinsResp = append(pinsResp, domain.PinResp{
+			Id:      p.Id,
+			Title:   p.Title,
+			Content: p.Content,
+			ImgLink: getUrlImg(p.PictureName),
+			UserId:  p.UserId,
+		})
+	}
+
+	return pinsResp, nil
+}

@@ -8,4 +8,6 @@ import (
 type IUsecase interface {
 	CreatePin(pin *domain.PinReq, file *multipart.FileHeader, userId int) (domain.PinResp, error)
 	GetPinList(userId int) ([]domain.PinResp, error)
+
+	GetPinBoardList(boardId int) ([]domain.PinResp, error)
 }

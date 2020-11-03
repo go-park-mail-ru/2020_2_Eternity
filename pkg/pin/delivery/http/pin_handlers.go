@@ -2,10 +2,12 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"mime/multipart"
 	"net/http"
 )
@@ -63,6 +65,22 @@ func (h *Handler) GetAllPins(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		config.Lg("pin_http", "GetAllPins").Error("uc.GetPinList: " + err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, pins)
+}
+
+func (h *Handler) GetPinsFromBoard(c *gin.Context) {
+	bp := api.GetBoardPins{}
+	if err := c.BindJSON(&bp); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		config.Lg("pin_http", "GetPinsFromBoard").Error("Bind: ", err.Error())
+		return
+	}
+	pins, err := h.uc.GetPinBoardList(bp.BoardID)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Cant show pins from board"})
+		config.Lg("pin_http", "GetPinsFromBoard").Error("Get pins", err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, pins)

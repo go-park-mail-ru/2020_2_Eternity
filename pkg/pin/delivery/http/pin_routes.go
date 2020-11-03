@@ -16,6 +16,8 @@ func AddPinRoutes(r *gin.Engine, db database.IDbConn, conf *config.Config) {
 	uc := usecase.NewUsecase(rep, store)
 	handler := NewHandler(uc)
 
+	r.GET("/user/pin/board", handler.GetPinsFromBoard)
+
 	authorized := r.Group("/", auth.AuthCheck())
 
 	authorized.POST("/user/pin", handler.CreatePin)

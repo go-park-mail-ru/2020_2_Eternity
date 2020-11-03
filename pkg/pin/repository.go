@@ -9,6 +9,8 @@ type IRepository interface {
 	StorePin(p *domain.Pin) error
 	GetPin(id int) (domain.Pin, error)
 	GetPinList(userId int) ([]domain.Pin, error)
+
+	GetPinBoardList(boardId int) ([]domain.Pin, error)
 }
 
 type IStorage interface {
