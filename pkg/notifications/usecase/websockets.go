@@ -84,7 +84,7 @@ func (wsPool *WebSocketPool) Run() {
 			var note domain.Notification
 			select {
 			case <- ctx.Done():
-				config.Lg("websockets", fmt.Sprintf("Worker#%d", i)).Info("Goroutine exit")
+				config.Lg("notifications", fmt.Sprintf("Worker#%d", i)).Info("Goroutine exit")
 				wsPool.wg.Done()
 				return
 			case note = <- wsPool.noteQueue:
@@ -97,12 +97,12 @@ func (wsPool *WebSocketPool) Run() {
 func (wsPool *WebSocketPool) notify(note *domain.Notification) {
 	data, err := json.Marshal(note)
 	if err != nil {
-		config.Lg("websockets", "notify").Error(err.Error())
+		config.Lg("notifications", "notify").Error(err.Error())
 		return
 	}
 
 	if err := wsPool.connects.SendData(note.ToUserId, data); err != nil {
-		config.Lg("websockets", "notify").Error(err.Error())
+		config.Lg("notifications", "notify").Error(err.Error())
 		return
 	}
 }
@@ -110,11 +110,11 @@ func (wsPool *WebSocketPool) notify(note *domain.Notification) {
 func (wsPool *WebSocketPool) Stop() {
 	// TODO (Pavel S) close connections
 	if wsPool.cancel == nil {
-		config.Lg("websockets", "Stop").Error("Nothing to exit")
+		config.Lg("notifications", "Stop").Error("Nothing to exit")
 		return
 	}
 
-	config.Lg("websockets", "Stop").Info("Terminating workers...")
+	config.Lg("notifications", "Stop").Info("Terminating workers...")
 	wsPool.cancel()
 	wsPool.wg.Wait()
 }

@@ -8,8 +8,8 @@ import (
 	comment_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/delivery/http"
 	pin_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/delivery/http"
 	user_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/delivery"
-	ws_http "github.com/go-park-mail-ru/2020_2_Eternity/pkg/websockets/delivery/http"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/websockets/usecase"
+	ws_http "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/usecase"
 
 	log "github.com/sirupsen/logrus"
 	"io"

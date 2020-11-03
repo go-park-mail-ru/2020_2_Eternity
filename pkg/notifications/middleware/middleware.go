@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/websockets/usecase"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/usecase"
 )
 
 func WsMiddleware(ws *usecase.WebSocketPool) gin.HandlerFunc {

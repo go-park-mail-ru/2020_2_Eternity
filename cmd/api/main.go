@@ -4,7 +4,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/server"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/websockets/usecase"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/usecase"
 )
 
 func init() {

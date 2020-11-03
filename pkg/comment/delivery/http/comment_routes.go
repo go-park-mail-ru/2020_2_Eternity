@@ -7,8 +7,8 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
 	comment_postgres "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/repository/postgres"
 	comment_usecase "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/usecase"
-	ws_middleware "github.com/go-park-mail-ru/2020_2_Eternity/pkg/websockets/middleware"
-	ws_usecase "github.com/go-park-mail-ru/2020_2_Eternity/pkg/websockets/usecase"
+	ws_middleware "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/middleware"
+	ws_usecase "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/usecase"
 )
 
 /*
