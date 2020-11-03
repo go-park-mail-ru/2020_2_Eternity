@@ -83,7 +83,7 @@ func (h *Handler) Login(c *gin.Context) {
 	cookie := http.Cookie{
 		Name:     config.Conf.Token.CookieName,
 		Value:    ss,
-		Expires:  time.Now().Add(5 * time.Minute),
+		Expires:  time.Now().Add(45 * time.Minute),
 		HttpOnly: true,
 		Path:     "/",
 	}

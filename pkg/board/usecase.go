@@ -9,4 +9,9 @@ type IUsecase interface {
 	CreateBoard(userId int, b *api.CreateBoard) (*domain.Board, error)
 	GetBoard(id int) (*domain.Board, error)
 	GetAllBoardsByUser(username string) ([]domain.Board, error)
+
+	CheckOwner(userId int, boardId int) error
+
+	AttachPin(boardId int, pinId int) error
+	DetachPin(boardId int, pinId int) error
 }

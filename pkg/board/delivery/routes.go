@@ -19,5 +19,7 @@ func AddBoardRoutes(r *gin.Engine, db database.IDbConn) {
 	authorized := r.Group("/", auth.AuthCheck())
 	{
 		authorized.POST("/board", handler.CreateBoard)
+		authorized.POST("/attach", handler.AttachPinToBoard)
+		authorized.DELETE("/detach", handler.DetachPinFromBoard)
 	}
 }

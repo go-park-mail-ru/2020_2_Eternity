@@ -65,7 +65,7 @@ type CreateBoard struct {
 	Content string `json:"content"`
 }
 
-type AttachPinToBoard struct {
+type AttachDetachPin struct {
 	BoardID int `json:"board_id"`
 	PinID   int `json:"pin_id"`
 }

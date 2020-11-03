@@ -63,3 +63,45 @@ func (h *Handler) GetAllBoardsbyUser(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, b)
 }
+
+func (h *Handler) AttachPinToBoard(c *gin.Context) {
+	bp, status, err := h.prepAtDet(c)
+	if err != nil {
+		c.AbortWithStatusJSON(status, *err)
+		return
+	}
+	if err := h.uc.AttachPin(bp.BoardID, bp.PinID); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Cannot attach"})
+		return
+	}
+	c.Status(http.StatusOK)
+}
+
+func (h *Handler) DetachPinFromBoard(c *gin.Context) {
+	bp, status, err := h.prepAtDet(c)
+	if err != nil {
+		c.AbortWithStatusJSON(status, *err)
+		return
+	}
+	if err := h.uc.DetachPin(bp.BoardID, bp.PinID); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Cannot attach"})
+		return
+	}
+	c.Status(http.StatusOK)
+}
+
+func (h *Handler) prepAtDet(c *gin.Context) (*api.AttachDetachPin, int, *utils.Error) {
+	claimsId, ok := auth.GetClaims(c)
+	if !ok {
+		return nil, http.StatusUnauthorized, &utils.Error{Error: "invalid token"}
+	}
+
+	bp := api.AttachDetachPin{}
+	if err := c.BindJSON(&bp); err != nil {
+		return nil, http.StatusBadRequest, &utils.Error{Error: "[BindJSON]: " + err.Error()}
+	}
+	if err := h.uc.CheckOwner(claimsId, bp.BoardID); err != nil {
+		return &bp, http.StatusBadRequest, &utils.Error{Error: err.Error()}
+	}
+	return &bp, http.StatusOK, nil
+}

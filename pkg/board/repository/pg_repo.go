@@ -60,3 +60,34 @@ func (r *Repository) GetAllBoardsByUser(username string) ([]domain.Board, error)
 	}
 	return boards, nil
 }
+
+func (r *Repository) CheckOwner(userId int, boardId int) error {
+	var owner int
+	if err := r.dbConn.QueryRow(context.Background(), "select user_id from boards where id = $1", boardId).Scan(&owner); err != nil {
+		config.Lg("board", "CheckOwner").Error(err.Error())
+		return err
+	}
+
+	if owner != userId {
+		err := errors.New("not an owner")
+		config.Lg("board", "CheckOwner").Error(err.Error())
+		return err
+	}
+	return nil
+}
+
+func (r *Repository) AttachPin(boardId int, pinId int) error {
+	if _, err := r.dbConn.Exec(context.Background(), "insert into boards_pins(board_id, pin_id) values($1, $2)", boardId, pinId); err != nil {
+		config.Lg("board", "AttachPin").Error(err.Error())
+		return err
+	}
+	return nil
+}
+
+func (r *Repository) DetachPin(boardId int, pinId int) error {
+	if _, err := r.dbConn.Exec(context.Background(), "delete from boards_pins where board_id = $1 and pin_id = $2", boardId, pinId); err != nil {
+		config.Lg("board", "DetachPin").Error(err.Error())
+		return err
+	}
+	return nil
+}

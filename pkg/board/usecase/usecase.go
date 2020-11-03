@@ -26,3 +26,14 @@ func (uc *BoardUsecase) GetBoard(id int) (*domain.Board, error) {
 func (uc *BoardUsecase) GetAllBoardsByUser(username string) ([]domain.Board, error) {
 	return uc.repo.GetAllBoardsByUser(username)
 }
+
+func (uc *BoardUsecase) CheckOwner(userId int, boardId int) error {
+	return uc.repo.CheckOwner(userId, boardId)
+}
+
+func (uc *BoardUsecase) AttachPin(boardId int, pinId int) error {
+	return uc.repo.AttachPin(boardId, pinId)
+}
+func (uc *BoardUsecase) DetachPin(boardId int, pinId int) error {
+	return uc.repo.DetachPin(boardId, pinId)
+}
