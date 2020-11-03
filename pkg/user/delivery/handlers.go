@@ -8,6 +8,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
+	"github.com/microcosm-cc/bluemonday"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 	"log"
@@ -19,11 +20,13 @@ import (
 
 type Handler struct {
 	uc user.IUsecase
+	p  *bluemonday.Policy
 }
 
-func NewHandler(uc user.IUsecase) *Handler {
+func NewHandler(uc user.IUsecase, p *bluemonday.Policy) *Handler {
 	return &Handler{
 		uc: uc,
+		p:  p,
 	}
 }
 
@@ -291,16 +294,19 @@ func (h *Handler) Unfollow(c *gin.Context) {
 }
 
 func (h *Handler) prepareFollow(c *gin.Context) (int, int, int, *utils.Error) {
-	followed := api.Follow{}
-
-	if err := c.BindJSON(&followed); err != nil {
-		return -1, -1, http.StatusBadRequest, &utils.Error{"bad json"}
-	}
-
 	claimsId, ok := auth.GetClaims(c)
 
 	if !ok {
 		return -1, -1, http.StatusUnauthorized, &utils.Error{Error: "invalid token"}
+	}
+
+	followed := api.Follow{}
+	if err := c.BindJSON(&followed); err != nil {
+		return -1, -1, http.StatusBadRequest, &utils.Error{Error: "bad json"}
+	}
+
+	if err := utils.ValidUsername(followed); err != nil {
+		return -1, -1, http.StatusBadRequest, &utils.Error{Error: "invalid username"}
 	}
 
 	u, err := h.uc.GetUserByName(followed.Username)
@@ -311,24 +317,17 @@ func (h *Handler) prepareFollow(c *gin.Context) (int, int, int, *utils.Error) {
 	return claimsId, u.ID, http.StatusOK, nil
 }
 
-/*func (h *Handler) GetUserPage(c *gin.Context) {
-
-	u, err := h.uc.GetUserByNameWithFollowers(c.Param("username"));
+func (h *Handler) GetUserPage(c *gin.Context) {
+	u, err := h.uc.GetUserByNameWithFollowers(c.Param("username"))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "not found user"})
 		return
 	}
 
-	pins, err := pin.GetPinList(u.ID)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, utils.Error{Error: "pins not found"})
-		return
-	}
 	userPage := api.UserPage{
 		Username:  u.Username,
 		Followers: u.Followers,
 		Following: u.Following,
-		PinsList:  pins,
 	}
 	c.JSON(http.StatusOK, userPage)
-}*/
+}

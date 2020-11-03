@@ -7,12 +7,13 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/repository"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/usecase"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/websockets"
+	"github.com/microcosm-cc/bluemonday"
 )
 
-func AddUserRoutes(r *gin.Engine, db database.IDbConn, ws *websockets.WebSocketPool) {
+func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, ws *websockets.WebSocketPool) {
 	rep := repository.NewRepo(db)
 	uc := usecase.NewUsecase(rep)
-	handler := NewHandler(uc)
+	handler := NewHandler(uc, p)
 
 	r.POST("/user/signup", handler.SignUp)
 	r.POST("/user/login", handler.Login)

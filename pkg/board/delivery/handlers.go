@@ -6,17 +6,20 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/board"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
+	"github.com/microcosm-cc/bluemonday"
 	"net/http"
 	"strconv"
 )
 
 type Handler struct {
 	uc board.IUsecase
+	p  *bluemonday.Policy
 }
 
-func NewHandler(uc board.IUsecase) *Handler {
+func NewHandler(uc board.IUsecase, p *bluemonday.Policy) *Handler {
 	return &Handler{
 		uc: uc,
+		p:  p,
 	}
 }
 
@@ -32,6 +35,8 @@ func (h *Handler) CreateBoard(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "[BindJSON]: " + err.Error()})
 		return
 	}
+
+	h.sanitize(&b)
 
 	rb, err := h.uc.CreateBoard(claimsId, &b)
 	if err != nil {
@@ -49,7 +54,7 @@ func (h *Handler) GetBoard(c *gin.Context) {
 	}
 	b, err := h.uc.GetBoard(id)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, err)
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, utils.Error{Error: "not found or fake id"})
 		return
 	}
 	c.JSON(http.StatusOK, *b)
@@ -84,7 +89,7 @@ func (h *Handler) DetachPinFromBoard(c *gin.Context) {
 		return
 	}
 	if err := h.uc.DetachPin(bp.BoardID, bp.PinID); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Cannot attach"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Cannot detach"})
 		return
 	}
 	c.Status(http.StatusOK)
@@ -104,4 +109,9 @@ func (h *Handler) prepAtDet(c *gin.Context) (*api.AttachDetachPin, int, *utils.E
 		return &bp, http.StatusBadRequest, &utils.Error{Error: err.Error()}
 	}
 	return &bp, http.StatusOK, nil
+}
+
+func (h *Handler) sanitize(b *api.CreateBoard) {
+	b.Content = h.p.Sanitize(b.Content)
+	b.Title = h.p.Sanitize(b.Title)
 }

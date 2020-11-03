@@ -8,6 +8,7 @@ import (
 	boardDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/board/delivery"
 	pinDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/delivery/http"
 	userDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/delivery"
+	"github.com/microcosm-cc/bluemonday"
 
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment"
 	log "github.com/sirupsen/logrus"
@@ -39,9 +40,11 @@ func New(config *config.Config, db database.IDbConn) *Server {
 	ws := websockets.NewPool()
 	r.GET("/ws", ws.Add)
 
-	userDelivery.AddUserRoutes(r, db, ws)
+	p := bluemonday.UGCPolicy()
+
+	userDelivery.AddUserRoutes(r, db, p, ws)
 	pinDelivery.AddPinRoutes(r, db, config)
-	boardDelivery.AddBoardRoutes(r, db)
+	boardDelivery.AddBoardRoutes(r, db, p)
 
 	rpd := comment.NewResponder()
 	r.POST("/pin/comments", auth.AuthCheck(), rpd.CreateComment)
