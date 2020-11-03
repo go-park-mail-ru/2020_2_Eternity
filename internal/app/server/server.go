@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	pin_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/delivery/http"
-	user_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/delivery"
+	boardDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/board/delivery"
+	pinDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/delivery/http"
+	userDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/delivery"
 
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment"
 	log "github.com/sirupsen/logrus"
@@ -38,8 +39,9 @@ func New(config *config.Config, db database.IDbConn) *Server {
 	ws := websockets.NewPool()
 	r.GET("/ws", ws.Add)
 
-	user_delivery.AddUserRoutes(r, db, ws)
-	pin_delivery.AddPinRoutes(r, db, config)
+	userDelivery.AddUserRoutes(r, db, ws)
+	pinDelivery.AddPinRoutes(r, db, config)
+	boardDelivery.AddBoardRoutes(r, db)
 
 	rpd := comment.NewResponder()
 	r.POST("/pin/comments", auth.AuthCheck(), rpd.CreateComment)

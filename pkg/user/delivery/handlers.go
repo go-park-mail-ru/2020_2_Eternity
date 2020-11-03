@@ -111,6 +111,12 @@ func (h *Handler) Logout(c *gin.Context) {
 }
 
 func (h *Handler) UpdateUser(c *gin.Context) {
+	claimsId, ok := auth.GetClaims(c)
+	if !ok {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "invalid token"})
+		return
+	}
+
 	profile := api.UpdateUser{}
 	if err := c.BindJSON(&profile); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
@@ -119,13 +125,6 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 
 	if err := utils.ValidUpdate(profile); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
-		return
-	}
-
-	claimsId, ok := auth.GetClaims(c)
-
-	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{"invalid token"})
 		return
 	}
 
@@ -139,8 +138,13 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 }
 
 func (h *Handler) UpdatePassword(c *gin.Context) {
-	psswds := api.UpdatePassword{}
+	claimsId, ok := auth.GetClaims(c)
+	if !ok {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "invalid token"})
+		return
+	}
 
+	psswds := api.UpdatePassword{}
 	if err := c.BindJSON(&psswds); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
@@ -149,12 +153,6 @@ func (h *Handler) UpdatePassword(c *gin.Context) {
 
 	if err := utils.ValidPasswords(psswds); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
-		return
-	}
-
-	claimsId, ok := auth.GetClaims(c)
-	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "invalid token"})
 		return
 	}
 

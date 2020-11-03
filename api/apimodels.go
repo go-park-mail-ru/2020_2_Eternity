@@ -1,7 +1,6 @@
 package api
 
 import (
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	"time"
 )
 
@@ -55,8 +54,23 @@ type Follow struct {
 }
 
 type UserPage struct {
-	Username  string           `json:"username"`
-	Followers int              `json:"followers"`
-	Following int              `json:"following"`
-	PinsList  []domain.PinResp `json:"pins_list"`
+	Username  string `json:"username"`
+	Followers int    `json:"followers"`
+	Following int    `json:"following"`
+	//PinsList  []domain.PinResp `json:"pins_list"`
+}
+
+type CreateBoard struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+}
+
+type AttachPinToBoard struct {
+	BoardID int `json:"board_id"`
+	PinID   int `json:"pin_id"`
+}
+
+type GetBoardPins struct {
+	BoardID   int `json:"board_id"`
+	LastPinId int `json:"pin_id"`
 }
