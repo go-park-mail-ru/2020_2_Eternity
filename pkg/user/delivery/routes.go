@@ -6,10 +6,10 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/repository"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/usecase"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/websockets"
+	usecase2 "github.com/go-park-mail-ru/2020_2_Eternity/pkg/websockets/usecase"
 )
 
-func AddUserRoutes(r *gin.Engine, db database.IDbConn, ws *websockets.WebSocketPool) {
+func AddUserRoutes(r *gin.Engine, db database.IDbConn, ws *usecase2.WebSocketPool) {
 	rep := repository.NewRepo(db)
 	uc := usecase.NewUsecase(rep)
 	handler := NewHandler(uc)
@@ -28,7 +28,7 @@ func AddUserRoutes(r *gin.Engine, db database.IDbConn, ws *websockets.WebSocketP
 		authorized.POST("/user/profile/avatar", handler.SetAvatar)
 
 		// experimental
-		authorized.Group("/", websockets.TestMwWs(ws)).POST("/follow", handler.Follow)
+		//authorized.Group("/", middleware.TestMwWs(ws)).POST("/follow", handler.Follow)
 
 		authorized.POST("/unfollow", handler.Unfollow)
 	}

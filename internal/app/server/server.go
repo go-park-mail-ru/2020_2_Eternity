@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	pin_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/delivery/http"
 	comment_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/delivery/http"
+	pin_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/delivery/http"
 	user_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/delivery"
+	ws_http "github.com/go-park-mail-ru/2020_2_Eternity/pkg/websockets/delivery/http"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/websockets/usecase"
 
 	log "github.com/sirupsen/logrus"
 	"io"
@@ -19,7 +21,6 @@ import (
 	"time"
 
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/websockets"
 )
 
 type Server struct {
@@ -27,19 +28,20 @@ type Server struct {
 	server  *http.Server
 }
 
-func New(config *config.Config, db database.IDbConn) *Server {
+func New(config *config.Config, db database.IDbConn, ws *usecase.WebSocketPool) *Server {
 	logFile := setupGinLogger()
 
 	r := gin.Default()
 	r.MaxMultipartMemory = 8 << 20
 	r.Static(config.Web.Static.UrlImg, config.Web.Static.DirImg)
 
-	ws := websockets.NewPool()
-	r.GET("/ws", ws.Add)
+
+	dwD := ws_http.NewDelivery(ws)
+	r.GET("/ws", /*auth.AuthCheck(),*/ dwD.Add)
 
 	user_delivery.AddUserRoutes(r, db, ws)
 	pin_delivery.AddPinRoutes(r, db, config)
-	comment_delivery.AddCommentRoutes(r, db)
+	comment_delivery.AddCommentRoutes(r, db, ws)
 
 	//rpd := comment.NewResponder()
 	//r.POST("/pin/comments", auth.AuthCheck(), rpd.CreateComment)
