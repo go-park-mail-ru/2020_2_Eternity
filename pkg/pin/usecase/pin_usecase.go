@@ -6,8 +6,6 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"mime/multipart"
-	"net/url"
-	"path/filepath"
 )
 
 type Usecase struct {
@@ -20,16 +18,6 @@ func NewUsecase(r pin.IRepository, s pin.IStorage) *Usecase {
 		repository:  r,
 		fileStorage: s,
 	}
-}
-
-func getUrlImg(imgName string) string {
-	imgUrl := url.URL{
-		Scheme: config.Conf.Web.Server.Protocol,
-		Host:   config.Conf.Web.Server.Host,
-		Path:   filepath.Join(config.Conf.Web.Static.UrlImg, imgName),
-	}
-
-	return imgUrl.String()
 }
 
 func (u *Usecase) CreatePin(pin *domain.PinReq, file *multipart.FileHeader, userId int) (domain.PinResp, error) {
@@ -65,7 +53,7 @@ func (u *Usecase) CreatePin(pin *domain.PinReq, file *multipart.FileHeader, user
 		Id:      modelPin.Id,
 		Title:   modelPin.Title,
 		Content: modelPin.Content,
-		ImgLink: getUrlImg(modelPin.PictureName),
+		ImgLink: utils.GetUrlImg(modelPin.PictureName),
 		UserId:  modelPin.UserId,
 	}, nil
 }
@@ -82,7 +70,7 @@ func (u *Usecase) GetPin(id int) (domain.PinResp, error) {
 		Id:      modelPin.Id,
 		Title:   modelPin.Title,
 		Content: modelPin.Content,
-		ImgLink: getUrlImg(modelPin.PictureName),
+		ImgLink: utils.GetUrlImg(modelPin.PictureName),
 		UserId:  modelPin.UserId,
 	}, nil
 }
@@ -100,7 +88,7 @@ func (u *Usecase) GetPinList(username string) ([]domain.PinResp, error) {
 			Id:      p.Id,
 			Title:   p.Title,
 			Content: p.Content,
-			ImgLink: getUrlImg(p.PictureName),
+			ImgLink: utils.GetUrlImg(p.PictureName),
 			UserId:  p.UserId,
 		})
 	}
@@ -121,7 +109,7 @@ func (u *Usecase) GetPinBoardList(boardId int) ([]domain.PinResp, error) {
 			Id:      p.Id,
 			Title:   p.Title,
 			Content: p.Content,
-			ImgLink: getUrlImg(p.PictureName),
+			ImgLink: utils.GetUrlImg(p.PictureName),
 			UserId:  p.UserId,
 		})
 	}

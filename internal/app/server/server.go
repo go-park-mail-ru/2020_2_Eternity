@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	boardDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/board/delivery"
+	feedDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/feed/delivery"
 	pinDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/delivery/http"
 	userDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/delivery"
 	"github.com/microcosm-cc/bluemonday"
@@ -45,6 +46,8 @@ func New(config *config.Config, db database.IDbConn) *Server {
 	userDelivery.AddUserRoutes(r, db, p, ws)
 	pinDelivery.AddPinRoutes(r, db, config)
 	boardDelivery.AddBoardRoutes(r, db, p)
+
+	feedDelivery.AddFeedRoutes(r, db, config)
 
 	rpd := comment.NewResponder()
 	r.POST("/pin/comments", auth.AuthCheck(), rpd.CreateComment)
