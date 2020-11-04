@@ -15,7 +15,7 @@ func AddBoardRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy) {
 	handler := NewHandler(uc, p)
 
 	r.GET("/board/:id", handler.GetBoard)
-	r.GET("/boards/:username", handler.GetAllBoardsbyUser)
+	r.GET("/boards", handler.GetAllBoardsbyUser)
 
 	authorized := r.Group("/", auth.AuthCheck())
 	{

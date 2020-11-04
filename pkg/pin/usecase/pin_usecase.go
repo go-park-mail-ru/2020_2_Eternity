@@ -70,6 +70,23 @@ func (u *Usecase) CreatePin(pin *domain.PinReq, file *multipart.FileHeader, user
 	}, nil
 }
 
+func (u *Usecase) GetPin(id int) (domain.PinResp, error) {
+	modelPin, err := u.repository.GetPin(id)
+
+	if err != nil {
+		config.Lg("pin_usecase", "GetPin").Error("Repo: ", err.Error())
+		return domain.PinResp{}, err
+	}
+
+	return domain.PinResp{
+		Id:      modelPin.Id,
+		Title:   modelPin.Title,
+		Content: modelPin.Content,
+		ImgLink: getUrlImg(modelPin.PictureName),
+		UserId:  modelPin.UserId,
+	}, nil
+}
+
 func (u *Usecase) GetPinList(username string) ([]domain.PinResp, error) {
 	pins, err := u.repository.GetPinList(username)
 	if err != nil {

@@ -19,7 +19,7 @@ func AddPinRoutes(r *gin.Engine, db database.IDbConn, conf *config.Config) {
 	r.GET("/user/pins/board", handler.GetPinsFromBoard)
 	r.GET("/user/pins", handler.GetAllPins)
 
-	r.GET("/user/pin/:id")
+	r.GET("/user/pin/:id", handler.GetPin)
 
 	authorized := r.Group("/", auth.AuthCheck())
 	{

@@ -10,6 +10,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"mime/multipart"
 	"net/http"
+	"strconv"
 )
 
 type Handler struct {
@@ -51,6 +52,20 @@ func (h *Handler) CreatePin(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, pinResp)
+}
+
+func (h *Handler) GetPin(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "not integer id"})
+		return
+	}
+	p, err := h.uc.GetPin(id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, utils.Error{Error: "not found pin or fake id"})
+		return
+	}
+	c.JSON(http.StatusOK, p)
 }
 
 func (h *Handler) GetAllPins(c *gin.Context) {
