@@ -49,7 +49,7 @@ type GetComment struct {
 	UserId  int     `json:"user_id"`
 }
 
-type Follow struct {
+type UserAct struct {
 	Username string `json:"username"`
 }
 

@@ -300,7 +300,7 @@ func (h *Handler) prepareFollow(c *gin.Context) (int, int, int, *utils.Error) {
 		return -1, -1, http.StatusUnauthorized, &utils.Error{Error: "invalid token"}
 	}
 
-	followed := api.Follow{}
+	followed := api.UserAct{}
 	if err := c.BindJSON(&followed); err != nil {
 		return -1, -1, http.StatusBadRequest, &utils.Error{Error: "bad json"}
 	}

@@ -21,7 +21,7 @@ func ValidUpdate(profile api.UpdateUser) error {
 	)
 }
 
-func ValidUsername(user api.Follow) error {
+func ValidUsername(user api.UserAct) error {
 	return validation.ValidateStruct(&user,
 		validation.Field(&user.Username, validation.Required, validation.Length(5, 50), is.Alphanumeric),
 	)

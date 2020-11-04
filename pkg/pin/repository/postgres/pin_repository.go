@@ -53,14 +53,14 @@ func (r *Repository) GetPin(id int) (domain.Pin, error) {
 	return p, nil
 }
 
-func (r *Repository) GetPinList(userId int) ([]domain.Pin, error) {
+func (r *Repository) GetPinList(username string) ([]domain.Pin, error) {
 	rows, err := r.dbConn.Query(
 		context.Background(),
 		"select pins.id, title, content, name, user_id "+
 			"from pins join pin_images "+
 			"on pins.id = pin_images.pin_id "+
-			"where user_id=$1;",
-		userId)
+			"where user_id in (select id from users where username = $1)",
+		username)
 	if err != nil {
 		config.Lg("pin", "pin.GetPinList").Error(err.Error())
 		return nil, err
@@ -68,7 +68,7 @@ func (r *Repository) GetPinList(userId int) ([]domain.Pin, error) {
 
 	defer rows.Close()
 
-	pins := []domain.Pin{}
+	var pins []domain.Pin
 	for rows.Next() {
 		pin := domain.Pin{}
 		if err := rows.Scan(&pin.Id, &pin.Title, &pin.Content, &pin.PictureName, &pin.UserId); err != nil {

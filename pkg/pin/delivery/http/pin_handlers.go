@@ -54,14 +54,21 @@ func (h *Handler) CreatePin(c *gin.Context) {
 }
 
 func (h *Handler) GetAllPins(c *gin.Context) {
-	userId, ok := auth.GetClaims(c)
-	if !ok {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		config.Lg("pin_http", "GetAllPins").Error("Can't get claims")
+	u := api.UserAct{}
+
+	if err := c.BindJSON(&u); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		config.Lg("pin_http", "GetAllPins").Error("Bind: ", err.Error())
 		return
 	}
 
-	pins, err := h.uc.GetPinList(userId)
+	if err := utils.ValidUsername(u); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		config.Lg("pin_http", "GetAllPins").Error("Validate: ", err.Error())
+		return
+	}
+
+	pins, err := h.uc.GetPinList(u.Username)
 	if err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		config.Lg("pin_http", "GetAllPins").Error("uc.GetPinList: " + err.Error())

@@ -70,14 +70,14 @@ func (u *Usecase) CreatePin(pin *domain.PinReq, file *multipart.FileHeader, user
 	}, nil
 }
 
-func (u *Usecase) GetPinList(userId int) ([]domain.PinResp, error) {
-	pins, err := u.repository.GetPinList(userId)
+func (u *Usecase) GetPinList(username string) ([]domain.PinResp, error) {
+	pins, err := u.repository.GetPinList(username)
 	if err != nil {
 		config.Lg("pin_usecase", "GetPinList").Error("Repo: ", err.Error())
 		return nil, err
 	}
 
-	pinsResp := []domain.PinResp{}
+	var pinsResp []domain.PinResp
 	for _, p := range pins {
 		pinsResp = append(pinsResp, domain.PinResp{
 			Id:      p.Id,
