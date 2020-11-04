@@ -123,3 +123,42 @@ func (r *Repository) GetUserByNameWithFollowers(username string) (*domain.User, 
 	}
 	return u, nil
 }
+
+func (r *Repository) GetFollowers(username string) ([]domain.User, error) {
+	rows, err := r.dbConn.Query(context.Background(), "select us.username, us.avatar from (users as u join follows on u.id = id2) "+
+		"p join users as us on p.id1 = us.id where p.username = $1", username)
+	if err != nil {
+		config.Lg("user", "GetFollowers").Error("r.GetFollowers ", err.Error())
+		return nil, err
+	}
+	defer rows.Close()
+	var users []domain.User
+	for rows.Next() {
+		u := domain.User{}
+		if err := rows.Scan(&u.Username, &u.Avatar); err != nil {
+			config.Lg("user", "GetFollowers").Error("r.GetFollowers ", err.Error())
+			return nil, err
+		}
+		users = append(users, u)
+	}
+	return users, nil
+}
+func (r *Repository) GetFollowing(username string) ([]domain.User, error) {
+	rows, err := r.dbConn.Query(context.Background(), "select us.username, us.avatar from (users as u join follows on u.id = id1) "+
+		"p join users as us on p.id2 = us.id where p.username = $1", username)
+	if err != nil {
+		config.Lg("user", "GetFollowing").Error("r.GetFollowing ", err.Error())
+		return nil, err
+	}
+	defer rows.Close()
+	var users []domain.User
+	for rows.Next() {
+		u := domain.User{}
+		if err := rows.Scan(&u.Username, &u.Avatar); err != nil {
+			config.Lg("user", "GetFollowing").Error("r.GetFollowing ", err.Error())
+			return nil, err
+		}
+		users = append(users, u)
+	}
+	return users, nil
+}

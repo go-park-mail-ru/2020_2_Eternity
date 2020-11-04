@@ -8,6 +8,7 @@ import (
 	boardDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/board/delivery"
 	feedDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/feed/delivery"
 	pinDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/delivery/http"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/search"
 	userDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/delivery"
 	"github.com/microcosm-cc/bluemonday"
 
@@ -48,6 +49,7 @@ func New(config *config.Config, db database.IDbConn) *Server {
 	boardDelivery.AddBoardRoutes(r, db, p)
 
 	feedDelivery.AddFeedRoutes(r, db, config)
+	search.AddSearchRoute(r)
 
 	rpd := comment.NewResponder()
 	r.POST("/pin/comments", auth.AuthCheck(), rpd.CreateComment)

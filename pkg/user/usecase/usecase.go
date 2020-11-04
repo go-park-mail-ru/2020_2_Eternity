@@ -52,3 +52,10 @@ func (uc *UserUsecase) Follow(following int, id int) error {
 func (uc *UserUsecase) UnFollow(unfollowing int, id int) error {
 	return uc.repo.UnFollow(unfollowing, id)
 }
+
+func (uc *UserUsecase) GetFollowers(username string) ([]domain.User, error) {
+	return uc.repo.GetFollowers(username)
+}
+func (uc *UserUsecase) GetFollowing(username string) ([]domain.User, error) {
+	return uc.repo.GetFollowing(username)
+}
