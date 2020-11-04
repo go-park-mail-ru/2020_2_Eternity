@@ -223,6 +223,7 @@ func (h *Handler) SetAvatar(c *gin.Context) {
 	filename, err := utils.RandomUuid()
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{Error: "Random cant generate UUID"})
+		return
 	}
 
 	path := root + config.Conf.Web.Static.DirAvt + filename
