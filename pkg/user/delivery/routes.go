@@ -25,7 +25,7 @@ func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, ws 
 		authorized.POST("/user/logout", handler.Logout)
 		authorized.GET("/user/profile", handler.GetProfile)
 		authorized.PUT("/user/profile/password", handler.UpdatePassword)
-		authorized.PUT("/user/profile/", handler.UpdateUser)
+		authorized.PUT("/user/profile", handler.UpdateUser)
 		authorized.POST("/user/profile/avatar", handler.SetAvatar)
 
 		// experimental
