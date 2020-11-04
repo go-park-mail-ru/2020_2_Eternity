@@ -8,6 +8,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
+	"github.com/microcosm-cc/bluemonday"
 	"mime/multipart"
 	"net/http"
 	"strconv"
@@ -15,11 +16,13 @@ import (
 
 type Handler struct {
 	uc pin.IUsecase
+	p  *bluemonday.Policy
 }
 
-func NewHandler(uc pin.IUsecase) *Handler {
+func NewHandler(uc pin.IUsecase, p *bluemonday.Policy) *Handler {
 	return &Handler{
 		uc: uc,
+		p:  p,
 	}
 }
 
@@ -36,13 +39,14 @@ func (h *Handler) CreatePin(c *gin.Context) {
 		return
 	}
 
-	// TODO (Pavel S) Validation
 	formPin := FormCreatePin{}
 	if err := c.Bind(&formPin); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		config.Lg("pin_http", "CreatePin").Error("Bind: ", err.Error())
 		return
 	}
+
+	h.sanitize(formPin.CreatePinReq)
 
 	pinResp, err := h.uc.CreatePin(formPin.CreatePinReq, formPin.Avatar, userId)
 	if err != nil {
@@ -106,4 +110,9 @@ func (h *Handler) GetPinsFromBoard(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, pins)
+}
+
+func (h *Handler) sanitize(f *domain.PinReq) {
+	h.p.Sanitize(f.Title)
+	h.p.Sanitize(f.Content)
 }

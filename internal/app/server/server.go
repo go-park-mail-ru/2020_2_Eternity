@@ -44,7 +44,7 @@ func New(config *config.Config, db database.IDbConn) *Server {
 	p := bluemonday.UGCPolicy()
 
 	userDelivery.AddUserRoutes(r, db, p, ws)
-	pinDelivery.AddPinRoutes(r, db, config)
+	pinDelivery.AddPinRoutes(r, db, p, config)
 	boardDelivery.AddBoardRoutes(r, db, p)
 
 	feedDelivery.AddFeedRoutes(r, db, config)
