@@ -16,7 +16,7 @@ func AddNoteRoutes(r *gin.Engine, db database.IDbConn) {
 
 	authorized := r.Group("/", auth.AuthCheck())
 
-	authorized.POST("/notifications", delivery.GetUserNotes)
+	authorized.GET("/notifications", delivery.GetUserNotes)
 	authorized.PUT("/notifications", delivery.UpdateUserNotes)
 }
 

@@ -4,6 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/middleware"
+	note_http "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/repository"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/usecase"
 )
@@ -26,8 +28,8 @@ func AddUserRoutes(r *gin.Engine, db database.IDbConn) {
 		authorized.PUT("/user/profile/", handler.UpdateUser)
 		authorized.POST("/user/profile/avatar", handler.SetAvatar)
 
-		// experimental
-		//authorized.Group("/", middleware.TestMwWs(ws)).POST("/follow", handler.Follow)
+		authorized.Group("/", middleware.SendNotification(note_http.CreateNoteUsecase(db))).
+			POST("/follow", handler.Follow)
 
 		authorized.POST("/unfollow", handler.Unfollow)
 	}

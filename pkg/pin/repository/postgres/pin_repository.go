@@ -37,7 +37,7 @@ func (r *Repository) StorePin(p *domain.Pin) error {
 func (r *Repository) GetPin(id int) (domain.Pin, error) {
 	row := r.dbConn.QueryRow(
 		context.Background(),
-		"select id, title, content, name, user_id "+
+		"select pins.id, title, content, name, user_id "+
 			"from pins join pin_images "+
 			"on pins.id = pin_images.pin_id "+
 			"where pins.id=$1;",
