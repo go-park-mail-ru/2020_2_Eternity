@@ -29,14 +29,14 @@ create table follows (
 	foreign key (id1) references users(id),
 	foreign key (id2) references users(id),
 	unique (id1, id2)
-)
+);
 
 create table stats (
 	id int unique not null,
-	followers int set default 0,
-	following int set default 0,
+	followers int default 0,
+	following int default 0,
 	foreign key(id) references users(id)
-)
+);
 
 CREATE OR REPLACE FUNCTION upd_stats() RETURNS TRIGGER AS $upd_stats$
     BEGIN

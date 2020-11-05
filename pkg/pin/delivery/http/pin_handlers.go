@@ -49,6 +49,12 @@ func (h *Handler) CreatePin(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, pinResp)
+	c.Set(domain.NotificationKey, domain.NotePin{
+		Id: pinResp.Id,
+		Title: pinResp.Title,
+		ImgLink: pinResp.ImgLink,
+		UserId: pinResp.UserId,
+	})
 }
 
 func (h *Handler) GetAllPins(c *gin.Context) {

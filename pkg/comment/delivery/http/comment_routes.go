@@ -7,8 +7,8 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
 	comment_postgres "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/repository/postgres"
 	comment_usecase "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/usecase"
-	ws_middleware "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/middleware"
-	ws_usecase "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/usecase"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/middleware"
+	note_http "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
 )
 
 /*
@@ -18,12 +18,12 @@ import (
 */
 
 
-func AddCommentRoutes(r *gin.Engine, db database.IDbConn, ws *ws_usecase.WebSocketPool) {
+func AddCommentRoutes(r *gin.Engine, db database.IDbConn) {
 	rep := comment_postgres.NewRepo(db)
 	uc := comment_usecase.NewUsecase(rep)
 	handler := NewHandler(uc)
 
-	r.POST("/pin/comments", auth.AuthCheck(), ws_middleware.WsMiddleware(ws), handler.CreateComment)
+	r.POST("/pin/comments", auth.AuthCheck(), middleware.SendNotification(note_http.CreateNoteUsecase(db)), handler.CreateComment)
 	r.GET(fmt.Sprintf("/pin/:%s/comments", PinIdParam), handler.GetPinComments)
 	r.GET(fmt.Sprintf("/comment/:%s", CommentIdParam), handler.GetCommentById)
 }

@@ -6,10 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	comment_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/delivery/http"
+	note_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
 	pin_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/delivery/http"
 	user_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/delivery"
-	ws_http "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/usecase"
 
 	log "github.com/sirupsen/logrus"
 	"io"
@@ -28,7 +27,7 @@ type Server struct {
 	server  *http.Server
 }
 
-func New(config *config.Config, db database.IDbConn, ws *usecase.WebSocketPool) *Server {
+func New(config *config.Config, db database.IDbConn) *Server {
 	logFile := setupGinLogger()
 
 	r := gin.Default()
@@ -36,17 +35,15 @@ func New(config *config.Config, db database.IDbConn, ws *usecase.WebSocketPool) 
 	r.Static(config.Web.Static.UrlImg, config.Web.Static.DirImg)
 
 
-	dwD := ws_http.NewDelivery(ws)
-	r.GET("/ws", /*auth.AuthCheck(),*/ dwD.Add)
+	//dwD := ws_http.NewDelivery(ws)
+	//r.GET("/ws", /*auth.AuthCheck(),*/ dwD.Add)
 
-	user_delivery.AddUserRoutes(r, db, ws)
+	user_delivery.AddUserRoutes(r, db)
 	pin_delivery.AddPinRoutes(r, db, config)
-	comment_delivery.AddCommentRoutes(r, db, ws)
+	comment_delivery.AddCommentRoutes(r, db)
+	note_delivery.AddNoteRoutes(r, db)
 
-	//rpd := comment.NewResponder()
-	//r.POST("/pin/comments", auth.AuthCheck(), rpd.CreateComment)
-	//r.GET(fmt.Sprintf("/pin/:%s/comments", comment.PinIdParam), rpd.GetComments)
-	//r.GET(fmt.Sprintf("/comment/:%s", comment.CommentIdParam), rpd.GetCommentById)
+
 
 	return &Server{
 		logFile: logFile,

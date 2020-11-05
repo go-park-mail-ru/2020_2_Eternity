@@ -121,3 +121,16 @@ func (r *Repository) GetUserByNameWithFollowers(username string) (*domain.User, 
 	}
 	return u, nil
 }
+
+func (r *Repository) GetFollowers(userId int) ([]int, error) {
+	followers := []int{}
+	row := r.dbConn.QueryRow(
+		context.Background(),
+		"select ARRAY(select id1 from follows where id2 = $1)",
+		userId)
+	if err := row.Scan(&followers); err != nil {
+		log.Println(err)
+		return []int{}, err
+	}
+	return followers, nil
+}

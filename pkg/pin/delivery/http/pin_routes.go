@@ -5,6 +5,8 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/middleware"
+	note_http "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
 	fstorage "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/repository/filestorage"
 	pin_postgres "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/repository/postgres"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/usecase"
@@ -18,6 +20,7 @@ func AddPinRoutes(r *gin.Engine, db database.IDbConn, conf *config.Config) {
 
 	authorized := r.Group("/", auth.AuthCheck())
 
-	authorized.POST("/user/pin", handler.CreatePin)
+
+	authorized.POST("/user/pin", middleware.SendNotification(note_http.CreateNoteUsecase(db)), handler.CreatePin)
 	authorized.GET("/user/pin", handler.GetAllPins)
 }

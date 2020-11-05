@@ -50,11 +50,12 @@ func (h *Handler) CreateComment(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, commentResp)
-	c.Set("note", domain.Notification{
-		FromUserId: userId,
-		ToUserId:   userId,
-		Type:       3,
-		Data:       "msg",
+	c.Set(domain.NotificationKey, domain.NoteComment{
+		Id: commentResp.Id,
+		Path: commentResp.Path,
+		Content: commentResp.Content,
+		PinId: commentResp.PinId,
+		UserId: commentResp.UserId,
 	})
 }
 

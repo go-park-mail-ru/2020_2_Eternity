@@ -4,7 +4,6 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/server"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/usecase"
 )
 
 func init() {
@@ -28,11 +27,8 @@ func main() {
 	defer dbConn.Close()
 	config.Lg("main", "main").Info("Connected to DB")
 
-	ws := usecase.NewPool()
-	ws.Run()
-	defer ws.Stop()
 
-	srv := server.New(config.Conf, dbConn, ws)
+	srv := server.New(config.Conf, dbConn)
 
 	srv.Run()
 

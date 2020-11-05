@@ -6,10 +6,9 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/repository"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/usecase"
-	usecase2 "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/usecase"
 )
 
-func AddUserRoutes(r *gin.Engine, db database.IDbConn, ws *usecase2.WebSocketPool) {
+func AddUserRoutes(r *gin.Engine, db database.IDbConn) {
 	rep := repository.NewRepo(db)
 	uc := usecase.NewUsecase(rep)
 	handler := NewHandler(uc)

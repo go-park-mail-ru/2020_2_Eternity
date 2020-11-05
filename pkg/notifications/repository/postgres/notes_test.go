@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	repo "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/repository/postgres"
@@ -41,7 +42,6 @@ func TestMain(m *testing.M) {
 //	r := repo.NewRepo(db)
 //
 //	n := domain.Notification{
-//		FromUserId: 2,
 //		ToUserId: 3,
 //		Type: 3,
 //		EncodedData: []byte("jopa"),
@@ -68,4 +68,27 @@ func TestGetUserNotes(t *testing.T) {
 	assert.Nil(t, err)
 
 	fmt.Println(ns)
+
+	type Tst struct {
+		B []byte `json:"b"`
+	}
+
+	res, _ := json.Marshal(Tst{[]byte("jopa")})
+	fmt.Println(string(res))
+}
+
+func TestUpdate(t *testing.T) {
+	r := repo.NewRepo(db)
+
+	err := r.UpdateNoteIsRead(1)
+	assert.Nil(t, err)
+
+}
+
+func TestUpdateAll(t *testing.T) {
+	r := repo.NewRepo(db)
+
+	err := r.UpdateUserNotes(3)
+	assert.Nil(t, err)
+
 }

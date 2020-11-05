@@ -18,14 +18,15 @@ func NewRepo(d database.IDbConn) *Repository {
 	}
 }
 
+
 func (r *Repository) StoreNote(n *domain.Notification) error {
 	err := r.dbConn.QueryRow(
 		context.Background(),
 		"INSERT INTO notifications " +
-			"(from_user_id, to_user_id, type, encoded_data, creation_time) " +
+			"(to_user_id, type, encoded_data, creation_time, is_read) " +
 			"VALUES ($1, $2, $3, $4, $5) " +
-			"RETURNING id, creation_time",
-		n.FromUserId, n.ToUserId, n.Type, n.EncodedData, time.Now()).Scan(&n.Id, &n.CreationTime)
+			"RETURNING id, creation_time, is_read",
+		n.ToUserId, n.Type, n.EncodedData, time.Now(), false).Scan(&n.Id, &n.CreationTime, &n.IsRead)
 
 	if err != nil {
 		config.Lg("notes_repo", "StoreNote").Error(err.Error())
@@ -39,10 +40,10 @@ func (r *Repository) GetNoteById(noteId int) (domain.Notification, error) {
 	n := domain.Notification{}
 	err := r.dbConn.QueryRow(
 		context.Background(),
-		"SELECT id, from_user_id, to_user_id, type, encoded_data, creation_time " +
+		"SELECT id, to_user_id, type, encoded_data, creation_time, is_read " +
 			"FROM notifications " +
 			"WHERE id = $1",
-		noteId).Scan(&n.Id, &n.FromUserId, &n.ToUserId, &n.Type, &n.EncodedData, &n.CreationTime)
+		noteId).Scan(&n.Id, &n.ToUserId, &n.Type, &n.EncodedData, &n.CreationTime, &n.IsRead)
 
 	if err != nil {
 		config.Lg("notes_repo", "GetNoteById").Error(err.Error())
@@ -56,9 +57,10 @@ func (r *Repository) GetNoteById(noteId int) (domain.Notification, error) {
 func (r *Repository) GetNotesToUser(userId int) ([]domain.Notification, error) {
 	rows, err := r.dbConn.Query(
 		context.Background(),
-		"SELECT id, from_user_id, to_user_id, type, encoded_data, creation_time " +
+		"SELECT id, to_user_id, type, encoded_data, creation_time, is_read " +
 			"FROM notifications " +
-			"WHERE to_user_id = $1",
+			"WHERE to_user_id = $1 " +
+			"ORDER BY creation_time ",
 		userId)
 
 	if err != nil {
@@ -71,7 +73,7 @@ func (r *Repository) GetNotesToUser(userId int) ([]domain.Notification, error) {
 	notes := []domain.Notification{}
 	for rows.Next() {
 		n := domain.Notification{}
-		err := rows.Scan(&n.Id, &n.FromUserId, &n.ToUserId, &n.Type, &n.EncodedData, &n.CreationTime)
+		err := rows.Scan(&n.Id, &n.ToUserId, &n.Type, &n.EncodedData, &n.CreationTime, &n.IsRead)
 
 		if err != nil {
 			config.Lg("notes_repo", "GetNotesToUser").Error(err.Error())
@@ -88,4 +90,36 @@ func (r *Repository) GetNotesToUser(userId int) ([]domain.Notification, error) {
 
 
 	return notes, nil
+}
+
+func (r *Repository) UpdateNoteIsRead(noteId int) error {
+	_, err := r.dbConn.Exec(
+		context.Background(),
+		"UPDATE notifications " +
+			"SET is_read = true " +
+			"WHERE id = $1 ",
+			noteId)
+
+	if err != nil {
+		config.Lg("notes_repo", " UpdateNoteIsRead").Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) UpdateUserNotes(userId int) error {
+	_, err := r.dbConn.Exec(
+		context.Background(),
+		"UPDATE notifications " +
+			"SET is_read = true " +
+			"WHERE to_user_id = $1 ",
+		userId)
+
+	if err != nil {
+		config.Lg("notes_repo", " UpdateUserNotes").Error(err.Error())
+		return err
+	}
+
+	return nil
 }
