@@ -55,6 +55,7 @@ type UserAct struct {
 
 type UserPage struct {
 	Username  string `json:"username"`
+	Avatar    string `json:"avatar"`
 	Followers int    `json:"followers"`
 	Following int    `json:"following"`
 	//PinsList  []domain.PinResp `json:"pins_list"`

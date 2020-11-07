@@ -115,7 +115,6 @@ func (r *Repository) GetUserByNameWithFollowers(username string) (*domain.User, 
 	u := &domain.User{
 		Username: username,
 	}
-
 	row := r.dbConn.QueryRow(context.Background(), "select users.id, avatar, followers, following from users join stats on users.id = stats.id where username=$1", username)
 	if err := row.Scan(&u.ID, &u.Avatar, &u.Followers, &u.Following); err != nil {
 		config.Lg("user", "GetUserByNameWithFollowers").Error("r.GetUserByNameWithFollowers ", err.Error())

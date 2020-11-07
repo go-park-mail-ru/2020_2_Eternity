@@ -20,6 +20,7 @@ func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, ws 
 	r.GET("/images/avatar/:file", handler.GetAvatar)
 	r.GET("/user/followers", handler.GetFollowers)
 	r.GET("/user/following", handler.GetFollowing)
+	r.GET("/userpage/:username", handler.GetUserPage)
 	authorized := r.Group("/")
 	authorized.Use(auth.AuthCheck())
 	{

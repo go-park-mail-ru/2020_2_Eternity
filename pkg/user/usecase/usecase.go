@@ -29,7 +29,7 @@ func (uc *UserUsecase) GetUserByName(username string) (*domain.User, error) {
 }
 
 func (uc *UserUsecase) GetUserByNameWithFollowers(username string) (*domain.User, error) {
-	return uc.repo.GetUserByName(username)
+	return uc.repo.GetUserByNameWithFollowers(username)
 }
 
 func (uc *UserUsecase) UpdateUser(id int, profile *api.UpdateUser) (*domain.User, error) {

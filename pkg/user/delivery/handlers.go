@@ -319,14 +319,14 @@ func (h *Handler) prepareFollow(c *gin.Context) (int, int, int, *utils.Error) {
 }
 
 func (h *Handler) GetUserPage(c *gin.Context) {
-	u, err := h.uc.GetUserByNameWithFollowers(c.Param("username"))
+	u, err := h.uc.GetUserByNameWithFollowers(h.p.Sanitize(c.Param("username")))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "not found user"})
 		return
 	}
-
 	userPage := api.UserPage{
 		Username:  u.Username,
+		Avatar:    u.Avatar,
 		Followers: u.Followers,
 		Following: u.Following,
 	}
@@ -346,6 +346,7 @@ func (h *Handler) GetFollowers(c *gin.Context) {
 	users, err := h.uc.GetFollowers(u.Username)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Cannot show followers"})
+		return
 	}
 	c.JSON(http.StatusOK, users)
 }
@@ -363,6 +364,7 @@ func (h *Handler) GetFollowing(c *gin.Context) {
 	users, err := h.uc.GetFollowing(u.Username)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Cannot show following"})
+		return
 	}
 	c.JSON(http.StatusOK, users)
 }

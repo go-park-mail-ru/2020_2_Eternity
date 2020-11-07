@@ -27,14 +27,17 @@ func (r *Repository) CreateBoard(userId int, b *api.CreateBoard) (*domain.Board,
 	}
 	rb.Title = b.Title
 	rb.Content = b.Content
-	rb.UserId = userId
+	if err := r.dbConn.QueryRow(context.Background(), "select username from users where id = $1", userId).Scan(&rb.Username); err != nil {
+		config.Lg("board", "CreateBoard").Error(err.Error())
+		return rb, errors.New("bad uid")
+	}
 	return rb, nil
 }
 func (r *Repository) GetBoard(id int) (*domain.Board, error) {
 	b := &domain.Board{
 		ID: id,
 	}
-	if err := r.dbConn.QueryRow(context.Background(), "select title, content, user_id from boards where id = $1", b.ID).Scan(&b.Title, &b.Content, &b.UserId); err != nil {
+	if err := r.dbConn.QueryRow(context.Background(), "select title, content, username from boards join users on users.id = boards.user_id where boards.id = $1", b.ID).Scan(&b.Title, &b.Content, &b.Username); err != nil {
 		config.Lg("board", "GetBoard").Error(err.Error())
 		return b, errors.New("bad id")
 	}
@@ -44,15 +47,17 @@ func (r *Repository) GetBoard(id int) (*domain.Board, error) {
 func (r *Repository) GetAllBoardsByUser(username string) ([]domain.Board, error) {
 	var boards []domain.Board
 
-	rows, err := r.dbConn.Query(context.Background(), "select boards.id, title, content, user_id from boards join users on users.id = boards.user_id where username = $1", username)
+	rows, err := r.dbConn.Query(context.Background(), "select boards.id, title, content from boards join users on users.id = boards.user_id where username = $1", username)
 	if err != nil {
 		config.Lg("board", "GetAllBoardsByUserId").Error(err.Error())
 		return boards, errors.New("bad id")
 	}
 	defer rows.Close()
 	for rows.Next() {
-		b := domain.Board{}
-		if err := rows.Scan(&b.ID, &b.Title, &b.Content, &b.UserId); err != nil {
+		b := domain.Board{
+			Username: username,
+		}
+		if err := rows.Scan(&b.ID, &b.Title, &b.Content); err != nil {
 			config.Lg("board", "GetAllBoardsByUserId").Error(err.Error())
 			return nil, err
 		}

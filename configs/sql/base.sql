@@ -33,8 +33,8 @@ create table if not exists follows(
 
 create table if not exists stats(
 	id int unique not null,
-	followers int set default 0,
-	following int set default 0,
+	followers int default 0,
+	following int default 0,
 	foreign key(id) references users(id)
 );
 
