@@ -23,7 +23,7 @@ create table if not exists pin_images(
 	foreign key(pin_id) references pins(id) on delete cascade
 );
 
-create table follows if not exists(
+create table if not exists follows(
 	id1 int not null,
 	id2 int not null,
 	foreign key (id1) references users(id),
@@ -31,7 +31,7 @@ create table follows if not exists(
 	unique (id1, id2)
 );
 
-create table stats if not exists (
+create table if not exists stats(
 	id int unique not null,
 	followers int set default 0,
 	following int set default 0,
