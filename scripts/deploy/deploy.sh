@@ -3,7 +3,8 @@
 numParams=1
 serviceName=pinterest
 usage="Usage. Run from root project dir:
->>>  ./build/deploy/deploy.sh [branch-name] (service-name)
+>>>  ./scripts/deploy/deploy.sh [branch-name] (service-name)
+
 * branch-name - name of git branch, which last commit will be build for deploy
 * service-name - name of backend service, default 'pinterest'"
 
@@ -18,11 +19,6 @@ if [ $# -lt  $numParams ]
 then
   echo "No parameters found. "
   echo "$usage"
-#  read line
-#    if [ $line != "y" ] && [  $line != "Y" ]
-#    then
-#      echo "not y"
-#    fi
 
 
 else
@@ -35,7 +31,8 @@ else
   df=$(diff /etc/pinterest/config.yaml configs/yaml/config.yaml)
   if [ -n "$df" ]
   then
-    echo "Config files are different
+    echo "
+    Config files are different
     "
     diff /etc/pinterest/config.yaml configs/yaml/config.yaml
     echo "
