@@ -11,7 +11,6 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -41,7 +40,7 @@ func (h *Handler) SignUp(c *gin.Context) {
 		return
 	}
 
-	h.p.Sanitize(profile.Description)
+	profile.Description = h.p.Sanitize(profile.Description)
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(profile.Password), config.Conf.Token.Value)
 
@@ -68,7 +67,7 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	u, err := h.uc.GetUserByName(form.Username)
+	u, err := h.uc.GetUserByNameWithFollowers(form.Username)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "invalid username"})
 		return
@@ -133,6 +132,8 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 		return
 	}
 
+	profile.Description = h.p.Sanitize(profile.Description)
+
 	u, err := h.uc.UpdateUser(claimsId, &profile)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, utils.Error{Error: err.Error()})
@@ -154,7 +155,6 @@ func (h *Handler) UpdatePassword(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
-	log.Println(psswds.NewPassword)
 
 	if err := utils.ValidPasswords(psswds); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)

@@ -18,8 +18,10 @@ func ValidProfile(profile api.SignUp) error {
 
 func ValidUpdate(profile api.UpdateUser) error {
 	return validation.ValidateStruct(&profile,
-		validation.Field(&profile.Email, validation.Required, is.EmailFormat),
-		validation.Field(&profile.Username, validation.Required, validation.Length(5, 50), is.Alphanumeric),
+		validation.Field(&profile.Email, is.EmailFormat),
+		validation.Field(&profile.Username, validation.Length(5, 50), is.Alphanumeric),
+		validation.Field(&profile.Name, is.Alphanumeric),
+		validation.Field(&profile.Surname, is.Alphanumeric),
 	)
 }
 

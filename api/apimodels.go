@@ -27,9 +27,12 @@ type Login struct {
 }
 
 type UpdateUser struct {
-	Username  string    `json:"username"`
-	Email     string    `json:"email"`
-	BirthDate time.Time `json:"date"`
+	Username    string    `json:"username"`
+	Email       string    `json:"email"`
+	Name        string    `json:"name"`
+	Surname     string    `json:"surname"`
+	Description string    `json:"description"`
+	BirthDate   time.Time `json:"date"`
 }
 
 type UpdatePassword struct {

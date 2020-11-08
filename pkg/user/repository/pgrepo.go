@@ -54,19 +54,54 @@ func (r *Repository) GetUserByName(username string) (*domain.User, error) {
 
 func (r *Repository) UpdateUser(id int, profile *api.UpdateUser) (*domain.User, error) {
 	u := &domain.User{}
-	if _, err := r.dbConn.Exec(context.Background(), "update users set username=$1, email=$2, birthdate=$3 where id=$4",
-		profile.Username, profile.Email, profile.BirthDate, id); err != nil {
-		config.Lg("user", "UpdateUser").Error("r.UpdateUser: ", err.Error())
-		return u, errors.New("username or email exists")
+
+	if profile.Email != "" {
+		if _, err := r.dbConn.Exec(context.Background(), "update users set email=$1 where id=$2",
+			profile.Email, id); err != nil {
+			config.Lg("user", "UpdateUser").Error("r.UpdateUser: ", err.Error())
+			return u, errors.New("fail update email")
+		}
 	}
-	u.Username = profile.Username
-	u.Email = profile.Email
-	u.BirthDate = profile.BirthDate
+	if profile.Username != "" {
+		if _, err := r.dbConn.Exec(context.Background(), "update users set username=$1 where id=$2",
+			profile.Username, id); err != nil {
+			config.Lg("user", "UpdateUser").Error("r.UpdateUser: ", err.Error())
+			return u, errors.New("fail update username")
+		}
+		u.Username = profile.Username
+	}
+
+	if profile.Name != "" {
+		if _, err := r.dbConn.Exec(context.Background(), "update users set name=$1 where id=$2",
+			profile.Name, id); err != nil {
+			config.Lg("user", "UpdateUser").Error("r.UpdateUser: ", err.Error())
+			return u, errors.New("fail update name")
+		}
+		u.Name = profile.Name
+	}
+
+	if profile.Surname != "" {
+		if _, err := r.dbConn.Exec(context.Background(), "update users set surname=$1 where id=$2",
+			profile.Surname, id); err != nil {
+			config.Lg("user", "UpdateUser").Error("r.UpdateUser: ", err.Error())
+			return u, errors.New("fail update surname")
+		}
+		u.Surname = profile.Surname
+	}
+
+	if profile.Description != "" {
+		if _, err := r.dbConn.Exec(context.Background(), "update users set description=$1 where id=$2",
+			profile.Description, id); err != nil {
+			config.Lg("user", "UpdateUser").Error("r.UpdateUser: ", err.Error())
+			return u, errors.New("fail update descr")
+		}
+		u.Description = profile.Description
+	}
 	return u, nil
 }
 
 func (r *Repository) UpdatePassword(id int, psswd string) error {
-	if _, err := r.dbConn.Exec(context.Background(), "update users set password=$1 where id=2 returning id=$2", psswd, id); err != nil {
+	if _, err := r.dbConn.Exec(context.Background(), "update users set password=$1 where id=$2", psswd, id); err != nil {
 		config.Lg("user", "UpdatePassword").Error("r.UpdatePassword: ", err.Error())
 		return errors.New("password error")
 	}
@@ -115,8 +150,8 @@ func (r *Repository) GetUserByNameWithFollowers(username string) (*domain.User, 
 	u := &domain.User{
 		Username: username,
 	}
-	row := r.dbConn.QueryRow(context.Background(), "select users.id, name, surname, description, avatar, followers, following from users join stats on users.id = stats.id where username=$1", username)
-	if err := row.Scan(&u.ID, &u.Name, &u.Surname, &u.Description, &u.Avatar, &u.Followers, &u.Following); err != nil {
+	row := r.dbConn.QueryRow(context.Background(), "select users.id, password, name, surname, description, avatar, followers, following from users join stats on users.id = stats.id where username=$1", username)
+	if err := row.Scan(&u.ID, &u.Password, &u.Name, &u.Surname, &u.Description, &u.Avatar, &u.Followers, &u.Following); err != nil {
 		config.Lg("user", "GetUserByNameWithFollowers").Error("r.GetUserByNameWithFollowers ", err.Error())
 		return u, err
 	}
