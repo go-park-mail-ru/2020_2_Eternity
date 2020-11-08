@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
+	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/models"
 	"log"
@@ -23,8 +24,9 @@ func NewRepo(d database.IDbConn) *Repository {
 
 func (r *Repository) CreateUser(user *api.SignUp) (*models.User, error) {
 	u := &models.User{}
-	if _, err := r.dbConn.Exec(context.Background(), "insert into users(username, email, password, birthdate, reg_date, avatar) values($1, $2, $3, $4, $5, $6)",
-		user.Username, user.Email, user.Password, user.BirthDate, time.Now(), "http://127.0.0.1:8008/images/avatar/default.jpeg"); err != nil {
+	if _, err := r.dbConn.Exec(context.Background(), "insert into users(username, email, password, name, surname, description, birthdate, reg_date, avatar) values($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+		user.Username, user.Email, user.Password, user.Name, user.Surname, user.Description, user.BirthDate, time.Now(), ""); err != nil {
+		config.Lg("user", "CreateUser").Error("r.CreateUser: ", err.Error())
 		return u, errors.New("user exists")
 	}
 	return u, nil

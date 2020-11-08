@@ -3,6 +3,9 @@ create table if not exists users(
 	username text unique not null,
 	email text unique not null,
 	password text not null,
+	name text,
+	surname text,
+	description text,
 	birthdate date,
 	reg_date timestamp,
 	avatar text

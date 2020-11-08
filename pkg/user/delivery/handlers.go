@@ -38,6 +38,8 @@ func (h *Handler) SignUp(c *gin.Context) {
 		return
 	}
 
+	h.p
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(profile.Password), config.Conf.Token.Value)
 
 	if err != nil {
