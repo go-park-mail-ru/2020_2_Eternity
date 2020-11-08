@@ -179,7 +179,7 @@ func (h *Handler) UpdatePassword(c *gin.Context) {
 		return
 	}
 
-	if err := h.uc.UpdatePassword(u.ID, string(hash)); err != nil {
+	if err := h.uc.UpdatePassword(claimsId, string(hash)); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{Error: err.Error()})
 		return
 	}
@@ -327,13 +327,7 @@ func (h *Handler) GetUserPage(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "not found user"})
 		return
 	}
-	userPage := api.UserPage{
-		Username:  u.Username,
-		Avatar:    u.Avatar,
-		Followers: u.Followers,
-		Following: u.Following,
-	}
-	c.JSON(http.StatusOK, userPage)
+	c.JSON(http.StatusOK, u)
 }
 
 func (h *Handler) GetFollowers(c *gin.Context) {

@@ -66,7 +66,7 @@ func (r *Repository) UpdateUser(id int, profile *api.UpdateUser) (*domain.User, 
 }
 
 func (r *Repository) UpdatePassword(id int, psswd string) error {
-	if _, err := r.dbConn.Exec(context.Background(), "update users set password=$1 where id=$2", psswd, id); err != nil {
+	if _, err := r.dbConn.Exec(context.Background(), "update users set password=$1 where id=2 returning id=$2", psswd, id); err != nil {
 		config.Lg("user", "UpdatePassword").Error("r.UpdatePassword: ", err.Error())
 		return errors.New("password error")
 	}
@@ -115,8 +115,8 @@ func (r *Repository) GetUserByNameWithFollowers(username string) (*domain.User, 
 	u := &domain.User{
 		Username: username,
 	}
-	row := r.dbConn.QueryRow(context.Background(), "select users.id, avatar, followers, following from users join stats on users.id = stats.id where username=$1", username)
-	if err := row.Scan(&u.ID, &u.Avatar, &u.Followers, &u.Following); err != nil {
+	row := r.dbConn.QueryRow(context.Background(), "select users.id, name, surname, description, avatar, followers, following from users join stats on users.id = stats.id where username=$1", username)
+	if err := row.Scan(&u.ID, &u.Name, &u.Surname, &u.Description, &u.Avatar, &u.Followers, &u.Following); err != nil {
 		config.Lg("user", "GetUserByNameWithFollowers").Error("r.GetUserByNameWithFollowers ", err.Error())
 		return u, err
 	}
