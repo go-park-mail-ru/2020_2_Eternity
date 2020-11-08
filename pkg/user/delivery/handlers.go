@@ -41,7 +41,7 @@ func (h *Handler) SignUp(c *gin.Context) {
 		return
 	}
 
-	h.p
+	h.p.Sanitize(profile.Description)
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(profile.Password), config.Conf.Token.Value)
 
