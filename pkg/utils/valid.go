@@ -21,6 +21,12 @@ func ValidUpdate(profile api.UpdateUser) error {
 	)
 }
 
+func ValidUsername(user api.UserAct) error {
+	return validation.ValidateStruct(&user,
+		validation.Field(&user.Username, validation.Required, validation.Length(5, 50), is.Alphanumeric),
+	)
+}
+
 func ValidPasswords(pswds api.UpdatePassword) error {
 	return validation.ValidateStruct(&pswds,
 		validation.Field(&pswds.OldPassword, validation.Required, validation.Length(8, 50), is.Alphanumeric),

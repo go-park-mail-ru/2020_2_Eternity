@@ -8,24 +8,29 @@ import (
 	note_http "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/repository"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/usecase"
+	"github.com/microcosm-cc/bluemonday"
+
 )
 
-func AddUserRoutes(r *gin.Engine, db database.IDbConn) {
+
+func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy) {
 	rep := repository.NewRepo(db)
 	uc := usecase.NewUsecase(rep)
-	handler := NewHandler(uc)
+	handler := NewHandler(uc, p)
 
 	r.POST("/user/signup", handler.SignUp)
 	r.POST("/user/login", handler.Login)
 	r.GET("/images/avatar/:file", handler.GetAvatar)
-
+	r.GET("/followers/:username", handler.GetFollowers)
+	r.GET("/following/:username", handler.GetFollowing)
+	r.GET("/userpage/:username", handler.GetUserPage)
 	authorized := r.Group("/")
 	authorized.Use(auth.AuthCheck())
 	{
 		authorized.POST("/user/logout", handler.Logout)
 		authorized.GET("/user/profile", handler.GetProfile)
 		authorized.PUT("/user/profile/password", handler.UpdatePassword)
-		authorized.PUT("/user/profile/", handler.UpdateUser)
+		authorized.PUT("/user/profile", handler.UpdateUser)
 		authorized.POST("/user/profile/avatar", handler.SetAvatar)
 
 		authorized.Group("/", middleware.SendNotification(note_http.CreateNoteUsecase(db))).

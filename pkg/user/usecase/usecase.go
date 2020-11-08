@@ -29,7 +29,7 @@ func (uc *UserUsecase) GetUserByName(username string) (*domain.User, error) {
 }
 
 func (uc *UserUsecase) GetUserByNameWithFollowers(username string) (*domain.User, error) {
-	return uc.repo.GetUserByName(username)
+	return uc.repo.GetUserByNameWithFollowers(username)
 }
 
 func (uc *UserUsecase) UpdateUser(id int, profile *api.UpdateUser) (*domain.User, error) {
@@ -51,4 +51,11 @@ func (uc *UserUsecase) Follow(following int, id int) error {
 }
 func (uc *UserUsecase) UnFollow(unfollowing int, id int) error {
 	return uc.repo.UnFollow(unfollowing, id)
+}
+
+func (uc *UserUsecase) GetFollowers(username string) ([]domain.User, error) {
+	return uc.repo.GetFollowers(username)
+}
+func (uc *UserUsecase) GetFollowing(username string) ([]domain.User, error) {
+	return uc.repo.GetFollowing(username)
 }

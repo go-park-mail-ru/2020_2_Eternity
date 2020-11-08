@@ -23,7 +23,7 @@ create table if not exists pin_images(
 	foreign key(pin_id) references pins(id) on delete cascade
 );
 
-create table follows (
+create table if not exists follows(
 	id1 int not null,
 	id2 int not null,
 	foreign key (id1) references users(id),
@@ -31,7 +31,7 @@ create table follows (
 	unique (id1, id2)
 );
 
-create table stats (
+create table if not exists stats(
 	id int unique not null,
 	followers int default 0,
 	following int default 0,
@@ -73,3 +73,19 @@ $ins_stats$ LANGUAGE plpgsql;
 CREATE TRIGGER ins_stats_trg
 AFTER INSERT OR DELETE ON users
     FOR EACH ROW EXECUTE PROCEDURE ins_stats();
+
+create table if not exists boards(
+	id serial primary key,
+	title varchar(255) not null,
+	content text not null,
+	user_id integer not null,
+	foreign key(user_id) references users(id)
+);
+
+create table if not exists boards_pins(
+	board_id int not null,
+	pin_id int not null,
+	foreign key (board_id) references boards(id),
+	foreign key (pin_id) references pins(id),
+	unique (board_id, pin_id)
+);

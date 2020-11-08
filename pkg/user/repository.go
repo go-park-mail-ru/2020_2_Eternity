@@ -21,5 +21,9 @@ type IRepository interface {
 	Follow(following int, id int) error
 	UnFollow(unfollowing int, id int) error
 
+
 	GetFollowersIds(userId int) ([]int, error)
+	GetFollowers(username string) ([]domain.User, error)
+	GetFollowing(username string) ([]domain.User, error)
+
 }
