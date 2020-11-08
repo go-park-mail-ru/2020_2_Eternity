@@ -2,7 +2,6 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
@@ -73,21 +72,9 @@ func (h *Handler) GetPin(c *gin.Context) {
 }
 
 func (h *Handler) GetAllPins(c *gin.Context) {
-	u := api.UserAct{}
+	username := h.p.Sanitize(c.Param("username"))
 
-	if err := c.BindJSON(&u); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
-		config.Lg("pin_http", "GetAllPins").Error("Bind: ", err.Error())
-		return
-	}
-
-	if err := utils.ValidUsername(u); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
-		config.Lg("pin_http", "GetAllPins").Error("Validate: ", err.Error())
-		return
-	}
-
-	pins, err := h.uc.GetPinList(u.Username)
+	pins, err := h.uc.GetPinList(username)
 	if err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		config.Lg("pin_http", "GetAllPins").Error("uc.GetPinList: " + err.Error())
@@ -97,13 +84,14 @@ func (h *Handler) GetAllPins(c *gin.Context) {
 }
 
 func (h *Handler) GetPinsFromBoard(c *gin.Context) {
-	bp := api.GetBoardPins{}
-	if err := c.BindJSON(&bp); err != nil {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
-		config.Lg("pin_http", "GetPinsFromBoard").Error("Bind: ", err.Error())
+		config.Lg("pin_http", "GetPinsFromBoard").Error("Bind: ", "No param")
 		return
 	}
-	pins, err := h.uc.GetPinBoardList(bp.BoardID)
+
+	pins, err := h.uc.GetPinBoardList(id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Cant show pins from board"})
 		config.Lg("pin_http", "GetPinsFromBoard").Error("Get pins", err.Error())

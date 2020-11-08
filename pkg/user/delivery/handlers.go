@@ -335,16 +335,8 @@ func (h *Handler) GetUserPage(c *gin.Context) {
 }
 
 func (h *Handler) GetFollowers(c *gin.Context) {
-	u := api.UserAct{}
-	if err := c.BindJSON(&u); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "JSON invalid"})
-		return
-	}
-	if err := utils.ValidUsername(u); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Bad Username"})
-		return
-	}
-	users, err := h.uc.GetFollowers(u.Username)
+	username := h.p.Sanitize(c.Param("username"))
+	users, err := h.uc.GetFollowers(username)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Cannot show followers"})
 		return
@@ -353,16 +345,8 @@ func (h *Handler) GetFollowers(c *gin.Context) {
 }
 
 func (h *Handler) GetFollowing(c *gin.Context) {
-	u := api.UserAct{}
-	if err := c.BindJSON(&u); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "JSON invalid"})
-		return
-	}
-	if err := utils.ValidUsername(u); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Bad Username"})
-		return
-	}
-	users, err := h.uc.GetFollowing(u.Username)
+	username := h.p.Sanitize(c.Param("username"))
+	users, err := h.uc.GetFollowing(username)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Cannot show following"})
 		return

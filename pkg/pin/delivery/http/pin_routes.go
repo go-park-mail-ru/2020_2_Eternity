@@ -17,8 +17,8 @@ func AddPinRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, conf
 	uc := usecase.NewUsecase(rep, store)
 	handler := NewHandler(uc, p)
 
-	r.GET("/user/pins/board", handler.GetPinsFromBoard)
-	r.GET("/user/pins", handler.GetAllPins)
+	r.GET("/pins/board/:id", handler.GetPinsFromBoard)
+	r.GET("/user/pins/:username", handler.GetAllPins)
 
 	r.GET("/user/pin/:id", handler.GetPin)
 

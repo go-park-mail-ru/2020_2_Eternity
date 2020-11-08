@@ -61,18 +61,8 @@ func (h *Handler) GetBoard(c *gin.Context) {
 }
 
 func (h *Handler) GetAllBoardsbyUser(c *gin.Context) {
-	u := api.UserAct{}
-	if err := c.BindJSON(&u); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "JSON Err"})
-		return
-	}
-
-	if err := utils.ValidUsername(u); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Invalid username"})
-		return
-	}
-
-	b, err := h.uc.GetAllBoardsByUser(u.Username)
+	username := h.p.Sanitize(c.Param("username"))
+	b, err := h.uc.GetAllBoardsByUser(username)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, err)
 		return
