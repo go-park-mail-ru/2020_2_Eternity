@@ -39,7 +39,7 @@ func TestMain(m *testing.M) {
 
 func Test(t *testing.T) {
 	r := repo.NewRepo(db)
-	f, err := r.GetFollowers(3)
+	f, err := r.GetFollowersIds(3)
 
 	assert.Nil(t, err)
 	fmt.Println(f)

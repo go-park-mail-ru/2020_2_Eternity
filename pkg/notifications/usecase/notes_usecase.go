@@ -42,7 +42,7 @@ func (uc *Usecase) getDstNoteComment (n *domain.NoteComment) ([]int, error) {
 }
 
 func (uc *Usecase) getDstNotePin (p *domain.NotePin) ([]int, error) {
-	toUsers, err := uc.userRepo.GetFollowers(p.UserId)
+	toUsers, err := uc.userRepo.GetFollowersIds(p.UserId)
 	if err != nil {
 		config.Lg("notifications_usecase", "getDstNotePin").Error(err.Error())
 		return nil, err
