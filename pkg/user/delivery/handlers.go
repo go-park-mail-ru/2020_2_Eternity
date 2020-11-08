@@ -229,7 +229,8 @@ func (h *Handler) SetAvatar(c *gin.Context) {
 	path := root + config.Conf.Web.Static.DirAvt + filename
 
 	if err := c.SaveUploadedFile(file, path); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{"Upload error"})
+		config.Lg("handlers", "SetAvatar").Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{Error: "Upload error"})
 		return
 	}
 
