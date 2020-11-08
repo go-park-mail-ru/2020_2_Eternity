@@ -5,10 +5,18 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	user_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/delivery"
 
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin"
+	comment_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/delivery/http"
+	note_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
+
+	boardDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/board/delivery"
+	feedDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/feed/delivery"
+	pinDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/delivery/http"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/search"
+	userDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/delivery"
+	"github.com/microcosm-cc/bluemonday"
+
+
 	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
@@ -19,8 +27,6 @@ import (
 	"time"
 
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/websockets"
 )
 
 type Server struct {
@@ -35,20 +41,22 @@ func New(config *config.Config, db database.IDbConn) *Server {
 	r.MaxMultipartMemory = 8 << 20
 	r.Static(config.Web.Static.UrlImg, config.Web.Static.DirImg)
 
-	ws := websockets.NewPool()
 
-	user_delivery.AddUserRoutes(r, db, ws)
 
-	r.GET("/ws", ws.Add)
+	comment_delivery.AddCommentRoutes(r, db)
+	note_delivery.AddNoteRoutes(r, db)
 
-	//r.Use(auth.AuthCheck())
-	r.POST("/user/pin", auth.AuthCheck(), pin.CreatePin)
-	r.GET("/user/pin", auth.AuthCheck(), pin.GetPin)
 
-	rpd := comment.NewResponder()
-	r.POST("/pin/comments", auth.AuthCheck(), rpd.CreateComment)
-	r.GET(fmt.Sprintf("/pin/:%s/comments", comment.PinIdParam), rpd.GetComments)
-	r.GET(fmt.Sprintf("/comment/:%s", comment.CommentIdParam), rpd.GetCommentById)
+	p := bluemonday.UGCPolicy()
+
+	userDelivery.AddUserRoutes(r, db, p)
+	pinDelivery.AddPinRoutes(r, db, p, config)
+	boardDelivery.AddBoardRoutes(r, db, p)
+
+	feedDelivery.AddFeedRoutes(r, db, config)
+	search.AddSearchRoute(r)
+
+
 
 	return &Server{
 		logFile: logFile,

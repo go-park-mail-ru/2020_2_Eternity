@@ -2,17 +2,17 @@ package user
 
 import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/models"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 )
 
 type IRepository interface {
-	CreateUser(user *api.SignUp) (*models.User, error)
+	CreateUser(user *api.SignUp) (*domain.User, error)
 
-	GetUser(id int) (*models.User, error)
-	GetUserByName(username string) (*models.User, error)
-	GetUserByNameWithFollowers(username string) (*models.User, error)
+	GetUser(id int) (*domain.User, error)
+	GetUserByName(username string) (*domain.User, error)
+	GetUserByNameWithFollowers(username string) (*domain.User, error)
 
-	UpdateUser(id int, profile *api.UpdateUser) (*models.User, error)
+	UpdateUser(id int, profile *api.UpdateUser) (*domain.User, error)
 	UpdatePassword(id int, psswd string) error
 
 	UpdateAvatar(id int, avatar string) error
@@ -20,4 +20,10 @@ type IRepository interface {
 
 	Follow(following int, id int) error
 	UnFollow(unfollowing int, id int) error
+
+
+	GetFollowersIds(userId int) ([]int, error)
+	GetFollowers(username string) ([]domain.User, error)
+	GetFollowing(username string) ([]domain.User, error)
+
 }

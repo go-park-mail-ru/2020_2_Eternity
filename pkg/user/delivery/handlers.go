@@ -8,6 +8,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
+	"github.com/microcosm-cc/bluemonday"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 	"log"
@@ -19,11 +20,13 @@ import (
 
 type Handler struct {
 	uc user.IUsecase
+	p  *bluemonday.Policy
 }
 
-func NewHandler(uc user.IUsecase) *Handler {
+func NewHandler(uc user.IUsecase, p *bluemonday.Policy) *Handler {
 	return &Handler{
 		uc: uc,
+		p:  p,
 	}
 }
 
@@ -85,7 +88,7 @@ func (h *Handler) Login(c *gin.Context) {
 	cookie := http.Cookie{
 		Name:     config.Conf.Token.CookieName,
 		Value:    ss,
-		Expires:  time.Now().Add(5 * time.Minute),
+		Expires:  time.Now().Add(45 * time.Minute),
 		HttpOnly: true,
 		Path:     "/",
 	}
@@ -113,6 +116,12 @@ func (h *Handler) Logout(c *gin.Context) {
 }
 
 func (h *Handler) UpdateUser(c *gin.Context) {
+	claimsId, ok := auth.GetClaims(c)
+	if !ok {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "invalid token"})
+		return
+	}
+
 	profile := api.UpdateUser{}
 	if err := c.BindJSON(&profile); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
@@ -121,13 +130,6 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 
 	if err := utils.ValidUpdate(profile); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
-		return
-	}
-
-	claimsId, ok := auth.GetClaims(c)
-
-	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{"invalid token"})
 		return
 	}
 
@@ -141,8 +143,13 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 }
 
 func (h *Handler) UpdatePassword(c *gin.Context) {
-	psswds := api.UpdatePassword{}
+	claimsId, ok := auth.GetClaims(c)
+	if !ok {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "invalid token"})
+		return
+	}
 
+	psswds := api.UpdatePassword{}
 	if err := c.BindJSON(&psswds); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
@@ -151,12 +158,6 @@ func (h *Handler) UpdatePassword(c *gin.Context) {
 
 	if err := utils.ValidPasswords(psswds); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
-		return
-	}
-
-	claimsId, ok := auth.GetClaims(c)
-	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "invalid token"})
 		return
 	}
 
@@ -224,12 +225,14 @@ func (h *Handler) SetAvatar(c *gin.Context) {
 	filename, err := utils.RandomUuid()
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{Error: "Random cant generate UUID"})
+		return
 	}
 
 	path := root + config.Conf.Web.Static.DirAvt + filename
 
 	if err := c.SaveUploadedFile(file, path); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{"Upload error"})
+		config.Lg("handlers", "SetAvatar").Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{Error: "Upload error"})
 		return
 	}
 
@@ -295,16 +298,19 @@ func (h *Handler) Unfollow(c *gin.Context) {
 }
 
 func (h *Handler) prepareFollow(c *gin.Context) (int, int, int, *utils.Error) {
-	followed := api.Follow{}
-
-	if err := c.BindJSON(&followed); err != nil {
-		return -1, -1, http.StatusBadRequest, &utils.Error{"bad json"}
-	}
-
 	claimsId, ok := auth.GetClaims(c)
 
 	if !ok {
 		return -1, -1, http.StatusUnauthorized, &utils.Error{Error: "invalid token"}
+	}
+
+	followed := api.UserAct{}
+	if err := c.BindJSON(&followed); err != nil {
+		return -1, -1, http.StatusBadRequest, &utils.Error{Error: "bad json"}
+	}
+
+	if err := utils.ValidUsername(followed); err != nil {
+		return -1, -1, http.StatusBadRequest, &utils.Error{Error: "invalid username"}
 	}
 
 	u, err := h.uc.GetUserByName(followed.Username)
@@ -315,24 +321,37 @@ func (h *Handler) prepareFollow(c *gin.Context) (int, int, int, *utils.Error) {
 	return claimsId, u.ID, http.StatusOK, nil
 }
 
-/*func (h *Handler) GetUserPage(c *gin.Context) {
-
-	u, err := h.uc.GetUserByNameWithFollowers(c.Param("username"));
+func (h *Handler) GetUserPage(c *gin.Context) {
+	u, err := h.uc.GetUserByNameWithFollowers(h.p.Sanitize(c.Param("username")))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "not found user"})
 		return
 	}
-
-	pins, err := pin.GetPinList(u.ID)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, utils.Error{Error: "pins not found"})
-		return
-	}
 	userPage := api.UserPage{
 		Username:  u.Username,
+		Avatar:    u.Avatar,
 		Followers: u.Followers,
 		Following: u.Following,
-		PinsList:  pins,
 	}
 	c.JSON(http.StatusOK, userPage)
-}*/
+}
+
+func (h *Handler) GetFollowers(c *gin.Context) {
+	username := h.p.Sanitize(c.Param("username"))
+	users, err := h.uc.GetFollowers(username)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Cannot show followers"})
+		return
+	}
+	c.JSON(http.StatusOK, users)
+}
+
+func (h *Handler) GetFollowing(c *gin.Context) {
+	username := h.p.Sanitize(c.Param("username"))
+	users, err := h.uc.GetFollowing(username)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Cannot show following"})
+		return
+	}
+	c.JSON(http.StatusOK, users)
+}

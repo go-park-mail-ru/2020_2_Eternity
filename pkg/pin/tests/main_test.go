@@ -3,8 +3,8 @@ package pintests
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/models"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin"
 	"math"
 	"net/http/httptest"
@@ -16,7 +16,7 @@ import (
 var (
 	ts = httptest.NewServer(setupServer())
 
-	u = models.User{
+	u = domain.User{
 		ID:        math.MaxInt32 - 10,
 		Username:  "username23456789876543234567",
 		Email:     "email235462345643u526453446346253",

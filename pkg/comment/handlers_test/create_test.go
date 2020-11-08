@@ -26,14 +26,14 @@ var (
 		UserId:  1,
 	}
 
-	commentApiCreateRootCase = api.CreateComment{
+	commentApiCreateRootCase = api.CommentCreateReq{
 		IsRoot:   true,
 		ParentId: 1,
 		Content:  commentCreateCase.Content,
 		PinId:    commentCreateCase.PinId,
 	}
 
-	commentApiGetRootCase = api.GetComment{
+	commentApiGetRootCase = api.CommentResp{
 		Id:      3,
 		Path:    []int32{1, 2, 3},
 		Content: commentCreateCase.Content,
@@ -41,14 +41,14 @@ var (
 		UserId:  commentCreateCase.UserId,
 	}
 
-	commentApiCreateChildCase = api.CreateComment{
+	commentApiCreateChildCase = api.CommentCreateReq{
 		IsRoot:   false,
 		ParentId: 2,
 		Content:  commentCreateCase.Content,
 		PinId:    commentCreateCase.PinId,
 	}
 
-	commentApiGetChildCase = api.GetComment{
+	commentApiGetChildCase = api.CommentResp{
 		Id:      5,
 		Path:    []int32{1, 3},
 		Content: commentCreateCase.Content,
@@ -117,7 +117,7 @@ func TestCreateRootComment(t *testing.T) {
 
 	assert.Equal(t, 200, cc.ctx.Writer.Status())
 
-	getCommentApi := api.GetComment{}
+	getCommentApi := api.CommentResp{}
 	require.Nil(t, json.Unmarshal(cc.writer.Body.Bytes(), &getCommentApi))
 	assert.Equal(t, getCommentApi, commentApiGetRootCase)
 }
@@ -141,7 +141,7 @@ func TestCreateChildComment(t *testing.T) {
 
 	assert.Equal(t, 200, cc.ctx.Writer.Status())
 
-	getCommentApi := api.GetComment{}
+	getCommentApi := api.CommentResp{}
 	require.Nil(t, json.Unmarshal(cc.writer.Body.Bytes(), &getCommentApi))
 	assert.Equal(t, getCommentApi, commentApiGetChildCase)
 }

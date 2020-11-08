@@ -7,7 +7,7 @@ dbinit:
 # Create all tables
 .PHONY: dbsetup
 dbsetup:
-	PGPASSWORD='662f2710-4e08-4be7-a278-a53ae86ba7f6' psql -U pinterest_user -h 127.0.0.1 -d pinterest_db -f configs/sql/base.sql -f configs/sql/comments.sql -w
+	PGPASSWORD='662f2710-4e08-4be7-a278-a53ae86ba7f6' psql -U pinterest_user -h 127.0.0.1 -d pinterest_db -f configs/sql/base.sql -f configs/sql/comments.sql -f configs/sql/notifications.sql -w
 
 
 # Drop all created tables

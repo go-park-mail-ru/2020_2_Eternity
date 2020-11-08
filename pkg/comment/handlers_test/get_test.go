@@ -59,11 +59,11 @@ func TestGetAllComments(t *testing.T) {
 
 	assert.Equal(t, 200, ctx.Writer.Status())
 
-	commentsApi := []api.GetComment{}
+	commentsApi := []api.CommentResp{}
 	assert.Nil(t, json.Unmarshal(writer.Body.Bytes(), &commentsApi))
 	assert.Equal(
 		t,
-		[]api.GetComment{
+		[]api.CommentResp{
 			{
 				Id:      commentGetAllCase[0].Id,
 				Path:    commentGetAllCase[0].Path,
@@ -129,11 +129,11 @@ func TestGetCommentById(t *testing.T) {
 
 	assert.Equal(t, 200, ctx.Writer.Status())
 
-	commentApi := api.GetComment{}
+	commentApi := api.CommentResp{}
 	assert.Nil(t, json.Unmarshal(writer.Body.Bytes(), &commentApi))
 	assert.Equal(
 		t,
-		api.GetComment{
+		api.CommentResp{
 			Id:      commentGetAllCase[0].Id,
 			Path:    commentGetAllCase[0].Path,
 			Content: commentGetAllCase[0].Content,

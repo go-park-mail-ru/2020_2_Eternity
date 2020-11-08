@@ -36,7 +36,7 @@ func (m *MockRepoComment) EXPECT() *MockRepoCommentMockRecorder {
 // CreateChildComment mocks base method
 func (m *MockRepoComment) CreateChildComment(c *comment.Comment, parentId int) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateChildComment", c, parentId)
+	ret := m.ctrl.Call(m, "StoreChildComment", c, parentId)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
@@ -44,13 +44,13 @@ func (m *MockRepoComment) CreateChildComment(c *comment.Comment, parentId int) e
 // CreateChildComment indicates an expected call of CreateChildComment
 func (mr *MockRepoCommentMockRecorder) CreateChildComment(c, parentId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateChildComment", reflect.TypeOf((*MockRepoComment)(nil).CreateChildComment), c, parentId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreChildComment", reflect.TypeOf((*MockRepoComment)(nil).CreateChildComment), c, parentId)
 }
 
 // CreateRootComment mocks base method
 func (m *MockRepoComment) CreateRootComment(c *comment.Comment) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateRootComment", c)
+	ret := m.ctrl.Call(m, "StoreRootComment", c)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
@@ -58,7 +58,7 @@ func (m *MockRepoComment) CreateRootComment(c *comment.Comment) error {
 // CreateRootComment indicates an expected call of CreateRootComment
 func (mr *MockRepoCommentMockRecorder) CreateRootComment(c interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRootComment", reflect.TypeOf((*MockRepoComment)(nil).CreateRootComment), c)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreRootComment", reflect.TypeOf((*MockRepoComment)(nil).CreateRootComment), c)
 }
 
 // GetComment mocks base method
@@ -79,7 +79,7 @@ func (mr *MockRepoCommentMockRecorder) GetComment(id interface{}) *gomock.Call {
 // GetAllComments mocks base method
 func (m *MockRepoComment) GetAllComments(pinId int) ([]comment.Comment, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAllComments", pinId)
+	ret := m.ctrl.Call(m, "GetPinComments", pinId)
 	ret0, _ := ret[0].([]comment.Comment)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
@@ -88,5 +88,5 @@ func (m *MockRepoComment) GetAllComments(pinId int) ([]comment.Comment, error) {
 // GetAllComments indicates an expected call of GetAllComments
 func (mr *MockRepoCommentMockRecorder) GetAllComments(pinId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllComments", reflect.TypeOf((*MockRepoComment)(nil).GetAllComments), pinId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPinComments", reflect.TypeOf((*MockRepoComment)(nil).GetAllComments), pinId)
 }
