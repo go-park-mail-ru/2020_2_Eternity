@@ -32,8 +32,8 @@ func (r *Repository) CreateUser(user *api.SignUp) (*domain.User, error) {
 
 func (r *Repository) GetUser(id int) (*domain.User, error) {
 	u := &domain.User{}
-	row := r.dbConn.QueryRow(context.Background(), "select username, password, email, birthdate, avatar from users where id=$1", id)
-	if err := row.Scan(&u.Username, &u.Password, &u.Email, &u.BirthDate, &u.Avatar); err != nil {
+	row := r.dbConn.QueryRow(context.Background(), "select username, name, surname, description, password, email, birthdate, avatar from users where id=$1", id)
+	if err := row.Scan(&u.Username, &u.Name, &u.Surname, &u.Description, &u.Password, &u.Email, &u.BirthDate, &u.Avatar); err != nil {
 		config.Lg("user", "GetUser").Error("r.GetUser: ", err.Error())
 		return u, err
 	}
