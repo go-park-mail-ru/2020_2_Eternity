@@ -14,6 +14,11 @@ func RandomUuid() (string, error) {
 	return strings.Replace(u.String(), "-", "", -1), err
 }
 
+//func GenerateUrlAvatar(filename string) string {
+//	return "http://" + config.Conf.Web.Server.Address + ":" + config.Conf.Web.Server.Port + "/images/avatar/" + filename
+//}
+
+
 func GenerateUrlAvatar(filename string) string {
-	return "http://" + config.Conf.Web.Server.Address + ":" + config.Conf.Web.Server.Port + "/images/avatar/" + filename
+	return "http://" + config.Conf.Web.Server.Host + "/images/avatar/" + filename
 }
