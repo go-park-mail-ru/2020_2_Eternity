@@ -7,6 +7,8 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -55,47 +57,51 @@ func (r *Repository) GetUserByName(username string) (*domain.User, error) {
 func (r *Repository) UpdateUser(id int, profile *api.UpdateUser) (*domain.User, error) {
 	u := &domain.User{}
 
+	i := 0
+	query := "update users set "
+	var queryParams []string
+	var values []interface{}
 	if profile.Email != "" {
-		if _, err := r.dbConn.Exec(context.Background(), "update users set email=$1 where id=$2",
-			profile.Email, id); err != nil {
-			config.Lg("user", "UpdateUser").Error("r.UpdateUser: ", err.Error())
-			return u, errors.New("fail update email")
-		}
+		i++
+		queryParams = append(queryParams, "email=$"+strconv.Itoa(i))
+		values = append(values, profile.Email)
+		u.Email = profile.Email
 	}
 	if profile.Username != "" {
-		if _, err := r.dbConn.Exec(context.Background(), "update users set username=$1 where id=$2",
-			profile.Username, id); err != nil {
-			config.Lg("user", "UpdateUser").Error("r.UpdateUser: ", err.Error())
-			return u, errors.New("fail update username")
-		}
+		i++
+		queryParams = append(queryParams, "username=$"+strconv.Itoa(i))
+		values = append(values, profile.Username)
 		u.Username = profile.Username
 	}
 
 	if profile.Name != "" {
-		if _, err := r.dbConn.Exec(context.Background(), "update users set name=$1 where id=$2",
-			profile.Name, id); err != nil {
-			config.Lg("user", "UpdateUser").Error("r.UpdateUser: ", err.Error())
-			return u, errors.New("fail update name")
-		}
+		i++
+		queryParams = append(queryParams, "name=$"+strconv.Itoa(i))
+		values = append(values, profile.Name)
 		u.Name = profile.Name
 	}
 
 	if profile.Surname != "" {
-		if _, err := r.dbConn.Exec(context.Background(), "update users set surname=$1 where id=$2",
-			profile.Surname, id); err != nil {
-			config.Lg("user", "UpdateUser").Error("r.UpdateUser: ", err.Error())
-			return u, errors.New("fail update surname")
-		}
+		i++
+		queryParams = append(queryParams, "surname=$"+strconv.Itoa(i))
+		values = append(values, profile.Surname)
 		u.Surname = profile.Surname
 	}
 
 	if profile.Description != "" {
-		if _, err := r.dbConn.Exec(context.Background(), "update users set description=$1 where id=$2",
-			profile.Description, id); err != nil {
-			config.Lg("user", "UpdateUser").Error("r.UpdateUser: ", err.Error())
-			return u, errors.New("fail update descr")
-		}
+		i++
+		queryParams = append(queryParams, "description=$"+strconv.Itoa(i))
+		values = append(values, profile.Description)
 		u.Description = profile.Description
+	}
+	query += strings.Join(queryParams, ",")
+	i++
+	query += " where id=$" + strconv.Itoa(i)
+	values = append(values, id)
+	if _, err := r.dbConn.Exec(context.Background(), query,
+		values...); err != nil {
+		config.Lg("user", "UpdateUser").Error("r.UpdateUser: ", err.Error())
+		return u, errors.New("fail update descr")
 	}
 	return u, nil
 }
