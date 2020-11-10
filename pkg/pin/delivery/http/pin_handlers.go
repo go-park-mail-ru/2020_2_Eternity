@@ -10,7 +10,12 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 	"mime/multipart"
 	"net/http"
-	"strconv"
+)
+
+const (
+	PinIdParam     = "id"
+	BoardIdParam = "id"
+	UsernameParam = "username"
 )
 
 type Handler struct {
@@ -70,21 +75,25 @@ func (h *Handler) CreatePin(c *gin.Context) {
 }
 
 func (h *Handler) GetPin(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := utils.GetIntParam(c, PinIdParam)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "not integer id"})
+		c.AbortWithStatus(http.StatusBadRequest)
+		config.Lg("pin_http", "GetPin").Error("GetIntParam: " + err.Error())
 		return
 	}
+
 	p, err := h.uc.GetPin(id)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, utils.Error{Error: "not found pin or fake id"})
+		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		config.Lg("pin_http", "GetPin").Error("uc.GetPin: " + err.Error())
 		return
 	}
+
 	c.JSON(http.StatusOK, p)
 }
 
 func (h *Handler) GetAllPins(c *gin.Context) {
-	username := h.p.Sanitize(c.Param("username"))
+	username := h.p.Sanitize(c.Param(UsernameParam))
 
 	pins, err := h.uc.GetPinList(username)
 	if err != nil {
@@ -92,21 +101,22 @@ func (h *Handler) GetAllPins(c *gin.Context) {
 		config.Lg("pin_http", "GetAllPins").Error("uc.GetPinList: " + err.Error())
 		return
 	}
+
 	c.JSON(http.StatusOK, pins)
 }
 
 func (h *Handler) GetPinsFromBoard(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := utils.GetIntParam(c, BoardIdParam)
 	if err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
-		config.Lg("pin_http", "GetPinsFromBoard").Error("Bind: ", "No param")
+		config.Lg("pin_http", "GetPinsFromBoard").Error("GetIntParam: ", err.Error())
 		return
 	}
 
 	pins, err := h.uc.GetPinBoardList(id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Cant show pins from board"})
-		config.Lg("pin_http", "GetPinsFromBoard").Error("Get pins", err.Error())
+		config.Lg("pin_http", "GetPinsFromBoard").Error("Get pins: ", err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, pins)
