@@ -6,7 +6,6 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	commentHttp "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/delivery/http"
 	mock_comment "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/mock"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	"github.com/golang/mock/gomock"
@@ -96,7 +95,7 @@ func TestCreateCommentSuccess(t *testing.T) {
 	gCtx.Set("info", userId)
 
 	mockUsecase := mock_comment.NewMockIUsecase(mockCtr)
-	h := commentHttp.NewHandler(mockUsecase, bluemonday.NewPolicy())
+	h := NewHandler(mockUsecase, bluemonday.NewPolicy())
 
 	// Success
 
@@ -137,7 +136,7 @@ func TestCreateCommentFail(t *testing.T) {
 	gCtx.Request = httptest.NewRequest("POST", "/", bytes.NewBuffer(buff))
 
 	mockUsecase := mock_comment.NewMockIUsecase(mockCtr)
-	h := commentHttp.NewHandler(mockUsecase, bluemonday.NewPolicy())
+	h := NewHandler(mockUsecase, bluemonday.NewPolicy())
 
 
 	mockUsecase.EXPECT().
@@ -182,10 +181,10 @@ func TestGetPinComments(t *testing.T) {
 	writerResp := httptest.NewRecorder()
 	gCtx, _ := gin.CreateTestContext(writerResp)
 	gCtx.Request = httptest.NewRequest("POST", "/", nil)
-	gCtx.Params = append(gCtx.Params, gin.Param{Key: commentHttp.PinIdParam, Value: strconv.Itoa(pinId)})
+	gCtx.Params = append(gCtx.Params, gin.Param{Key: PinIdParam, Value: strconv.Itoa(pinId)})
 
 	mockUsecase := mock_comment.NewMockIUsecase(mockCtr)
-	h := commentHttp.NewHandler(mockUsecase, bluemonday.NewPolicy())
+	h := NewHandler(mockUsecase, bluemonday.NewPolicy())
 
 	// Success
 
@@ -223,7 +222,7 @@ func TestGetPinCommentsFail(t *testing.T) {
 	gCtx.Request = httptest.NewRequest("POST", "/", nil)
 
 	mockUsecase := mock_comment.NewMockIUsecase(mockCtr)
-	h := commentHttp.NewHandler(mockUsecase, bluemonday.NewPolicy())
+	h := NewHandler(mockUsecase, bluemonday.NewPolicy())
 
 	// no param
 
@@ -246,10 +245,10 @@ func TestGetCommentById(t *testing.T) {
 	writerResp := httptest.NewRecorder()
 	gCtx, _ := gin.CreateTestContext(writerResp)
 	gCtx.Request = httptest.NewRequest("GET", "/", nil)
-	gCtx.Params = append(gCtx.Params, gin.Param{Key: commentHttp.CommentIdParam, Value: strconv.Itoa(commentId)})
+	gCtx.Params = append(gCtx.Params, gin.Param{Key: CommentIdParam, Value: strconv.Itoa(commentId)})
 
 	mockUsecase := mock_comment.NewMockIUsecase(mockCtr)
-	h := commentHttp.NewHandler(mockUsecase, bluemonday.NewPolicy())
+	h := NewHandler(mockUsecase, bluemonday.NewPolicy())
 
 
 	// Success

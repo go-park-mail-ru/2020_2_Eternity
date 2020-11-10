@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
-	pinHttp "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/delivery/http"
 	mock_pin "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/mock"
 	"github.com/golang/mock/gomock"
 	"github.com/microcosm-cc/bluemonday"
@@ -127,7 +126,7 @@ func TestCreatePinSuccess(t *testing.T) {
 
 
 	mockUsecase := mock_pin.NewMockIUsecase(mockCtr)
-	h := pinHttp.NewHandler(mockUsecase, bluemonday.NewPolicy())
+	h := NewHandler(mockUsecase, bluemonday.NewPolicy())
 
 	// Success
 
@@ -164,7 +163,7 @@ func TestCreatePinFail(t *testing.T) {
 	gCtx.Request = httptest.NewRequest("POST", "/", nil)
 
 	mockUsecase := mock_pin.NewMockIUsecase(mockCtr)
-	h := pinHttp.NewHandler(mockUsecase, bluemonday.NewPolicy())
+	h := NewHandler(mockUsecase, bluemonday.NewPolicy())
 
 	mockUsecase.EXPECT().
 		CreatePin(gomock.Any(), gomock.Any(), gomock.Any()).
@@ -205,11 +204,11 @@ func TestGetPinById(t *testing.T) {
 	writerResp := httptest.NewRecorder()
 	gCtx, _ := gin.CreateTestContext(writerResp)
 	gCtx.Request = httptest.NewRequest("GET", "/", nil)
-	gCtx.Params = append(gCtx.Params, gin.Param{Key: pinHttp.PinIdParam, Value: strconv.Itoa(pinId)})
+	gCtx.Params = append(gCtx.Params, gin.Param{Key: PinIdParam, Value: strconv.Itoa(pinId)})
 
 
 	mockUsecase := mock_pin.NewMockIUsecase(mockCtr)
-	h := pinHttp.NewHandler(mockUsecase, bluemonday.NewPolicy())
+	h := NewHandler(mockUsecase, bluemonday.NewPolicy())
 
 	// Success
 
@@ -258,10 +257,10 @@ func TestGetAllPins(t *testing.T) {
 	writerResp := httptest.NewRecorder()
 	gCtx, _ := gin.CreateTestContext(writerResp)
 	gCtx.Request = httptest.NewRequest("GET", "/", nil)
-	gCtx.Params = append(gCtx.Params, gin.Param{Key: pinHttp.UsernameParam, Value: username})
+	gCtx.Params = append(gCtx.Params, gin.Param{Key: UsernameParam, Value: username})
 
 	mockUsecase := mock_pin.NewMockIUsecase(mockCtr)
-	h := pinHttp.NewHandler(mockUsecase, bluemonday.NewPolicy())
+	h := NewHandler(mockUsecase, bluemonday.NewPolicy())
 
 	// Success
 
@@ -297,10 +296,10 @@ func TestGetPinsFromBoard(t *testing.T) {
 	writerResp := httptest.NewRecorder()
 	gCtx, _ := gin.CreateTestContext(writerResp)
 	gCtx.Request = httptest.NewRequest("GET", "/", nil)
-	gCtx.Params = append(gCtx.Params, gin.Param{Key: pinHttp.BoardIdParam, Value: strconv.Itoa(boardId)})
+	gCtx.Params = append(gCtx.Params, gin.Param{Key: BoardIdParam, Value: strconv.Itoa(boardId)})
 
 	mockUsecase := mock_pin.NewMockIUsecase(mockCtr)
-	h := pinHttp.NewHandler(mockUsecase, bluemonday.NewPolicy())
+	h := NewHandler(mockUsecase, bluemonday.NewPolicy())
 
 	// Success
 

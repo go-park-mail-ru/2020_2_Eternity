@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
-	pinUsecase "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/usecase"
 	mock_pin "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/mock"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -65,7 +64,7 @@ func TestCreatePin(t *testing.T) {
 	mockRepo := mock_pin.NewMockIRepository(mockCtr)
 	mockStorage := mock_pin.NewMockIStorage(mockCtr)
 
-	uc := pinUsecase.NewUsecase(mockRepo, mockStorage)
+	uc := NewUsecase(mockRepo, mockStorage)
 
 	mockRepo.EXPECT().
 		StorePin(gomock.Any()).

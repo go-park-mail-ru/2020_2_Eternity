@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	mock_comment "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/mock"
-	commentUsecase "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/usecase"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -89,7 +88,7 @@ func TestCreateRootComment(t *testing.T) {
 	defer ctrl.Finish()
 	mockRepo := mock_comment.NewMockIRepository(ctrl)
 
-	uc := commentUsecase.NewUsecase(mockRepo)
+	uc := NewUsecase(mockRepo)
 
 
 	// Success
@@ -132,7 +131,7 @@ func TestCreateChildComment(t *testing.T) {
 	defer ctrl.Finish()
 	mockRepo := mock_comment.NewMockIRepository(ctrl)
 
-	uc := commentUsecase.NewUsecase(mockRepo)
+	uc := NewUsecase(mockRepo)
 
 
 	// Success
@@ -161,7 +160,7 @@ func TestGetPinComments(t *testing.T) {
 	defer ctrl.Finish()
 	mockRepo := mock_comment.NewMockIRepository(ctrl)
 
-	uc := commentUsecase.NewUsecase(mockRepo)
+	uc := NewUsecase(mockRepo)
 
 	// Success
 
@@ -205,7 +204,7 @@ func TestGetCommentById(t *testing.T) {
 	defer ctrl.Finish()
 	mockRepo := mock_comment.NewMockIRepository(ctrl)
 
-	uc := commentUsecase.NewUsecase(mockRepo)
+	uc := NewUsecase(mockRepo)
 
 	// Success
 
