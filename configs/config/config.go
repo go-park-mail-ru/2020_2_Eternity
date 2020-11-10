@@ -4,6 +4,7 @@ import (
 	"flag"
 	"github.com/jackc/pgx"
 	"github.com/spf13/viper"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -79,6 +80,35 @@ func NewConfig() *Config {
 	viper.SetConfigName(confFile)
 	viper.SetConfigType(confExt)
 	viper.AddConfigPath(confDir)
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		Lg("config", "newConfig").Fatal("Fatal error config file ", err)
+	}
+
+	conf := new(Config)
+
+	er := viper.Unmarshal(conf)
+	if er != nil {
+		Lg("config", "newConfig").Fatal("Fatal error config file:", er)
+	}
+
+	return conf
+}
+
+func NewTestConfig() *Config {
+	setDefaultDb()
+	setDefaultWeb()
+	setDefaultLog()
+
+	confDir, confFile, confExt := splitPath(getConfPath())
+	Lg("config", "newConfig").
+		Infof("Config dir: '%s', config file name: '%s', config ext: '%s'", confDir, confFile, confExt)
+
+	viper.SetConfigName(confFile)
+	viper.SetConfigType(confExt)
+	log.Println(os.Getwd())
+	viper.AddConfigPath("../../../configs/yaml")
 
 	err := viper.ReadInConfig()
 	if err != nil {

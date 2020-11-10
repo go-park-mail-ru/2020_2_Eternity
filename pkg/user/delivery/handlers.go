@@ -163,7 +163,7 @@ func (h *Handler) UpdatePassword(c *gin.Context) {
 
 	u, err := h.uc.GetUser(claimsId)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "user doesnt exist"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "user doesnt exist"})
 		return
 	}
 
@@ -189,7 +189,7 @@ func (h *Handler) UpdatePassword(c *gin.Context) {
 func (h *Handler) GetProfile(c *gin.Context) {
 	claimsId, ok := auth.GetClaims(c)
 	if !ok {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{Error: "can't get key"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "can't get key"})
 		return
 	}
 
@@ -256,6 +256,7 @@ func (h *Handler) GetAvatar(c *gin.Context) {
 
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
+		config.Lg("user", "Get Avatar").Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Error filename"})
 		return
 	}

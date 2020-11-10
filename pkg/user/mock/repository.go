@@ -180,6 +180,21 @@ func (mr *MockIRepositoryMockRecorder) UnFollow(unfollowing, id interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnFollow", reflect.TypeOf((*MockIRepository)(nil).UnFollow), unfollowing, id)
 }
 
+// GetFollowersIds mocks base method
+func (m *MockIRepository) GetFollowersIds(userId int) ([]int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFollowersIds", userId)
+	ret0, _ := ret[0].([]int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetFollowersIds indicates an expected call of GetFollowersIds
+func (mr *MockIRepositoryMockRecorder) GetFollowersIds(userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFollowersIds", reflect.TypeOf((*MockIRepository)(nil).GetFollowersIds), userId)
+}
+
 // GetFollowers mocks base method
 func (m *MockIRepository) GetFollowers(username string) ([]domain.User, error) {
 	m.ctrl.T.Helper()
