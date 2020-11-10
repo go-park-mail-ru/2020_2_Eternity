@@ -7,6 +7,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
+	"github.com/microcosm-cc/bluemonday"
 	"net/http"
 )
 
@@ -17,11 +18,13 @@ const (
 
 type Handler struct {
 	uc comment.IUsecase
+	p  *bluemonday.Policy
 }
 
-func NewHandler(uc comment.IUsecase) *Handler {
+func NewHandler(uc comment.IUsecase, p *bluemonday.Policy) *Handler {
 	return &Handler{
 		uc: uc,
+		p: p,
 	}
 }
 
@@ -40,6 +43,14 @@ func (h *Handler) CreateComment(c *gin.Context) {
 		config.Lg("comment_http", "CreateComment").Error("BindJSON ", err.Error())
 		return
 	}
+
+	if err := commentReq.Validate(); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		config.Lg("comment_http", "CreateComment").Error("Validate: ", err.Error())
+		return
+	}
+
+	commentReq.Content = h.p.Sanitize(commentReq.Content)
 
 	commentResp, err := h.uc.CreateComment(&commentReq, userId)
 	if err != nil {

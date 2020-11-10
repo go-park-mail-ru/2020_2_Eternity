@@ -45,6 +45,12 @@ func (h *Handler) CreatePin(c *gin.Context) {
 		return
 	}
 
+	if err := formPin.CreatePinReq.Validate(); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		config.Lg("pin_http", "CreatePin").Error("Validate: ", err.Error())
+		return
+	}
+
 	h.sanitize(formPin.CreatePinReq)
 
 	pinResp, err := h.uc.CreatePin(formPin.CreatePinReq, formPin.Avatar, userId)
@@ -107,6 +113,6 @@ func (h *Handler) GetPinsFromBoard(c *gin.Context) {
 }
 
 func (h *Handler) sanitize(f *domain.PinReq) {
-	h.p.Sanitize(f.Title)
-	h.p.Sanitize(f.Content)
+	f.Title = h.p.Sanitize(f.Title)
+	f.Content = h.p.Sanitize(f.Content)
 }

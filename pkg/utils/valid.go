@@ -37,3 +37,4 @@ func ValidPasswords(pswds api.UpdatePassword) error {
 		validation.Field(&pswds.NewPassword, validation.Required, validation.Length(8, 50), is.Alphanumeric),
 	)
 }
+

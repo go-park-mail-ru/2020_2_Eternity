@@ -9,6 +9,7 @@ import (
 	comment_usecase "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/usecase"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/middleware"
 	note_http "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
+	"github.com/microcosm-cc/bluemonday"
 )
 
 /*
@@ -18,10 +19,10 @@ import (
 */
 
 
-func AddCommentRoutes(r *gin.Engine, db database.IDbConn) {
+func AddCommentRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy) {
 	rep := comment_postgres.NewRepo(db)
 	uc := comment_usecase.NewUsecase(rep)
-	handler := NewHandler(uc)
+	handler := NewHandler(uc, p)
 
 	r.POST("/pin/comments", auth.AuthCheck(), middleware.SendNotification(note_http.CreateNoteUsecase(db)), handler.CreateComment)
 	r.GET(fmt.Sprintf("/pin/:%s/comments", PinIdParam), handler.GetPinComments)

@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	commentDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/delivery/http"
 
-	comment_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/delivery/http"
-	note_delivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
+	noteDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
 
 	boardDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/board/delivery"
 	feedDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/feed/delivery"
@@ -15,7 +15,6 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/search"
 	userDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/delivery"
 	"github.com/microcosm-cc/bluemonday"
-
 
 	log "github.com/sirupsen/logrus"
 	"io"
@@ -43,12 +42,13 @@ func New(config *config.Config, db database.IDbConn) *Server {
 
 
 
-	comment_delivery.AddCommentRoutes(r, db)
-	note_delivery.AddNoteRoutes(r, db)
+
+	noteDelivery.AddNoteRoutes(r, db)
 
 
 	p := bluemonday.UGCPolicy()
 
+	commentDelivery.AddCommentRoutes(r, db, p)
 	userDelivery.AddUserRoutes(r, db, p)
 	pinDelivery.AddPinRoutes(r, db, p, config)
 	boardDelivery.AddBoardRoutes(r, db, p)
