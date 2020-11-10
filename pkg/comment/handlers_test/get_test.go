@@ -42,6 +42,9 @@ func TestGetAllComments(t *testing.T) {
 	ctx.Request = req
 	ctx.Params = append(ctx.Params, gin.Param{Key: comment.PinIdParam, Value: "4"})
 
+	ctx.Set()
+	ctx.Param()
+
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockRepoComment := mock_comment.NewMockRepoComment(ctrl)
