@@ -263,6 +263,39 @@ func TestDelivery_UpdateS(t *testing.T) {
 	assert.Equal(t, 200, c.Writer.Status())
 }
 
+func TestDelivery_UpdateC(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
+	userHandler := NewHandler(userMockUsecase, p)
+
+	w := httptest.NewRecorder()
+
+	path := "/user/profile"
+
+	testUser := api.UpdateUser{
+		Username: "21savage",
+	}
+	body, err := json.Marshal(testUser)
+	if err != nil {
+		log.Fatal("cant marshal")
+		return
+	}
+
+	userMockUsecase.EXPECT().UpdateUser(1, gomock.Any()).Return(nil, errors.New(""))
+
+	req, err := http.NewRequest("PUT", path, bytes.NewReader(body))
+
+	c, r := gin.CreateTestContext(w)
+
+	r.Use(mid())
+	r.PUT(path, userHandler.UpdateUser)
+	r.ServeHTTP(c.Writer, req)
+	assert.Equal(t, 422, c.Writer.Status())
+}
+
 func TestDelivery_UpdateUserUnAuth(t *testing.T) {
 	t.Helper()
 	ctrl := gomock.NewController(t)
@@ -353,7 +386,7 @@ func TestDelivery_UpdatePassword(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	path := "/user/profile"
+	path := "/user/profile/password"
 
 	testPswd := api.UpdatePassword{
 		OldPassword: "12345678",
@@ -385,6 +418,111 @@ func TestDelivery_UpdatePassword(t *testing.T) {
 	assert.Equal(t, 200, c.Writer.Status())
 }
 
+func TestDelivery_UpdatePasswordU(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
+	userHandler := NewHandler(userMockUsecase, p)
+
+	w := httptest.NewRecorder()
+
+	path := "/user/profile/password"
+
+	testPswd := api.UpdatePassword{
+		OldPassword: "12345678",
+		NewPassword: "123145678",
+	}
+	body, err := json.Marshal(testPswd)
+	if err != nil {
+		log.Fatal("cant marshal")
+		return
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(testPswd.OldPassword), config.Conf.Token.Value)
+	if err != nil {
+		log.Fatal(err)
+	}
+	u := domain.User{
+		Password: string(hash),
+	}
+
+	userMockUsecase.EXPECT().GetUser(gomock.Any()).Return(&u, nil)
+	userMockUsecase.EXPECT().UpdatePassword(gomock.Any(), gomock.Any()).Return(errors.New(""))
+
+	req, err := http.NewRequest("PUT", path, bytes.NewReader(body))
+
+	c, r := gin.CreateTestContext(w)
+	r.Use(mid())
+	r.PUT(path, userHandler.UpdatePassword)
+	r.ServeHTTP(c.Writer, req)
+	assert.Equal(t, 500, c.Writer.Status())
+}
+
+func TestDelivery_UpdatePasswordG(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
+	userHandler := NewHandler(userMockUsecase, p)
+
+	w := httptest.NewRecorder()
+
+	path := "/user/profile/password"
+
+	testPswd := api.UpdatePassword{
+		OldPassword: "12345678",
+		NewPassword: "123145678",
+	}
+	body, err := json.Marshal(testPswd)
+	if err != nil {
+		log.Fatal("cant marshal")
+		return
+	}
+
+	u := domain.User{}
+
+	userMockUsecase.EXPECT().GetUser(gomock.Any()).Return(&u, errors.New(""))
+
+	req, err := http.NewRequest("PUT", path, bytes.NewReader(body))
+
+	c, r := gin.CreateTestContext(w)
+	r.Use(mid())
+	r.PUT(path, userHandler.UpdatePassword)
+	r.ServeHTTP(c.Writer, req)
+	assert.Equal(t, 400, c.Writer.Status())
+}
+
+func TestDelivery_UpdatePasswordAuth(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
+	userHandler := NewHandler(userMockUsecase, p)
+
+	w := httptest.NewRecorder()
+
+	path := "/user/profile/password"
+
+	testPswd := api.UpdatePassword{
+		OldPassword: "12345678",
+		NewPassword: "123145678",
+	}
+	body, err := json.Marshal(testPswd)
+	if err != nil {
+		log.Fatal("cant marshal")
+		return
+	}
+	req, err := http.NewRequest("PUT", path, bytes.NewReader(body))
+	c, r := gin.CreateTestContext(w)
+	r.PUT(path, userHandler.UpdatePassword)
+	r.ServeHTTP(c.Writer, req)
+	assert.Equal(t, 401, c.Writer.Status())
+}
+
 func TestDelivery_UpdatePasswordW(t *testing.T) {
 	t.Helper()
 	ctrl := gomock.NewController(t)
@@ -395,7 +533,7 @@ func TestDelivery_UpdatePasswordW(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	path := "/user/profile"
+	path := "/user/profile/password"
 
 	testPswd := api.UpdatePassword{
 		OldPassword: "12345678",
@@ -521,7 +659,7 @@ func TestDelivery_Follow(t *testing.T) {
 	u := &domain.User{Username: "21savage"}
 
 	userMockUsecase.EXPECT().GetUserByName(u.Username).Return(u, nil)
-	userMockUsecase.EXPECT().Follow(gomock.Any(), gomock.Any()).Return(nil)
+	userMockUsecase.EXPECT().Follow(1, gomock.Any()).Return(nil)
 	w := httptest.NewRecorder()
 	path := "/follow"
 	req, _ := http.NewRequest("POST", path, bytes.NewReader(body))
@@ -531,6 +669,68 @@ func TestDelivery_Follow(t *testing.T) {
 	r.POST(path, userHandler.Follow)
 	r.ServeHTTP(c.Writer, req)
 	assert.Equal(t, 200, c.Writer.Status())
+}
+
+func TestDelivery_FollowE(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
+	userHandler := NewHandler(userMockUsecase, p)
+
+	f := api.UserAct{
+		Username: "21savage",
+	}
+
+	body, err := json.Marshal(f)
+	if err != nil {
+		log.Fatal("cant marshal")
+		return
+	}
+
+	u := &domain.User{Username: "21savage"}
+
+	userMockUsecase.EXPECT().GetUserByName(u.Username).Return(u, nil)
+	userMockUsecase.EXPECT().Follow(1, gomock.Any()).Return(errors.New(""))
+	w := httptest.NewRecorder()
+	path := "/follow"
+	req, _ := http.NewRequest("POST", path, bytes.NewReader(body))
+
+	c, r := gin.CreateTestContext(w)
+	r.Use(mid())
+	r.POST(path, userHandler.Follow)
+	r.ServeHTTP(c.Writer, req)
+	assert.Equal(t, 400, c.Writer.Status())
+}
+
+func TestDelivery_FollowV(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
+	userHandler := NewHandler(userMockUsecase, p)
+
+	f := api.UserAct{
+		Username: "21",
+	}
+
+	body, err := json.Marshal(f)
+	if err != nil {
+		log.Fatal("cant marshal")
+		return
+	}
+
+	w := httptest.NewRecorder()
+	path := "/follow"
+	req, _ := http.NewRequest("POST", path, bytes.NewReader(body))
+
+	c, r := gin.CreateTestContext(w)
+	r.Use(mid())
+	r.POST(path, userHandler.Follow)
+	r.ServeHTTP(c.Writer, req)
+	assert.Equal(t, 400, c.Writer.Status())
 }
 
 func TestDelivery_FollowF(t *testing.T) {
@@ -582,7 +782,7 @@ func TestDelivery_UnFollow(t *testing.T) {
 	u := &domain.User{Username: "21savage"}
 
 	userMockUsecase.EXPECT().GetUserByName(u.Username).Return(u, nil)
-	userMockUsecase.EXPECT().UnFollow(gomock.Any(), gomock.Any()).Return(nil)
+	userMockUsecase.EXPECT().UnFollow(1, gomock.Any()).Return(nil)
 	w := httptest.NewRecorder()
 	path := "/unfollow"
 	req, _ := http.NewRequest("POST", path, bytes.NewReader(body))
@@ -592,6 +792,71 @@ func TestDelivery_UnFollow(t *testing.T) {
 	r.POST(path, userHandler.Unfollow)
 	r.ServeHTTP(c.Writer, req)
 	assert.Equal(t, 200, c.Writer.Status())
+}
+
+func TestDelivery_UnFollowE(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
+	userHandler := NewHandler(userMockUsecase, p)
+
+	f := api.UserAct{
+		Username: "21savage",
+	}
+
+	body, err := json.Marshal(f)
+	if err != nil {
+		log.Fatal("cant marshal")
+		return
+	}
+
+	u := &domain.User{Username: "21savage"}
+
+	userMockUsecase.EXPECT().GetUserByName(u.Username).Return(u, errors.New(""))
+	w := httptest.NewRecorder()
+	path := "/unfollow"
+	req, _ := http.NewRequest("POST", path, bytes.NewReader(body))
+
+	c, r := gin.CreateTestContext(w)
+	r.Use(mid())
+	r.POST(path, userHandler.Unfollow)
+	r.ServeHTTP(c.Writer, req)
+	assert.Equal(t, 400, c.Writer.Status())
+}
+
+func TestDelivery_UnFollowW(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
+	userHandler := NewHandler(userMockUsecase, p)
+
+	f := api.UserAct{
+		Username: "21savage",
+	}
+
+	body, err := json.Marshal(f)
+	if err != nil {
+		log.Fatal("cant marshal")
+		return
+	}
+
+	u := &domain.User{Username: "21savage"}
+
+	userMockUsecase.EXPECT().GetUserByName(u.Username).Return(u, nil)
+	userMockUsecase.EXPECT().UnFollow(1, gomock.Any()).Return(errors.New(""))
+	w := httptest.NewRecorder()
+	path := "/unfollow"
+	req, _ := http.NewRequest("POST", path, bytes.NewReader(body))
+
+	c, r := gin.CreateTestContext(w)
+	r.Use(mid())
+	r.POST(path, userHandler.Unfollow)
+	r.ServeHTTP(c.Writer, req)
+	assert.Equal(t, 400, c.Writer.Status())
 }
 
 func TestDelivery_UnFollowF(t *testing.T) {
