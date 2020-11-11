@@ -3,8 +3,8 @@ package delivery
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/board"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"github.com/microcosm-cc/bluemonday"
 	"net/http"
@@ -24,7 +24,7 @@ func NewHandler(uc board.IUsecase, p *bluemonday.Policy) *Handler {
 }
 
 func (h *Handler) CreateBoard(c *gin.Context) {
-	claimsId, ok := auth.GetClaims(c)
+	claimsId, ok := jwthelper.GetClaims(c)
 	if !ok {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "invalid token"})
 		return
@@ -97,7 +97,7 @@ func (h *Handler) DetachPinFromBoard(c *gin.Context) {
 }
 
 func (h *Handler) prepAtDet(c *gin.Context) (*api.AttachDetachPin, int, *utils.Error) {
-	claimsId, ok := auth.GetClaims(c)
+	claimsId, ok := jwthelper.GetClaims(c)
 	if !ok {
 		return nil, http.StatusUnauthorized, &utils.Error{Error: "invalid token"}
 	}

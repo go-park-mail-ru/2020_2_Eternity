@@ -4,6 +4,7 @@ import (
 	b64 "encoding/base64"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"time"
 )
@@ -14,6 +15,7 @@ type Claims struct {
 }
 
 type CsrfClaims struct {
+	Id      int
 	Val     string
 	Expires time.Time
 	jwt.StandardClaims
@@ -44,9 +46,10 @@ func ParseToken(cookie string, claims *Claims) (*jwt.Token, error) {
 	})
 }
 
-func CreateCsrfToken(val string, expires time.Time) (string, error) {
+func CreateCsrfToken(id int, val string, expires time.Time) (string, error) {
 	SecretKey := []byte(config.Conf.Token.SecretName)
 	claims := CsrfClaims{
+		Id:      id,
 		Val:     val,
 		Expires: expires,
 		StandardClaims: jwt.StandardClaims{
@@ -74,4 +77,17 @@ func ParseCsrfToken(value string, claims *CsrfClaims) (*jwt.Token, error) {
 		}
 		return []byte(config.Conf.Token.SecretName), nil
 	})
+}
+
+func GetClaims(c *gin.Context) (int, bool) {
+	claims, ok := c.Get("info")
+	if !ok {
+		return -1, false
+	}
+
+	claimsId, ok := claims.(int)
+	if !ok {
+		return -1, false
+	}
+	return claimsId, true
 }

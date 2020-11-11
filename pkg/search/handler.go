@@ -3,13 +3,13 @@ package search
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"net/http"
 )
 
 func Search(c *gin.Context) {
-	claimsId, ok := auth.GetClaims(c)
+	claimsId, ok := jwthelper.GetClaims(c)
 
 	if !ok {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "invalid token"})

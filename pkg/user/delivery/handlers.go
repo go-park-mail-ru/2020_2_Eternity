@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
@@ -88,7 +87,7 @@ func (h *Handler) Login(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{Error: "cannot generate value"})
 		return
 	}
-	t, err := jwthelper.CreateCsrfToken(sr, time.Now().Add(45*time.Minute))
+	t, err := jwthelper.CreateCsrfToken(u.ID, sr, time.Now().Add(45*time.Minute))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{Error: "cannot create csrf token"})
 		return
@@ -125,7 +124,7 @@ func (h *Handler) Logout(c *gin.Context) {
 }
 
 func (h *Handler) UpdateUser(c *gin.Context) {
-	claimsId, ok := auth.GetClaims(c)
+	claimsId, ok := jwthelper.GetClaims(c)
 	if !ok {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "invalid token"})
 		return
@@ -154,7 +153,7 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 }
 
 func (h *Handler) UpdatePassword(c *gin.Context) {
-	claimsId, ok := auth.GetClaims(c)
+	claimsId, ok := jwthelper.GetClaims(c)
 	if !ok {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "invalid token"})
 		return
@@ -197,7 +196,7 @@ func (h *Handler) UpdatePassword(c *gin.Context) {
 }
 
 func (h *Handler) GetProfile(c *gin.Context) {
-	claimsId, ok := auth.GetClaims(c)
+	claimsId, ok := jwthelper.GetClaims(c)
 	if !ok {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "can't get key"})
 		return
@@ -219,7 +218,7 @@ func (h *Handler) SetAvatar(c *gin.Context) {
 		return
 	}
 
-	claimsId, ok := auth.GetClaims(c)
+	claimsId, ok := jwthelper.GetClaims(c)
 
 	if !ok {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "invalid token"})
@@ -309,7 +308,7 @@ func (h *Handler) Unfollow(c *gin.Context) {
 }
 
 func (h *Handler) prepareFollow(c *gin.Context) (int, int, int, *utils.Error) {
-	claimsId, ok := auth.GetClaims(c)
+	claimsId, ok := jwthelper.GetClaims(c)
 
 	if !ok {
 		return -1, -1, http.StatusUnauthorized, &utils.Error{Error: "invalid token"}
@@ -362,7 +361,7 @@ func (h *Handler) GetFollowing(c *gin.Context) {
 }
 
 func (h *Handler) IsFollowing(c *gin.Context) {
-	claimsId, ok := auth.GetClaims(c)
+	claimsId, ok := jwthelper.GetClaims(c)
 	if !ok {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "can't get key"})
 		return

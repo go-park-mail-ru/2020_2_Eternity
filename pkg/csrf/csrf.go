@@ -25,6 +25,15 @@ func CSRFCheck() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusForbidden, utils.Error{Error: "fake token"})
 			return
 		}
+		claimsId, ok := jwthelper.GetClaims(c)
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "unauthorized"})
+			return
+		}
+		if claimsId != claims.Id {
+			c.AbortWithStatusJSON(http.StatusForbidden, utils.Error{Error: "not valid csrf"})
+			return
+		}
 		t := time.Now()
 		if t.After(claims.Expires) {
 			c.AbortWithStatusJSON(http.StatusForbidden, utils.Error{Error: "expires csrf"})

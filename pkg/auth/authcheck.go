@@ -29,16 +29,3 @@ func AuthCheck() gin.HandlerFunc {
 		c.Next()
 	}
 }
-
-func GetClaims(c *gin.Context) (int, bool) {
-	claims, ok := c.Get("info")
-	if !ok {
-		return -1, false
-	}
-
-	claimsId, ok := claims.(int)
-	if !ok {
-		return -1, false
-	}
-	return claimsId, true
-}

@@ -3,7 +3,7 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications"
 	"net/http"
 )
@@ -18,10 +18,8 @@ func NewDelivery(uc notifications.IUsecase) *Delivery {
 	}
 }
 
-
-
 func (d *Delivery) GetUserNotes(c *gin.Context) {
-	userId, ok := auth.GetClaims(c)
+	userId, ok := jwthelper.GetClaims(c)
 	if !ok {
 		config.Lg("notifications_http", "GetUserNotes").Error("Can't get claims")
 		c.AbortWithStatus(http.StatusBadRequest)
@@ -39,7 +37,7 @@ func (d *Delivery) GetUserNotes(c *gin.Context) {
 }
 
 func (d *Delivery) UpdateUserNotes(c *gin.Context) {
-	userId, ok := auth.GetClaims(c)
+	userId, ok := jwthelper.GetClaims(c)
 	if !ok {
 		config.Lg("notifications_http", " UpdateUserNotes").Error("Can't get claims")
 		c.AbortWithStatus(http.StatusBadRequest)
