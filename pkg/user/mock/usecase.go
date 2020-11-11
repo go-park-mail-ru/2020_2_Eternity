@@ -209,3 +209,17 @@ func (mr *MockIUsecaseMockRecorder) GetFollowing(username interface{}) *gomock.C
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFollowing", reflect.TypeOf((*MockIUsecase)(nil).GetFollowing), username)
 }
+
+// IsFollowing mocks base method
+func (m *MockIUsecase) IsFollowing(id int, username string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsFollowing", id, username)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// IsFollowing indicates an expected call of IsFollowing
+func (mr *MockIUsecaseMockRecorder) IsFollowing(id, username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsFollowing", reflect.TypeOf((*MockIUsecase)(nil).IsFollowing), id, username)
+}

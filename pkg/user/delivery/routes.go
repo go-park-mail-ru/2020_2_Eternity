@@ -9,9 +9,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/repository"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/usecase"
 	"github.com/microcosm-cc/bluemonday"
-
 )
-
 
 func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy) {
 	rep := repository.NewRepo(db)
@@ -37,5 +35,6 @@ func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy) {
 			POST("/follow", handler.Follow)
 
 		authorized.POST("/unfollow", handler.Unfollow)
+		authorized.GET("/isfollowing/:username", handler.IsFollowing)
 	}
 }

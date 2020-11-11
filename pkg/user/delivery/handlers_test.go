@@ -747,3 +747,64 @@ func TestDelivery_GetFollowingF(t *testing.T) {
 	r.ServeHTTP(c.Writer, req)
 	assert.Equal(t, 400, c.Writer.Status())
 }
+
+func TestHandler_IsFollowing(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
+	userHandler := NewHandler(userMockUsecase, p)
+	w := httptest.NewRecorder()
+
+	path := "/isfollowing/21savage"
+
+	userMockUsecase.EXPECT().IsFollowing(1, "21savage").Return(nil)
+	req, _ := http.NewRequest("GET", path, nil)
+	c, r := gin.CreateTestContext(w)
+	r.Use(mid())
+
+	r.GET("/isfollowing/:username", userHandler.IsFollowing)
+	r.ServeHTTP(c.Writer, req)
+	assert.Equal(t, 200, c.Writer.Status())
+}
+
+func TestHandler_IsFollowingF(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
+	userHandler := NewHandler(userMockUsecase, p)
+	w := httptest.NewRecorder()
+
+	path := "/isfollowing/21"
+
+	userMockUsecase.EXPECT().IsFollowing(1, "21").Return(errors.New(""))
+	req, _ := http.NewRequest("GET", path, nil)
+	c, r := gin.CreateTestContext(w)
+	r.Use(mid())
+
+	r.GET("/isfollowing/:username", userHandler.IsFollowing)
+	r.ServeHTTP(c.Writer, req)
+	assert.Equal(t, 200, c.Writer.Status())
+}
+
+func TestHandler_IsFollowingU(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
+	userHandler := NewHandler(userMockUsecase, p)
+	w := httptest.NewRecorder()
+
+	path := "/isfollowing/21savage"
+
+	req, _ := http.NewRequest("GET", path, nil)
+	c, r := gin.CreateTestContext(w)
+
+	r.GET("/isfollowing/:username", userHandler.IsFollowing)
+	r.ServeHTTP(c.Writer, req)
+	assert.Equal(t, 401, c.Writer.Status())
+}

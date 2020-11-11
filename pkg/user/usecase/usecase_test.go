@@ -230,3 +230,19 @@ func TestUserUsecase_GetFollowing(t *testing.T) {
 		assert.Equal(t, err, nil)
 	}
 }
+
+func TestUserUsecase_IsFollowing(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	userMockRepository := mock_user.NewMockIRepository(ctrl)
+	usecase := NewUsecase(userMockRepository)
+
+	username := "future1"
+
+	userMockRepository.EXPECT().IsFollowing(1, username).Return(nil)
+	if err := usecase.IsFollowing(1, username); err != nil {
+		assert.Equal(t, err, nil)
+	}
+}

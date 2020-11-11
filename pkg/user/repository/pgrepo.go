@@ -215,3 +215,12 @@ func (r *Repository) GetFollowing(username string) ([]domain.User, error) {
 	}
 	return users, nil
 }
+
+func (r *Repository) IsFollowing(id int, username string) error {
+	var u int
+	if err := r.dbConn.QueryRow(context.Background(), "select id2 from follows join users on users.id = follows.id2 where username=$1 and id1=$2", username, id).Scan(&u); err != nil {
+		config.Lg("user", "IsFollowing").Error(err.Error())
+		return err
+	}
+	return nil
+}

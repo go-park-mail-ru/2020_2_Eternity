@@ -84,3 +84,7 @@ type GetBoardPins struct {
 	BoardID int `json:"board_id"`
 	//LastPinId int `json:"pin_id"`
 }
+
+type IsFollowing struct {
+	Following bool `json:"following"`
+}

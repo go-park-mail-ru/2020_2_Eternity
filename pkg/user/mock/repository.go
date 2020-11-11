@@ -224,3 +224,17 @@ func (mr *MockIRepositoryMockRecorder) GetFollowing(username interface{}) *gomoc
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFollowing", reflect.TypeOf((*MockIRepository)(nil).GetFollowing), username)
 }
+
+// IsFollowing mocks base method
+func (m *MockIRepository) IsFollowing(id int, username string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsFollowing", id, username)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// IsFollowing indicates an expected call of IsFollowing
+func (mr *MockIRepositoryMockRecorder) IsFollowing(id, username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsFollowing", reflect.TypeOf((*MockIRepository)(nil).IsFollowing), id, username)
+}

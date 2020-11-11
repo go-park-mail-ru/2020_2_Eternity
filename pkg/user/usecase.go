@@ -23,4 +23,6 @@ type IUsecase interface {
 
 	GetFollowers(username string) ([]domain.User, error)
 	GetFollowing(username string) ([]domain.User, error)
+
+	IsFollowing(id int, username string) error
 }

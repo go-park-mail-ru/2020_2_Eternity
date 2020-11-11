@@ -350,3 +350,23 @@ func (h *Handler) GetFollowing(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, users)
 }
+
+func (h *Handler) IsFollowing(c *gin.Context) {
+	claimsId, ok := auth.GetClaims(c)
+	if !ok {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "can't get key"})
+		return
+	}
+	username := h.p.Sanitize(c.Param("username"))
+
+	f := api.IsFollowing{
+		Following: false,
+	}
+
+	if err := h.uc.IsFollowing(claimsId, username); err != nil {
+		c.JSON(http.StatusOK, f)
+		return
+	}
+	f.Following = true
+	c.JSON(http.StatusOK, f)
+}
