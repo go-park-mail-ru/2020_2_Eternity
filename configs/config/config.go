@@ -4,7 +4,6 @@ import (
 	"flag"
 	"github.com/jackc/pgx"
 	"github.com/spf13/viper"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -101,16 +100,20 @@ func NewTestConfig() *Config {
 	setDefaultWeb()
 	setDefaultLog()
 
-	confDir, confFile, confExt := splitPath(getConfPath())
-	Lg("config", "newConfig").
-		Infof("Config dir: '%s', config file name: '%s', config ext: '%s'", confDir, confFile, confExt)
+	viper.SetConfigName("config.yaml")
 
-	viper.SetConfigName(confFile)
-	viper.SetConfigType(confExt)
-	log.Println(os.Getwd())
-	viper.AddConfigPath("../../../configs/yaml")
+	path, err := os.Getwd()
 
-	err := viper.ReadInConfig()
+	rootFolder := "2020_2_Eternity"
+
+	idx := strings.LastIndex(path, rootFolder)
+
+	path = path[:idx+len(rootFolder)]
+
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(path + "/configs/yaml")
+
+	err = viper.ReadInConfig()
 	if err != nil {
 		Lg("config", "newConfig").Fatal("Fatal error config file ", err)
 	}
@@ -121,7 +124,6 @@ func NewTestConfig() *Config {
 	if er != nil {
 		Lg("config", "newConfig").Fatal("Fatal error config file:", er)
 	}
-
 	return conf
 }
 

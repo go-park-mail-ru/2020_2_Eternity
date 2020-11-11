@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
+	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	mock_board "github.com/go-park-mail-ru/2020_2_Eternity/pkg/board/mock"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	"github.com/golang/mock/gomock"
@@ -25,6 +26,12 @@ func mid() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+var _ = func() bool {
+	testing.Init()
+	config.Conf = config.NewTestConfig()
+	return true
+}()
 
 func TestHandler_CreateBoard(t *testing.T) {
 	t.Helper()

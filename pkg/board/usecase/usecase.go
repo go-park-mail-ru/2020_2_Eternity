@@ -23,6 +23,7 @@ func (uc *BoardUsecase) CreateBoard(userId int, b *api.CreateBoard) (*domain.Boa
 func (uc *BoardUsecase) GetBoard(id int) (*domain.Board, error) {
 	return uc.repo.GetBoard(id)
 }
+
 func (uc *BoardUsecase) GetAllBoardsByUser(username string) ([]domain.Board, error) {
 	return uc.repo.GetAllBoardsByUser(username)
 }

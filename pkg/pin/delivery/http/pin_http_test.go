@@ -23,40 +23,45 @@ import (
 	"testing"
 )
 
-var (
+var _ = func() bool {
+	testing.Init()
+	config.Conf = config.NewTestConfig()
+	return true
+}()
 
-	userId = 3
-	pinId = 4
+var (
+	userId   = 3
+	pinId    = 4
 	username = "username123"
-	boardId = 6
+	boardId  = 6
 
 	pinReq = domain.PinReq{
-		Title:       "title",
-		Content:     "content",
+		Title:   "title",
+		Content: "content",
 	}
 
 	pinResp = domain.PinResp{
-		Id: 		 1,
-		Title:       pinReq.Title,
-		Content:     pinReq.Content,
-		ImgLink: 	 "link",
-		UserId:      userId,
+		Id:      1,
+		Title:   pinReq.Title,
+		Content: pinReq.Content,
+		ImgLink: "link",
+		UserId:  userId,
 	}
 
 	pinRespMany = []domain.PinResp{
 		{
-			Id: 		 3,
-			Title:       "tittle123",
-			Content:     "content14",
-			ImgLink: 	 "link4213",
-			UserId:      userId,
+			Id:      3,
+			Title:   "tittle123",
+			Content: "content14",
+			ImgLink: "link4213",
+			UserId:  userId,
 		},
 		{
-			Id: 		 4,
-			Title:       "tittle13",
-			Content:     "content4",
-			ImgLink: 	 "link13",
-			UserId:      userId,
+			Id:      4,
+			Title:   "tittle13",
+			Content: "content4",
+			ImgLink: "link13",
+			UserId:  userId,
 		},
 	}
 )
@@ -103,8 +108,6 @@ func createMultipartBody(pr domain.PinReq) (*bytes.Buffer, string, error) {
 }
 
 func TestMain(m *testing.M) {
-	config.Conf = config.NewConfigTst()
-
 
 	code := m.Run()
 	os.Exit(code)
@@ -123,7 +126,6 @@ func TestCreatePinSuccess(t *testing.T) {
 	gCtx.Request = httptest.NewRequest("POST", "/", buff)
 	gCtx.Request.Header.Set("Content-Type", contentType)
 	gCtx.Set("info", userId)
-
 
 	mockUsecase := mock_pin.NewMockIUsecase(mockCtr)
 	h := NewHandler(mockUsecase, bluemonday.NewPolicy())
@@ -193,9 +195,7 @@ func TestCreatePinFail(t *testing.T) {
 	h.CreatePin(gCtx)
 	assert.Equal(t, gCtx.Writer.Status(), http.StatusBadRequest)
 
-
 }
-
 
 func TestGetPinById(t *testing.T) {
 	mockCtr := gomock.NewController(t)
@@ -205,7 +205,6 @@ func TestGetPinById(t *testing.T) {
 	gCtx, _ := gin.CreateTestContext(writerResp)
 	gCtx.Request = httptest.NewRequest("GET", "/", nil)
 	gCtx.Params = append(gCtx.Params, gin.Param{Key: PinIdParam, Value: strconv.Itoa(pinId)})
-
 
 	mockUsecase := mock_pin.NewMockIUsecase(mockCtr)
 	h := NewHandler(mockUsecase, bluemonday.NewPolicy())
@@ -235,7 +234,6 @@ func TestGetPinById(t *testing.T) {
 
 	assert.Equal(t, gCtx.Writer.Status(), http.StatusUnprocessableEntity)
 
-
 	// no param
 	gCtx.Params = gin.Params{}
 
@@ -248,7 +246,6 @@ func TestGetPinById(t *testing.T) {
 
 	assert.Equal(t, gCtx.Writer.Status(), http.StatusBadRequest)
 }
-
 
 func TestGetAllPins(t *testing.T) {
 	mockCtr := gomock.NewController(t)
@@ -275,7 +272,6 @@ func TestGetAllPins(t *testing.T) {
 	psResp := []domain.PinResp{}
 	require.Nil(t, json.Unmarshal(writerResp.Body.Bytes(), &psResp))
 	assert.Equal(t, psResp, pinRespMany)
-
 
 	// Fail
 

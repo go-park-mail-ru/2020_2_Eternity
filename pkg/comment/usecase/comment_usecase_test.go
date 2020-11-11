@@ -14,49 +14,48 @@ import (
 var (
 	userId = 3
 
-	commentReqRoot = domain.CommentCreateReq {
-		IsRoot: true,
+	commentReqRoot = domain.CommentCreateReq{
+		IsRoot:   true,
 		ParentId: 1,
-		Content: "content",
-		PinId: 2,
+		Content:  "content",
+		PinId:    2,
 	}
 
-	commentRespRoot = domain.CommentResp {
-		Id: 1,
-		Path: []int32{1},
+	commentRespRoot = domain.CommentResp{
+		Id:      1,
+		Path:    []int32{1},
 		Content: commentReqRoot.Content,
-		PinId: commentReqRoot.PinId,
-		UserId: userId,
+		PinId:   commentReqRoot.PinId,
+		UserId:  userId,
 	}
 
-	commentReqChild = domain.CommentCreateReq {
-		IsRoot: false,
+	commentReqChild = domain.CommentCreateReq{
+		IsRoot:   false,
 		ParentId: 1,
-		Content: "content",
-		PinId: 2,
+		Content:  "content",
+		PinId:    2,
 	}
 
-	commentRespChild = domain.CommentResp {
-		Id: 2,
-		Path: []int32{1, 2},
+	commentRespChild = domain.CommentResp{
+		Id:      2,
+		Path:    []int32{1, 2},
 		Content: commentReqChild.Content,
-		PinId: commentReqChild.PinId,
-		UserId: userId,
+		PinId:   commentReqChild.PinId,
+		UserId:  userId,
 	}
-
 
 	pinId     = 5
 	commentId = 10
 
-	commentRespOne = domain.CommentResp {
-		Id: 2,
-		Path: []int32{1, 2},
+	commentRespOne = domain.CommentResp{
+		Id:      2,
+		Path:    []int32{1, 2},
 		Content: "content",
-		PinId: 12,
-		UserId: userId,
+		PinId:   12,
+		UserId:  userId,
 	}
 
-	commentRespMany = []domain.CommentResp {
+	commentRespMany = []domain.CommentResp{
 		{
 			Id:      12,
 			Path:    []int32{2},
@@ -73,15 +72,17 @@ var (
 		},
 	}
 )
-
+var _ = func() bool {
+	testing.Init()
+	config.Conf = config.NewTestConfig()
+	return true
+}()
 
 func TestMain(m *testing.M) {
-	config.Conf = config.NewConfigTst()
+
 	code := m.Run()
 	os.Exit(code)
 }
-
-
 
 func TestCreateRootComment(t *testing.T) {
 	ctrl := gomock.NewController(t)
@@ -90,14 +91,13 @@ func TestCreateRootComment(t *testing.T) {
 
 	uc := NewUsecase(mockRepo)
 
-
 	// Success
 
 	mockRepo.EXPECT().
 		StoreRootComment(gomock.Eq(&domain.Comment{
 			Content: commentReqRoot.Content,
-			PinId: commentReqRoot.PinId,
-			UserId: userId,
+			PinId:   commentReqRoot.PinId,
+			UserId:  userId,
 		})).
 		DoAndReturn(func(c *domain.Comment) error {
 			c.Id = commentRespRoot.Id
@@ -115,8 +115,8 @@ func TestCreateRootComment(t *testing.T) {
 	mockRepo.EXPECT().
 		StoreRootComment(gomock.Eq(&domain.Comment{
 			Content: commentReqRoot.Content,
-			PinId: commentReqRoot.PinId,
-			UserId: userId,
+			PinId:   commentReqRoot.PinId,
+			UserId:  userId,
 		})).
 		Return(errors.New("")).
 		Times(1)
@@ -125,7 +125,6 @@ func TestCreateRootComment(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-
 func TestCreateChildComment(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -133,14 +132,13 @@ func TestCreateChildComment(t *testing.T) {
 
 	uc := NewUsecase(mockRepo)
 
-
 	// Success
 
 	mockRepo.EXPECT().
 		StoreChildComment(gomock.Eq(&domain.Comment{
 			Content: commentReqChild.Content,
-			PinId: commentReqChild.PinId,
-			UserId: userId,
+			PinId:   commentReqChild.PinId,
+			UserId:  userId,
 		}), gomock.Eq(commentReqChild.ParentId)).
 		DoAndReturn(func(c *domain.Comment, parentId int) error {
 			c.Id = commentRespChild.Id
@@ -154,7 +152,6 @@ func TestCreateChildComment(t *testing.T) {
 	assert.Equal(t, commentRespChild, cResp)
 }
 
-
 func TestGetPinComments(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -167,18 +164,18 @@ func TestGetPinComments(t *testing.T) {
 	mockRepo.EXPECT().
 		GetPinComments(gomock.Eq(pinId)).
 		DoAndReturn(func(pinId int) ([]domain.Comment, error) {
-		commentsResp := []domain.Comment{}
+			commentsResp := []domain.Comment{}
 			for _, mComment := range commentRespMany {
 				commentsResp = append(commentsResp, domain.Comment{
-					Id: mComment.Id,
-					Path : mComment.Path,
+					Id:      mComment.Id,
+					Path:    mComment.Path,
 					Content: mComment.Content,
-					PinId: mComment.PinId,
-					UserId: mComment.UserId,
+					PinId:   mComment.PinId,
+					UserId:  mComment.UserId,
 				})
 			}
 
-		return commentsResp, nil
+			return commentsResp, nil
 		}).
 		Times(1)
 
@@ -197,8 +194,6 @@ func TestGetPinComments(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-
-
 func TestGetCommentById(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -211,11 +206,11 @@ func TestGetCommentById(t *testing.T) {
 	mockRepo.EXPECT().
 		GetComment(gomock.Eq(commentId)).
 		Return(domain.Comment{
-			Id: commentRespOne.Id,
-			Path: commentRespOne.Path,
+			Id:      commentRespOne.Id,
+			Path:    commentRespOne.Path,
 			Content: commentRespOne.Content,
-			PinId: commentRespOne.PinId,
-			UserId: commentRespOne.UserId,
+			PinId:   commentRespOne.PinId,
+			UserId:  commentRespOne.UserId,
 		}, nil).
 		Times(1)
 

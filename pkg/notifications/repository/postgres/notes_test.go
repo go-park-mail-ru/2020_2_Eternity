@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	repo "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/repository/postgres"
+
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"os"
@@ -31,7 +31,6 @@ func TestMain(m *testing.M) {
 
 	db, err = pgxpool.ConnectConfig(context.Background(), conf)
 
-
 	code := m.Run()
 
 	db.Close()
@@ -53,7 +52,7 @@ func TestMain(m *testing.M) {
 //}
 
 func TestGetId(t *testing.T) {
-	r := repo.NewRepo(db)
+	r := NewRepo(db)
 
 	n, err := r.GetNoteById(1)
 	assert.Nil(t, err)
@@ -62,7 +61,7 @@ func TestGetId(t *testing.T) {
 }
 
 func TestGetUserNotes(t *testing.T) {
-	r := repo.NewRepo(db)
+	r := NewRepo(db)
 
 	ns, err := r.GetNotesToUser(3)
 	assert.Nil(t, err)
@@ -78,7 +77,7 @@ func TestGetUserNotes(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	r := repo.NewRepo(db)
+	r := NewRepo(db)
 
 	err := r.UpdateNoteIsRead(1)
 	assert.Nil(t, err)
@@ -86,7 +85,7 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestUpdateAll(t *testing.T) {
-	r := repo.NewRepo(db)
+	r := NewRepo(db)
 
 	err := r.UpdateUserNotes(3)
 	assert.Nil(t, err)

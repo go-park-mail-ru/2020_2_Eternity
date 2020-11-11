@@ -22,42 +22,40 @@ import (
 )
 
 var (
-	//gCtx *gin.Context
-	//writerResp *httptest.ResponseRecorder
+//gCtx *gin.Context
+//writerResp *httptest.ResponseRecorder
 )
-
 
 var (
 	userId = 3
 
-	commentReqRoot = domain.CommentCreateReq {
-		IsRoot: true,
+	commentReqRoot = domain.CommentCreateReq{
+		IsRoot:   true,
 		ParentId: 1,
-		Content: "content",
-		PinId: 2,
+		Content:  "content",
+		PinId:    2,
 	}
 
-	commentRespRoot = domain.CommentResp {
-		Id: 1,
-		Path: []int32{1},
+	commentRespRoot = domain.CommentResp{
+		Id:      1,
+		Path:    []int32{1},
 		Content: commentReqRoot.Content,
-		PinId: commentReqRoot.PinId,
-		UserId: userId,
+		PinId:   commentReqRoot.PinId,
+		UserId:  userId,
 	}
-
 
 	pinId     = 5
 	commentId = 10
 
-	commentRespOne = domain.CommentResp {
-		Id: 2,
-		Path: []int32{1, 2},
+	commentRespOne = domain.CommentResp{
+		Id:      2,
+		Path:    []int32{1, 2},
 		Content: "content",
-		PinId: 12,
-		UserId: userId,
+		PinId:   12,
+		UserId:  userId,
 	}
 
-	commentRespMany = []domain.CommentResp {
+	commentRespMany = []domain.CommentResp{
 		{
 			Id:      12,
 			Path:    []int32{2},
@@ -75,10 +73,13 @@ var (
 	}
 )
 
+var _ = func() bool {
+	testing.Init()
+	config.Conf = config.NewTestConfig()
+	return true
+}()
+
 func TestMain(m *testing.M) {
-	config.Conf = config.NewConfigTst()
-
-
 	code := m.Run()
 	os.Exit(code)
 }
@@ -138,7 +139,6 @@ func TestCreateCommentFail(t *testing.T) {
 	mockUsecase := mock_comment.NewMockIUsecase(mockCtr)
 	h := NewHandler(mockUsecase, bluemonday.NewPolicy())
 
-
 	mockUsecase.EXPECT().
 		CreateComment(gomock.Any(), gomock.Any()).
 		Times(0)
@@ -167,12 +167,10 @@ func TestCreateCommentFail(t *testing.T) {
 
 	gCtx.Request = httptest.NewRequest("POST", "/", bytes.NewBuffer(buff))
 
-
 	h.CreateComment(gCtx)
 
 	assert.Equal(t, gCtx.Writer.Status(), http.StatusBadRequest)
 }
-
 
 func TestGetPinComments(t *testing.T) {
 	mockCtr := gomock.NewController(t)
@@ -236,11 +234,9 @@ func TestGetPinCommentsFail(t *testing.T) {
 
 }
 
-
 func TestGetCommentById(t *testing.T) {
 	mockCtr := gomock.NewController(t)
 	defer mockCtr.Finish()
-
 
 	writerResp := httptest.NewRecorder()
 	gCtx, _ := gin.CreateTestContext(writerResp)
@@ -249,7 +245,6 @@ func TestGetCommentById(t *testing.T) {
 
 	mockUsecase := mock_comment.NewMockIUsecase(mockCtr)
 	h := NewHandler(mockUsecase, bluemonday.NewPolicy())
-
 
 	// Success
 

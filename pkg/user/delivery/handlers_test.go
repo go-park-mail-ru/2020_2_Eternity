@@ -20,10 +20,15 @@ import (
 	"time"
 )
 
+var _ = func() bool {
+	testing.Init()
+	config.Conf = config.NewTestConfig()
+	return true
+}()
+
 var p = bluemonday.UGCPolicy()
 
 func TestDelivery_SignUpSuccess(t *testing.T) {
-	config.Conf = config.NewTestConfig()
 	t.Helper()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
