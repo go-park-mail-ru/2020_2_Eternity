@@ -90,10 +90,10 @@ func TestDelivery_SignUpValidP(t *testing.T) {
 	}
 
 	req, err := http.NewRequest("POST", path, bytes.NewReader(body))
-	_, r := gin.CreateTestContext(w)
+	c, r := gin.CreateTestContext(w)
 	r.POST(path, userHandler.SignUp)
-	r.ServeHTTP(w, req)
-	assert.Equal(t, 400, w.Code)
+	r.ServeHTTP(c.Writer, req)
+	assert.Equal(t, 400, c.Writer.Status())
 }
 
 func TestDelivery_LoginF(t *testing.T) {
@@ -125,6 +125,46 @@ func TestDelivery_LoginF(t *testing.T) {
 	r.POST(path, userHandler.Login)
 	r.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
+}
+
+func TestDelivery_Login(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
+	userHandler := NewHandler(userMockUsecase, p)
+
+	w := httptest.NewRecorder()
+
+	path := "/user/login"
+
+	testUser := api.Login{
+		Username: "21savage",
+		Password: "1234578",
+	}
+	body, err := json.Marshal(testUser)
+	if err != nil {
+		log.Fatal("cant marshal")
+		return
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(testUser.Password), config.Conf.Token.Value)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	respUser := &domain.User{
+		Username: "21savage",
+		Password: string(hash),
+	}
+	userMockUsecase.EXPECT().GetUserByNameWithFollowers(gomock.Any()).Return(respUser, nil)
+
+	req, err := http.NewRequest("POST", path, bytes.NewReader(body))
+	_, r := gin.CreateTestContext(w)
+	r.POST(path, userHandler.Login)
+	r.ServeHTTP(w, req)
+	assert.Equal(t, 200, w.Code)
 }
 
 func TestDelivery_LogoutF(t *testing.T) {
