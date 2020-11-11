@@ -23,9 +23,8 @@ func AddPinRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, conf
 	r.GET("/user/pins/:username", handler.GetAllPins)
 	r.GET("/user/pin/:id", handler.GetPin)
 
-	authorized := r.Group("/", auth.AuthCheck())
+	authorized := r.Group("/", auth.AuthCheck()) // authorized.Use(csrf.CSRFCheck()) на фронте его еще нет, поэтому закомменчен
 
 	authorized.POST("/user/pin", middleware.SendNotification(note_http.CreateNoteUsecase(db)), handler.CreatePin)
-
 
 }

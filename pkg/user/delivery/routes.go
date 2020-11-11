@@ -23,7 +23,7 @@ func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy) {
 	r.GET("/following/:username", handler.GetFollowing)
 	r.GET("/userpage/:username", handler.GetUserPage)
 	authorized := r.Group("/")
-	authorized.Use(auth.AuthCheck())
+	authorized.Use(auth.AuthCheck()) // authorized.Use(csrf.CSRFCheck()) на фронте его еще нет, поэтому закомменчен
 	{
 		authorized.POST("/user/logout", handler.Logout)
 		authorized.GET("/user/profile", handler.GetProfile)

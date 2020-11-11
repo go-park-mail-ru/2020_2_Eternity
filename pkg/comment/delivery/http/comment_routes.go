@@ -18,13 +18,12 @@ import (
 	Post  pin/:pin_id/comments   - create new comment for pin
 */
 
-
 func AddCommentRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy) {
 	rep := comment_postgres.NewRepo(db)
 	uc := comment_usecase.NewUsecase(rep)
 	handler := NewHandler(uc, p)
 
-	r.POST("/pin/comments", auth.AuthCheck(), middleware.SendNotification(note_http.CreateNoteUsecase(db)), handler.CreateComment)
+	r.POST("/pin/comments", auth.AuthCheck(), middleware.SendNotification(note_http.CreateNoteUsecase(db)), handler.CreateComment) // Use(csrf.CSRFCheck()) на фронте его еще нет, поэтому закомменчен
 	r.GET(fmt.Sprintf("/pin/:%s/comments", PinIdParam), handler.GetPinComments)
 	r.GET(fmt.Sprintf("/comment/:%s", CommentIdParam), handler.GetCommentById)
 }

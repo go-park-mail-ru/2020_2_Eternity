@@ -83,6 +83,16 @@ func (h *Handler) Login(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{Error: "cannot create token"})
 		return
 	}
+	sr, err := utils.RandomUuid()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{Error: "cannot generate value"})
+		return
+	}
+	t, err := jwthelper.CreateCsrfToken(sr, time.Now().Add(45*time.Minute))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{Error: "cannot create csrf token"})
+		return
+	}
 
 	cookie := http.Cookie{
 		Name:     config.Conf.Token.CookieName,
@@ -91,7 +101,7 @@ func (h *Handler) Login(c *gin.Context) {
 		HttpOnly: true,
 		Path:     "/",
 	}
-
+	c.Header("X-CSRF-TOKEN", t)
 	http.SetCookie(c.Writer, &cookie)
 	c.JSON(http.StatusOK, u)
 }

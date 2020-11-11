@@ -14,12 +14,11 @@ import (
 func AddNoteRoutes(r *gin.Engine, db database.IDbConn) {
 	delivery := NewDelivery(CreateNoteUsecase(db))
 
-	authorized := r.Group("/", auth.AuthCheck())
+	authorized := r.Group("/", auth.AuthCheck()) // authorized.Use(csrf.CSRFCheck()) на фронте его еще нет, поэтому закомменчен
 
 	authorized.GET("/notifications", delivery.GetUserNotes)
 	authorized.PUT("/notifications", delivery.UpdateUserNotes)
 }
-
 
 func CreateNoteUsecase(db database.IDbConn) notifications.IUsecase {
 	repPin := pin_postgres.NewRepo(db)
