@@ -99,7 +99,7 @@ func (u *Usecase) GetPinList(username string) ([]domain.PinResp, error) {
 func (u *Usecase) GetPinBoardList(boardId int) ([]domain.PinResp, error) {
 	pins, err := u.repository.GetPinBoardList(boardId)
 	if err != nil {
-		config.Lg("pin_usecase", "GetPinList").Error("Repo: ", err.Error())
+		config.Lg("pin_usecase", "GetPinBoardList").Error("Repo: ", err.Error())
 		return nil, err
 	}
 
