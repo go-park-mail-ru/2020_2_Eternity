@@ -6,6 +6,7 @@ func NewConfigTst() *Config {
 	setDefaultDbTst()
 	setDefaultWebTst()
 	setDefaultLogTst()
+	setDefaultTokenTst()
 
 	conf := new(Config)
 
@@ -24,6 +25,12 @@ func setDefaultDbTst() {
 	viper.SetDefault("database.postgres.db_name", "pinterest_db")
 	viper.SetDefault("database.postgres.ssl_mode", "disable")
 	viper.SetDefault("database.postgres.host", "localhost")
+}
+
+func setDefaultTokenTst() {
+	viper.SetDefault("token.secretname", "SECRET")
+	viper.SetDefault("token.cookiename", "eternity")
+	viper.SetDefault("token.value", 7)
 }
 
 func setDefaultWebTst() {

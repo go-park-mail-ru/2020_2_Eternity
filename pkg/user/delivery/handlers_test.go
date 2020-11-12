@@ -22,7 +22,7 @@ import (
 
 var _ = func() bool {
 	testing.Init()
-	config.Conf = config.NewTestConfig()
+	config.Conf = config.NewConfigTst()
 	return true
 }()
 

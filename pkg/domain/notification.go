@@ -47,7 +47,7 @@ type NoteComment struct {
 
 
 type NoteFollow struct {
-	FollowerId  int `bson:"user_id"`
+	FollowerId  int `bson:"follower_id"`
 	UserId  int `bson:"user_id"`
 }
 
