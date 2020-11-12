@@ -7,11 +7,6 @@ import (
 	"os"
 )
 
-func init() {
-	// NOTE (Pavel S) Temporary
-	config.Conf = config.NewConfig()
-	config.Db = config.NewDatabase(&config.Conf.Db).Open()
-}
 
 func initDirs() error {
 	root, err := os.Getwd()
@@ -32,6 +27,9 @@ func initDirs() error {
 }
 
 func main() {
+	config.Conf = config.NewConfig()
+	config.Db = config.NewDatabase(&config.Conf.Db).Open()
+
 	logger := config.Logger{}
 	logger.Init()
 	defer logger.Cleanup()

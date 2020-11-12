@@ -95,37 +95,6 @@ func NewConfig() *Config {
 	return conf
 }
 
-func NewTestConfig() *Config {
-	setDefaultDb()
-	setDefaultWeb()
-	setDefaultLog()
-
-	viper.SetConfigName("config.yaml")
-
-	path, err := os.Getwd()
-
-	rootFolder := "2020_2_Eternity"
-
-	idx := strings.LastIndex(path, rootFolder)
-
-	path = path[:idx+len(rootFolder)]
-
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath(path + "/configs/yaml")
-
-	err = viper.ReadInConfig()
-	if err != nil {
-		Lg("config", "newConfig").Fatal("Fatal error config file ", err)
-	}
-
-	conf := new(Config)
-
-	er := viper.Unmarshal(conf)
-	if er != nil {
-		Lg("config", "newConfig").Fatal("Fatal error config file:", er)
-	}
-	return conf
-}
 
 func setDefaultDb() {
 	viper.SetDefault("database.postgres.driver_name", "default")

@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	mock_database "github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database/mock"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	mock_user "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/mock"
 	"github.com/golang/mock/gomock"
@@ -1072,4 +1073,16 @@ func TestHandler_IsFollowingU(t *testing.T) {
 	r.GET("/isfollowing/:username", userHandler.IsFollowing)
 	r.ServeHTTP(c.Writer, req)
 	assert.Equal(t, 401, c.Writer.Status())
+}
+
+
+func TestCreateRoutes(t *testing.T) {
+	mockCtr := gomock.NewController(t)
+	defer mockCtr.Finish()
+
+	writerResp := httptest.NewRecorder()
+	_, r := gin.CreateTestContext(writerResp)
+
+	mockDatabase := mock_database.NewMockIDbConn(mockCtr)
+	AddUserRoutes(r, mockDatabase, bluemonday.NewPolicy())
 }

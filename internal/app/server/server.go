@@ -41,10 +41,7 @@ func New(config *config.Config, db database.IDbConn) *Server {
 	r.Static(config.Web.Static.UrlImg, config.Web.Static.DirImg)
 
 
-
-
 	noteDelivery.AddNoteRoutes(r, db)
-
 
 	p := bluemonday.UGCPolicy()
 

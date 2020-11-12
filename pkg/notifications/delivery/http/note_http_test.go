@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	mock_database "github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database/mock"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	mock_notifications "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/mock"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/usecase"
@@ -139,4 +140,26 @@ func TestUpdUserNotes(t *testing.T) {
 	h.UpdateUserNotes(gCtx)
 
 	assert.Equal(t, gCtx.Writer.Status(), http.StatusUnauthorized)
+}
+
+
+func TestCreateRoutes(t *testing.T) {
+	mockCtr := gomock.NewController(t)
+	defer mockCtr.Finish()
+
+	writerResp := httptest.NewRecorder()
+	_, r := gin.CreateTestContext(writerResp)
+
+	mockDatabase := mock_database.NewMockIDbConn(mockCtr)
+	AddNoteRoutes(r, mockDatabase)
+}
+
+
+func TestCreateNoteUsecase(t *testing.T) {
+	mockCtr := gomock.NewController(t)
+	defer mockCtr.Finish()
+
+
+	mockDatabase := mock_database.NewMockIDbConn(mockCtr)
+	CreateNoteUsecase(mockDatabase)
 }
