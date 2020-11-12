@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	chatDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/chat/delivery/http"
 	commentDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/delivery/http"
 
 	noteDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
@@ -45,6 +46,7 @@ func New(config *config.Config, db database.IDbConn) *Server {
 
 	p := bluemonday.UGCPolicy()
 
+	chatDelivery.AddChatRoutes(r, db, p)
 	commentDelivery.AddCommentRoutes(r, db, p)
 	userDelivery.AddUserRoutes(r, db, p)
 	pinDelivery.AddPinRoutes(r, db, p, config)
