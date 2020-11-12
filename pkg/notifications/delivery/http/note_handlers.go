@@ -24,7 +24,7 @@ func (d *Delivery) GetUserNotes(c *gin.Context) {
 	userId, ok := auth.GetClaims(c)
 	if !ok {
 		config.Lg("notifications_http", "GetUserNotes").Error("Can't get claims")
-		c.AbortWithStatus(http.StatusBadRequest)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
@@ -42,7 +42,7 @@ func (d *Delivery) UpdateUserNotes(c *gin.Context) {
 	userId, ok := auth.GetClaims(c)
 	if !ok {
 		config.Lg("notifications_http", " UpdateUserNotes").Error("Can't get claims")
-		c.AbortWithStatus(http.StatusBadRequest)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
