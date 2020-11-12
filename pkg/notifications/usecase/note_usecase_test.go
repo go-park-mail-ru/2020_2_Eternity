@@ -18,6 +18,7 @@ import (
 
 var (
 	userId = 321
+	noteId = 432
 
 	toUsers = []int{2}
 
@@ -163,6 +164,17 @@ func TestCreateNotesFail(t *testing.T) {
 	err = uc.CreateNotes(noteComment)
 	assert.NotNil(t, err)
 
+	// pin error
+
+	mockUser.EXPECT().
+		GetFollowersIds(gomock.Eq(notePin.UserId)).
+		Return(toUsers, errors.New("")).
+		Times(1)
+
+
+	err = uc.CreateNotes(notePin)
+	assert.NotNil(t, err)
+
 	// store note error
 
 	mockPin.EXPECT().
@@ -218,4 +230,47 @@ func TestGetUserNotes(t *testing.T) {
 	nsResp, err := uc.GetUserNotes(userId)
 	assert.Nil(t, err)
 	assert.Equal(t, noteRespMany, nsResp)
+}
+
+
+
+func TestUpdateNote(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockNotes := mock_notifications.NewMockIRepository(ctrl)
+	mockPin := mock_pin.NewMockIRepository(ctrl)
+	mockUser := mock_user.NewMockIRepository(ctrl)
+
+	uc := NewUsecase(mockNotes, mockPin, mockUser)
+
+	// Success
+
+	mockNotes.EXPECT().
+		UpdateNoteIsRead(gomock.Eq(noteId)).
+		Return(nil).
+		Times(1)
+
+	err := uc.UpdateNote(noteId)
+	assert.Nil(t, err)
+}
+
+
+func TestUpdateUserNotes(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockNotes := mock_notifications.NewMockIRepository(ctrl)
+	mockPin := mock_pin.NewMockIRepository(ctrl)
+	mockUser := mock_user.NewMockIRepository(ctrl)
+
+	uc := NewUsecase(mockNotes, mockPin, mockUser)
+
+	// Success
+
+	mockNotes.EXPECT().
+		UpdateUserNotes(gomock.Eq(userId)).
+		Return(nil).
+		Times(1)
+
+	err := uc.UpdateUserNotes(userId)
+	assert.Nil(t, err)
 }
