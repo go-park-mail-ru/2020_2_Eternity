@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
@@ -292,6 +293,11 @@ func (h *Handler) Follow(c *gin.Context) {
 	c.Status(http.StatusOK)
 	c.Set("status", 200)
 	c.Set("follow_id", followedUser)
+
+	c.Set(domain.NotificationKey, domain.NoteFollow{
+		FollowerId: followingUser,
+		UserId:  followedUser,
+	})
 }
 
 func (h *Handler) Unfollow(c *gin.Context) {
