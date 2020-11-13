@@ -1,19 +1,24 @@
 package config
 
 import (
+	"flag"
+	"github.com/jackc/pgx"
 	"github.com/spf13/viper"
-	"log"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 var (
-	Conf = newConfig()
-	Db   = newDatabase(&Conf.Db).Open()
+	Conf *Config
+	Db   *pgx.Conn
 )
 
 type Config struct {
-	Db    ConfDB    `mapstructure:"database"`
-	Web   ConfWeb   `mapstructure:"web"`
-	Token ConfToken `mapstructure:"token"`
+	Db     ConfDB     `mapstructure:"database"`
+	Web    ConfWeb    `mapstructure:"web"`
+	Token  ConfToken  `mapstructure:"token"`
+	Logger ConfLogger `mapstructure:"logger"`
 }
 
 type ConfDB struct {
@@ -27,6 +32,7 @@ type ConfPostgres struct {
 	DbName     string `mapstructure:"db_name"`
 	SslMode    string `mapstructure:"ssl_mode"`
 	Host       string `mapstructure:"host"`
+	MaxConn    string `mapstructure:"max_conn"` // TODO (PavelS) Remove or redone
 }
 
 type ConfWeb struct {
@@ -41,40 +47,54 @@ type ConfToken struct {
 }
 
 type ConfServer struct {
-	Address string `mapstructure:"address"`
-	Port    string `mapstructure:"port"`
+	Address  string `mapstructure:"address"`
+	Port     string `mapstructure:"port"`
+	Host     string `mapstructure:"host"`
+	Protocol string `mapstructure:"protocol"`
 }
 
 type ConfStatic struct {
-	DirImg        string `mapstructure:"dir_img"`
-	UrlImg        string `mapstructure:"url_img"`
-	DirAvt        string `mapstructure:"dir_avt"`
-	DirDepth      int    `mapstructure:"dir_depth"`
-	DirNameLength int    `mapstructure:"dir_name_length"`
+	DirImg string `mapstructure:"dir_img"`
+	UrlImg string `mapstructure:"url_img"`
+	DirAvt string `mapstructure:"dir_avt"`
 }
 
-func newConfig() *Config {
+type ConfLogger struct {
+	GinFilePath    string `mapstructure:"gin_file"`
+	CommonFilePath string `mapstructure:"common_file"`
+	GinLevel       string `mapstructure:"gin_level"`
+	CommonLevel    string `mapstructure:"common_level"`
+	StdoutLog      bool   `mapstructure:"stdout_log"`
+}
+
+func NewConfig() *Config {
 	setDefaultDb()
 	setDefaultWeb()
+	setDefaultLog()
 
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./configs/yaml")
+	confDir, confFile, confExt := splitPath(getConfPath())
+	Lg("config", "newConfig").
+		Infof("Config dir: '%s', config file name: '%s', config ext: '%s'", confDir, confFile, confExt)
+
+	viper.SetConfigName(confFile)
+	viper.SetConfigType(confExt)
+	viper.AddConfigPath(confDir)
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatalf("Fatal error config file: %s \n", err)
+		Lg("config", "newConfig").Fatal("Fatal error config file ", err)
 	}
 
 	conf := new(Config)
 
 	er := viper.Unmarshal(conf)
 	if er != nil {
-		log.Fatalf("Fatal error config file: %s \n", err)
+		Lg("config", "newConfig").Fatal("Fatal error config file:", er)
 	}
 
 	return conf
 }
+
 
 func setDefaultDb() {
 	viper.SetDefault("database.postgres.driver_name", "default")
@@ -88,9 +108,46 @@ func setDefaultDb() {
 func setDefaultWeb() {
 	viper.SetDefault("web.server.address", "")
 	viper.SetDefault("web.server.port", "0000")
+	viper.SetDefault("web.server.host", "pinterest-tp.tk")
+	viper.SetDefault("web.server.protocol", "http://")
 	viper.SetDefault("web.static.dir_img", "img")
 	viper.SetDefault("web.static.url_img", "img")
 	viper.SetDefault("web.static.dir_avt", "/static/avatar/")
-	viper.SetDefault("web.static.dir_name_length", 1)
-	viper.SetDefault("web.static.dir_depth", 5)
+}
+
+func setDefaultLog() {
+	viper.SetDefault("logger.gin_file", "/var/log/pinterest/gin.log")
+	viper.SetDefault("logger.common_file", "/var/log/pinterest/common.log")
+	viper.SetDefault("logger.gin_level", "debug")
+	viper.SetDefault("logger.common_level", "debug")
+	viper.SetDefault("logger.stdout_log", true)
+}
+
+func getConfPath() string {
+	argPath := ""
+	flag.StringVar(&argPath, "config", "", "Specify config path")
+	flag.Parse()
+
+	if argPath != "" {
+		return argPath
+	}
+
+	if confPath, ok := os.LookupEnv("CONF_PATH"); ok {
+		return confPath
+	}
+
+	return "./configs/yaml/config.yaml"
+}
+
+func splitPath(path string) (dir, fileName, ext string) {
+	dir, file := filepath.Split(path)
+	strs := strings.Split(file, ".")
+
+	if len(strs) == 2 {
+		return dir, strs[0], strs[1]
+	} else if len(strs) == 1 {
+		return dir, strs[0], ""
+	} else {
+		return dir, "", ""
+	}
 }
