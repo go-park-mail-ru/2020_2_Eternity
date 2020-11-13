@@ -42,6 +42,7 @@ func (uc *Usecase) CreateComment(commentReq *domain.CommentCreateReq, userId int
 		Content: modelComment.Content,
 		PinId: modelComment.PinId,
 		UserId: modelComment.UserId,
+		Username: modelComment.Username,
 	}, nil
 }
 
@@ -61,6 +62,7 @@ func (uc *Usecase) GetPinComments(pinId int) ([]domain.CommentResp, error) {
 			Content: mComment.Content,
 			PinId: mComment.PinId,
 			UserId: mComment.UserId,
+			Username: mComment.Username,
 		})
 	}
 
@@ -81,5 +83,6 @@ func (uc *Usecase) GetCommentById(commentId int) (domain.CommentResp, error) {
 		Content: modelComment.Content,
 		PinId: modelComment.PinId,
 		UserId: modelComment.UserId,
+		Username: modelComment.Username,
 	}, nil
 }

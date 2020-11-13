@@ -9,6 +9,7 @@ type Comment struct {
 	Content string
 	PinId   int
 	UserId  int
+	Username string
 }
 
 
@@ -35,4 +36,5 @@ type CommentResp struct {
 	Content string  `json:"content"`
 	PinId   int     `json:"pin_id"`
 	UserId  int     `json:"user_id"`
+	Username string
 }
