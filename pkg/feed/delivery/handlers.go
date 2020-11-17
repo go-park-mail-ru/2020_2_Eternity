@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/feed"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"net/http"
+	"strconv"
 )
 
 type Handler struct {
@@ -18,7 +19,12 @@ func NewHandler(uc feed.IUseCase) *Handler {
 }
 
 func (h *Handler) GetFeed(c *gin.Context) {
-	pins, err := h.uc.GetFeed(0)
+	last := c.Query("last")
+	id, err := strconv.Atoi(last)
+	if err != nil {
+		id = 0
+	}
+	pins, err := h.uc.GetFeed(0, id)
 
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{Error: "Cant get feed"})

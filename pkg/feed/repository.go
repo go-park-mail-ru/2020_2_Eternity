@@ -5,5 +5,5 @@ import (
 )
 
 type IRepository interface {
-	GetFeed(userId int) ([]domain.Pin, error)
+	GetFeed(userId int, last int) ([]domain.Pin, error)
 }

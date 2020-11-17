@@ -3,24 +3,26 @@ package usecase
 import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/feed"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/search"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 )
 
 type Usecase struct {
-	r feed.IRepository
+	r search.IRepository
 }
 
-func NewUseCase(r feed.IRepository) *Usecase {
-	return &Usecase{
-		r: r,
-	}
+func NewUsecase(r search.IRepository) *Usecase {
+	return &Usecase{r: r}
 }
 
-func (uc *Usecase) GetFeed(userId int, last int) ([]domain.PinResp, error) {
-	pins, err := uc.r.GetFeed(userId, last)
+func (uc *Usecase) GetUsersByName(username string, last int) ([]domain.UserSearch, error) {
+	return uc.r.GetUsersByName(username, last)
+}
+
+func (uc *Usecase) GetPinsByTitle(title string, last int) ([]domain.PinResp, error) {
+	pins, err := uc.r.GetPinsByTitle(title, last)
 	if err != nil {
-		config.Lg("feed_usecase", "GetFeed").Error("Repo: ", err.Error())
+		config.Lg("search_usecase", "GetPinsByTitle").Error("Repo: ", err.Error())
 		return nil, err
 	}
 

@@ -7,13 +7,13 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	chatDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/chat/delivery/http"
 	commentDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/delivery/http"
+	search "github.com/go-park-mail-ru/2020_2_Eternity/pkg/search/delivery/http"
 
 	noteDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
 
 	boardDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/board/delivery"
 	feedDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/feed/delivery"
 	pinDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/delivery/http"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/search"
 	userDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/delivery"
 	"github.com/microcosm-cc/bluemonday"
 
@@ -41,7 +41,6 @@ func New(config *config.Config, db database.IDbConn) *Server {
 	r.MaxMultipartMemory = 8 << 20
 	r.Static(config.Web.Static.UrlImg, config.Web.Static.DirImg)
 
-
 	noteDelivery.AddNoteRoutes(r, db)
 
 	p := bluemonday.UGCPolicy()
@@ -53,9 +52,7 @@ func New(config *config.Config, db database.IDbConn) *Server {
 	boardDelivery.AddBoardRoutes(r, db, p)
 
 	feedDelivery.AddFeedRoutes(r, db, config)
-	search.AddSearchRoute(r)
-
-
+	search.AddSearchRoute(r, db)
 
 	return &Server{
 		logFile: logFile,
