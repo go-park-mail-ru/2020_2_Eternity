@@ -98,6 +98,7 @@ func (r *Repository) GetPinBoardList(boardId int) ([]domain.Pin, error) {
 	for rows.Next() {
 		pin := domain.Pin{}
 		if err := rows.Scan(&pin.Id, &pin.Title, &pin.Content, &pin.PictureName, &pin.UserId); err != nil {
+			config.Lg("pin", "pin.GetPinBoardList").Error(err.Error())
 			return nil, err
 		}
 		pins = append(pins, pin)

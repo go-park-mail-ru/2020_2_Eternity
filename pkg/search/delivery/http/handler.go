@@ -47,7 +47,12 @@ func (h *Handler) Search(c *gin.Context) {
 		c.JSON(http.StatusOK, users)
 		return
 	case "pin":
-		c.JSON(http.StatusOK, utils.Error{Error: fmt.Sprintf("wants to search by pin with content = %s", cont)})
+		pins, err := h.uc.GetPinsByTitle(cont, last)
+		if err != nil {
+			c.JSON(http.StatusOK, utils.Error{Error: "pins not found"})
+			return
+		}
+		c.JSON(http.StatusOK, pins)
 		return
 	default:
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: fmt.Sprintf("Bad search type %s. Can search by user and pin", sType)})

@@ -92,3 +92,31 @@ create table if not exists boards_pins(
 	foreign key (pin_id) references pins(id),
 	unique (board_id, pin_id)
 );
+
+
+create table pins_vectors (
+    idv int unique not null,
+    vec tsvector,
+	foreign key(idv) references pins(id)
+);
+
+CREATE INDEX idx_gin_pins_title
+ON pins_vectors
+USING gin ("vec");
+
+CREATE OR REPLACE FUNCTION ins_pin_vct() RETURNS TRIGGER AS $ins_pin_vct$
+    BEGIN
+        IF (TG_OP = 'UPDATE') THEN
+            update pins_vectors set vec=to_tsvector(new.title) where old.idv = idv;
+            RETURN OLD;
+        ELSIF (TG_OP = 'INSERT') THEN
+			insert into pins_vectors(idv, vec) values(new.id, to_tsvector(new.title));
+            RETURN NEW;
+        END IF;
+        RETURN NULL; -- возвращаемое значение для триггера AFTER игнорируется
+    END;
+$ins_pin_vct$ LANGUAGE plpgsql;
+
+CREATE TRIGGER ins_pin_vct_trg
+AFTER INSERT OR UPDATE ON pins
+    FOR EACH ROW EXECUTE PROCEDURE ins_pin_vct();
