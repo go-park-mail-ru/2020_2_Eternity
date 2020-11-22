@@ -8,6 +8,7 @@ import (
 	chatDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/chat/delivery/http"
 	commentDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/delivery/http"
 	search "github.com/go-park-mail-ru/2020_2_Eternity/pkg/search/delivery/http"
+	"google.golang.org/grpc"
 
 	noteDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
 
@@ -34,7 +35,7 @@ type Server struct {
 	server  *http.Server
 }
 
-func New(config *config.Config, db database.IDbConn) *Server {
+func New(config *config.Config, db database.IDbConn, sc *grpc.ClientConn) *Server {
 	logFile := setupGinLogger()
 
 	r := gin.Default()
@@ -52,7 +53,8 @@ func New(config *config.Config, db database.IDbConn) *Server {
 	boardDelivery.AddBoardRoutes(r, db, p)
 
 	feedDelivery.AddFeedRoutes(r, db, config)
-	search.AddSearchRoute(r, db)
+
+	search.AddSearchRoute(r, sc)
 
 	return &Server{
 		logFile: logFile,
