@@ -6,15 +6,18 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/auth"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/middleware"
 	note_http "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
+	proto_auth "github.com/go-park-mail-ru/2020_2_Eternity/pkg/proto/auth"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/repository"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/usecase"
 	"github.com/microcosm-cc/bluemonday"
+	"google.golang.org/grpc"
 )
 
-func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy) {
+func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, ac *grpc.ClientConn) {
 	rep := repository.NewRepo(db)
 	uc := usecase.NewUsecase(rep)
-	handler := NewHandler(uc, p)
+	client := proto_auth.NewAuthServiceClient(ac)
+	handler := NewHandler(uc, p, client)
 
 	r.POST("/user/signup", handler.SignUp)
 	r.POST("/user/login", handler.Login)

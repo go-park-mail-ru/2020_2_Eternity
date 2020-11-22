@@ -6,6 +6,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/proto/auth"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"github.com/microcosm-cc/bluemonday"
@@ -19,11 +20,13 @@ import (
 
 type Handler struct {
 	uc user.IUsecase
+	as auth.AuthServiceClient
 	p  *bluemonday.Policy
 }
 
-func NewHandler(uc user.IUsecase, p *bluemonday.Policy) *Handler {
+func NewHandler(uc user.IUsecase, p *bluemonday.Policy, ac auth.AuthServiceClient) *Handler {
 	return &Handler{
+		as: ac,
 		uc: uc,
 		p:  p,
 	}
@@ -67,43 +70,39 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	u, err := h.uc.GetUserByNameWithFollowers(form.Username)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "invalid username"})
+	u, err := h.as.Login(c, &auth.LoginReq{
+		Username: form.Username,
+		Password: form.Password,
+	})
+	if u == nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
-
-	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(form.Password)); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "bad password"})
-		return
-	}
-
-	ss, err := jwthelper.CreateJwtToken(u.ID)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{Error: "cannot create token"})
-		return
-	}
-	sr, err := utils.RandomUuid()
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{Error: "cannot generate value"})
-		return
-	}
-	t, err := jwthelper.CreateCsrfToken(u.ID, sr, time.Now().Add(45*time.Minute))
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{Error: "cannot create csrf token"})
+		config.Lg("user", "LoginService").Error(err.Error(), " Status: ", u.Status)
+		c.AbortWithStatusJSON(int(u.Status), utils.Error{Error: u.Error})
 		return
 	}
 
 	cookie := http.Cookie{
 		Name:     config.Conf.Token.CookieName,
-		Value:    ss,
+		Value:    u.Tokens.JwtT,
 		Expires:  time.Now().Add(45 * time.Minute),
 		HttpOnly: true,
 		Path:     "/",
 	}
-	c.Header("X-CSRF-TOKEN", t)
+	c.Header("X-CSRF-TOKEN", u.Tokens.CsrfT)
 	http.SetCookie(c.Writer, &cookie)
-	c.JSON(http.StatusOK, u)
+	c.JSON(http.StatusOK, &domain.User{
+		Username:    u.Info.Username,
+		Email:       u.Info.Email,
+		Name:        u.Info.Name,
+		Surname:     u.Info.Surname,
+		Description: u.Info.Description,
+		Avatar:      u.Info.Avatar,
+		Followers:   int(u.Info.Followers),
+		Following:   int(u.Info.Following),
+	})
 }
 
 func (h *Handler) Logout(c *gin.Context) {

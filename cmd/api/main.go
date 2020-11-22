@@ -4,9 +4,9 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/server"
+	"google.golang.org/grpc"
 	"os"
 )
-
 
 func initDirs() error {
 	root, err := os.Getwd()
@@ -24,6 +24,22 @@ func initDirs() error {
 		return err
 	}
 	return nil
+}
+
+func InitClientConnections() (*grpc.ClientConn, *grpc.ClientConn, error) {
+	sc, err := grpc.Dial(config.Conf.Web.Search.Address+":"+config.Conf.Web.Search.Port,
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+	ac, err := grpc.Dial(config.Conf.Web.Auth.Address+":"+config.Conf.Web.Auth.Port,
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+	return sc, ac, nil
 }
 
 func main() {
@@ -49,8 +65,15 @@ func main() {
 	defer dbConn.Close()
 	config.Lg("main", "main").Info("Connected to DB")
 
+	sc, ac, err := InitClientConnections()
+	if err != nil {
+		config.Lg("main", "search").Fatal("Connection grpc refused")
+		return
+	}
+	defer sc.Close()
+	defer ac.Close()
 
-	srv := server.New(config.Conf, dbConn)
+	srv := server.New(config.Conf, dbConn, sc, ac)
 
 	srv.Run()
 

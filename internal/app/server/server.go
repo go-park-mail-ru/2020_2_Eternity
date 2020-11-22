@@ -35,7 +35,7 @@ type Server struct {
 	server  *http.Server
 }
 
-func New(config *config.Config, db database.IDbConn, sc *grpc.ClientConn) *Server {
+func New(config *config.Config, db database.IDbConn, sc *grpc.ClientConn, ac *grpc.ClientConn) *Server {
 	logFile := setupGinLogger()
 
 	r := gin.Default()
@@ -48,7 +48,7 @@ func New(config *config.Config, db database.IDbConn, sc *grpc.ClientConn) *Serve
 
 	chatDelivery.AddChatRoutes(r, db, p)
 	commentDelivery.AddCommentRoutes(r, db, p)
-	userDelivery.AddUserRoutes(r, db, p)
+	userDelivery.AddUserRoutes(r, db, p, ac)
 	pinDelivery.AddPinRoutes(r, db, p, config)
 	boardDelivery.AddBoardRoutes(r, db, p)
 

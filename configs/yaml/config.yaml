@@ -22,6 +22,18 @@ web: {
     url_img: "/static/img",
     dir_avt: "/static/avatar/",
   },
+  search: {
+    address: "localhost",
+    port: "8000",
+    host: "pinterest-tp.tk",
+    protocol: "tcp",
+  },
+  auth: {
+    address: "localhost",
+    port: "8001",
+    host: "pinterest-tp.tk",
+    protocol: "tcp",
+  },
 }
 
 token: {

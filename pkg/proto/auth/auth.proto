@@ -1,0 +1,48 @@
+syntax="proto3";
+
+package auth;
+
+message LoginReq {
+  string Username = 1;
+  string Password = 2;
+}
+
+message Check {
+  string cookie = 1;
+}
+
+message User {
+  int32   ID = 1;
+  string Username = 2;
+  string Email = 3;
+  string Password = 4;
+  string Name = 5;
+  string Surname = 6;
+  string Description = 7;
+  string Avatar = 8;
+  int32 Followers = 9;
+  int32 Following = 10;
+}
+
+message Token {
+  string jwtT = 1;
+  string csrfT = 2;
+}
+
+message LoginInfo {
+  bool Valid = 1;
+  User Info = 2;
+  Token Tokens = 3;
+  int32 Status = 4;
+  string Error = 5;
+}
+
+message UserID {
+  bool valid = 1;
+  int32 id = 2;
+}
+
+service AuthService {
+  rpc CheckCookie(Check) returns (UserID) {}
+  rpc Login(LoginReq) returns (LoginInfo) {}
+}

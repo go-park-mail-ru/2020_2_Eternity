@@ -4,9 +4,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/proto/auth"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
 	"net/http"
 )
+
+type AuthMw struct {
+	auth.AuthServiceClient
+}
 
 func AuthCheck() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -15,6 +20,7 @@ func AuthCheck() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "bad cookie"})
 			return
 		}
+
 		claims := jwthelper.Claims{}
 		token, err := jwthelper.ParseToken(cookie, &claims)
 		if token == nil {
@@ -25,7 +31,7 @@ func AuthCheck() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "fake token"})
 			return
 		}
-		c.Set("info", claims.Id)
+		c.Set("info", int(claims.Id))
 		c.Next()
 	}
 }

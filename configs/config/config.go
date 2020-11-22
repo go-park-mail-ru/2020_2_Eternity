@@ -38,6 +38,8 @@ type ConfPostgres struct {
 type ConfWeb struct {
 	Server ConfServer `mapstructure:"server"`
 	Static ConfStatic `mapstructure:"static"`
+	Search ConfSearch `mapstructure:"search"`
+	Auth   ConfAuth   `mapstructure:"auth"`
 }
 
 type ConfToken struct {
@@ -57,6 +59,20 @@ type ConfStatic struct {
 	DirImg string `mapstructure:"dir_img"`
 	UrlImg string `mapstructure:"url_img"`
 	DirAvt string `mapstructure:"dir_avt"`
+}
+
+type ConfSearch struct {
+	Address  string `mapstructure:"address"`
+	Port     string `mapstructure:"port"`
+	Host     string `mapstructure:"host"`
+	Protocol string `mapstructure:"protocol"`
+}
+
+type ConfAuth struct {
+	Address  string `mapstructure:"address"`
+	Port     string `mapstructure:"port"`
+	Host     string `mapstructure:"host"`
+	Protocol string `mapstructure:"protocol"`
 }
 
 type ConfLogger struct {
@@ -94,7 +110,6 @@ func NewConfig() *Config {
 
 	return conf
 }
-
 
 func setDefaultDb() {
 	viper.SetDefault("database.postgres.driver_name", "default")
