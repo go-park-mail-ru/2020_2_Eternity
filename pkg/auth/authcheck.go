@@ -10,7 +10,34 @@ import (
 )
 
 type AuthMw struct {
-	auth.AuthServiceClient
+	ac auth.AuthServiceClient
+}
+
+func NewAuthMw(ac auth.AuthServiceClient) *AuthMw {
+	return &AuthMw{
+		ac: ac,
+	}
+}
+
+func (mw *AuthMw) AuthCheck() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		cookie, err := c.Cookie(config.Conf.Token.CookieName)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "bad cookie"})
+			return
+		}
+
+		userId, err := mw.ac.CheckCookie(c, &auth.Check{Cookie: cookie})
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{
+				Error: err.Error(),
+			})
+			return
+		}
+
+		c.Set("info", int(userId.Id))
+		c.Next()
+	}
 }
 
 func AuthCheck() gin.HandlerFunc {

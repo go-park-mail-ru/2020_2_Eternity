@@ -19,6 +19,8 @@ func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, ac 
 	client := proto_auth.NewAuthServiceClient(ac)
 	handler := NewHandler(uc, p, client)
 
+	mw := auth.NewAuthMw(client)
+
 	r.POST("/user/signup", handler.SignUp)
 	r.POST("/user/login", handler.Login)
 	r.GET("/images/avatar/:file", handler.GetAvatar)
@@ -26,7 +28,7 @@ func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, ac 
 	r.GET("/following/:username", handler.GetFollowing)
 	r.GET("/userpage/:username", handler.GetUserPage)
 	authorized := r.Group("/")
-	authorized.Use(auth.AuthCheck()) // authorized.Use(csrf.CSRFCheck()) на фронте его еще нет, поэтому закомменчен
+	authorized.Use(mw.AuthCheck()) // authorized.Use(csrf.CSRFCheck()) на фронте его еще нет, поэтому закомменчен
 	{
 		authorized.POST("/user/logout", handler.Logout)
 		authorized.GET("/user/profile", handler.GetProfile)

@@ -12,6 +12,7 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -75,11 +76,14 @@ func (h *Handler) Login(c *gin.Context) {
 		Password: form.Password,
 	})
 	if u == nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		config.Lg("user", "LoginService").Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "bad login or password"})
 		return
 	}
+
 	if err != nil {
 		config.Lg("user", "LoginService").Error(err.Error(), " Status: ", u.Status)
+		log.Println(u.Error)
 		c.AbortWithStatusJSON(int(u.Status), utils.Error{Error: u.Error})
 		return
 	}
