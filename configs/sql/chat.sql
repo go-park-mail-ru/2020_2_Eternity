@@ -61,7 +61,7 @@ CREATE OR REPLACE FUNCTION msg_change() RETURNS TRIGGER AS $msg_change$
              END IF;
 
             IF (OLD.id = (SELECT last_msg_id FROM chats where chats.id = OLD.chat_id)) THEN
-            --  ываыва
+
                 CREATE TEMPORARY TABLE last_msg
                 ON COMMIT DROP
                 AS
@@ -72,7 +72,6 @@ CREATE OR REPLACE FUNCTION msg_change() RETURNS TRIGGER AS $msg_change$
                     VALUES (0, '', 0, NOW());
                 END IF;
 
-              --  WITH last_msg AS (SELECT * FROM messages ORDER BY id DESC LIMIT 1)
                 UPDATE chats
                 SET last_msg_id = last_msg.id,
                  last_msg_content = last_msg.content,
@@ -81,12 +80,6 @@ CREATE OR REPLACE FUNCTION msg_change() RETURNS TRIGGER AS $msg_change$
 	            FROM last_msg
                 WHERE chats.id = OLD.chat_id;
 
-               -- WITH last_msg AS (SELECT * FROM messages ORDER BY id DESC LIMIT 1)
-                UPDATE uu_chat
-                SET last_read_msg_id = last_msg.id
-                FROM last_msg
-                WHERE uu_chat.chat_id = OLD.chat_id AND
-                      uu_chat.user_id = OLD.user_id;
             END IF;
 
 
