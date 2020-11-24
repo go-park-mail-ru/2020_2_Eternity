@@ -20,6 +20,8 @@ func NewRepo(d database.IDbConn) *Repository {
 	}
 }
 
+// Chats
+
 func (r *Repository) StoreChat(ch *domainChat.Chat, userName string, collocutorName string) error {
 	tx, err := r.dbConn.Begin(context.Background())
 	if err != nil {
@@ -203,3 +205,79 @@ func (r *Repository) MarkAllMessagesRead(chatId int, userName string) error {
 
 	return nil
 }
+
+
+// Messages
+
+func (r *Repository) StoreMessage(mReq *domainChat.CreateMessageReq) (domainChat.Message, error) {
+	// TODO (Pavel S) Add protection of writing to foreign chat
+	m := domainChat.Message{}
+	err := r.dbConn.QueryRow(
+		context.Background(),
+			"WITH u AS (SELECT id, avatar FROM users WHERE username = $1) " +
+			"INSERT INTO messages (content, creation_time, chat_id, user_id, username, avatar) " +
+			"VALUES ($2, $3, $4, (SELECT id FROM u), $1, (SELECT avatar FROM u)) " +
+			"RETURNING id, content, creation_time, chat_id, user_id, username, avatar ",
+			mReq.UserName, mReq.Content, time.Now(), mReq.ChatId).
+		Scan(&m.Id, &m.Content, &m.CreationTime, &m.ChatId, &m.UserId, &m.UserName, &m.UserAvatarLink)
+
+
+	if err != nil {
+		config.Lg("chat_repo", "StoreMessage").Error(err.Error())
+		return domainChat.Message{}, err
+	}
+
+	return m, nil
+}
+
+func (r *Repository) DeleteMessage(msgId int) error {
+	_, err := r.dbConn.Exec(context.Background(),"DELETE FROM messages WHERE id = $1 ", msgId)
+
+	if err != nil {
+		config.Lg("chat_repo", "DeleteMessage").Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) GetLastNMessages(mReq *domainChat.GetLastNMessagesReq) ([]domainChat.Message, error) {
+	rows, err := r.dbConn.Query(
+		context.Background(),
+		"SELECT * FROM " +
+				"(SELECT id, content, creation_time, chat_id, user_id, username, avatar " +
+				"FROM messages " +
+				"WHERE chat_id = $1 " +
+				"ORDER BY id DESC " +
+				"LIMIT $2) t " +
+			"ORDER BY id ",
+			mReq.ChatId, mReq.NMessages)
+
+	if err != nil {
+		config.Lg("chat_repo", "GetLastNMessages").Error(err.Error())
+		return nil,  err
+	}
+
+	defer rows.Close()
+
+	msgs := []domainChat.Message{}
+	for rows.Next() {
+		m := domainChat.Message{}
+		err := rows.Scan(&m.Id, &m.Content, &m.CreationTime, &m.ChatId, &m.UserId, &m.UserName, &m.UserAvatarLink)
+
+		if err != nil {
+			config.Lg("comment_postgres", "GetLastNMessages").Error(err.Error())
+			return nil, err
+		}
+
+		msgs = append(msgs, m)
+	}
+
+	if rows.Err() != nil {
+		config.Lg("comment_postgres", "GetLastNMessages").Error(rows.Err())
+		return nil, rows.Err()
+	}
+
+	return msgs, nil
+}
+

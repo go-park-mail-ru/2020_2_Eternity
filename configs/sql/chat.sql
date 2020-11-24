@@ -31,7 +31,8 @@ create table if not exists messages(
 	creation_time timestamp not null default NOW(),
 	chat_id integer not null,
 	user_id integer not null,
-	is_read bool not null,  -- should de deleted
+    username text not null,
+    avatar text,
 	foreign key(user_id) references users(id) on delete cascade,
 	foreign key(chat_id) references chats(id) on delete cascade
 );

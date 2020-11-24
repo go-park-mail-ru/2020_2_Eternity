@@ -10,7 +10,7 @@ type Message struct {
 	ChatId int
 	UserId int
 	UserName string
-	Avatar string
+	UserAvatarLink string
 	Files []FileInfo
 }
 
@@ -19,6 +19,19 @@ type CreateMessageReq struct {
 	UserName string
 	ChatId int
 	Content string
+}
+
+type GetLastNMessagesReq struct {
+	UserName string
+	ChatId int
+	NMessages int
+}
+
+type GetNMessagesBeforeReq struct {
+	UserName string
+	ChatId int
+	NMessages int
+	BeforeMessageId int
 }
 
 
@@ -35,7 +48,8 @@ type MessageResp struct {
 	Content string
 	CreationTime time.Time
 	ChatId int
+	IsRead bool
 	UserName string
-	Avatar string
+	UserAvatarLink string
 	Files []FileInfo
 }

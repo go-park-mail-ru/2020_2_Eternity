@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 )
@@ -66,10 +65,51 @@ func TestMain(m *testing.M) {
 //	fmt.Println(chat)
 //}
 
-func TestChatMkRead(t *testing.T) {
-	r := NewRepo(db)
+//func TestChatMkRead(t *testing.T) {
+//	r := NewRepo(db)
+//
+//	err := r.MarkAllMessagesRead(1, "name3")
+//
+//	assert.Nil(t, err)
+//}
 
-	err := r.MarkAllMessagesRead(1, "name3")
+//func TestStoreMsg(t *testing.T) {
+//	r := NewRepo(db)
+//
+//	mReq := domainChat.CreateMessageReq{
+//		UserName: "name",
+//		ChatId: 1,
+//		Content: "I'm fine",
+//	}
+//
+//	m, err := r.StoreMessage(&mReq)
+//
+//	fmt.Println(m)
+//
+//	assert.Nil(t, err)
+//}
 
-	assert.Nil(t, err)
-}
+//func TestDeleteMsg(t *testing.T) {
+//	r := NewRepo(db)
+//
+//
+//	err := r.DeleteMessage(3)
+//
+//	assert.Nil(t, err)
+//}
+
+//func TestGetLastNMsgs(t *testing.T) {
+//	r := NewRepo(db)
+//
+//	mReq := domainChat.GetLastNMessagesReq{
+//		UserName: "name",
+//		ChatId: 1,
+//		NMessages: 3,
+//	}
+//
+//	m, err := r.GetLastNMessages(&mReq)
+//
+//	fmt.Println(m)
+//
+//	assert.Nil(t, err)
+//}
