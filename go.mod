@@ -21,6 +21,7 @@ require (
 	github.com/onsi/ginkgo v1.14.2 // indirect
 	github.com/onsi/gomega v1.10.3 // indirect
 	github.com/pkg/errors v0.9.1
+	github.com/prometheus/client_golang v0.9.3
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/viper v1.7.1

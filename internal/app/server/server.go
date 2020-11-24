@@ -7,8 +7,11 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	chatDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/chat/delivery/http"
 	commentDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/delivery/http"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/metric"
 	search "github.com/go-park-mail-ru/2020_2_Eternity/pkg/search/delivery/http"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
+	"net"
 
 	noteDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
 
@@ -35,12 +38,37 @@ type Server struct {
 	server  *http.Server
 }
 
+// testing
+func RouterForMetrics() {
+	r := gin.Default()
+	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
+	lis, err := net.Listen("tcp", "localhost:7007")
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	if err := r.RunListener(lis); err != nil {
+		log.Fatal(err)
+		return
+	}
+}
+
 func New(config *config.Config, db database.IDbConn, sc *grpc.ClientConn, ac *grpc.ClientConn) *Server {
 	logFile := setupGinLogger()
 
 	r := gin.Default()
 	r.MaxMultipartMemory = 8 << 20
 	r.Static(config.Web.Static.UrlImg, config.Web.Static.DirImg)
+
+	m, err := metric.CreateNewMetric("main")
+
+	if err != nil {
+		log.Fatal("errr", err)
+	}
+
+	r.Use(metric.CollectMetrics(m))
+	go RouterForMetrics()
 
 	noteDelivery.AddNoteRoutes(r, db)
 
