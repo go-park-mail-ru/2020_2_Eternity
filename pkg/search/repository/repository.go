@@ -19,19 +19,20 @@ func NewRepository(db database.IDbConn) *Repository {
 }
 
 func (r *Repository) GetUsersByName(username string, last int) ([]domain.UserSearch, error) {
-	query := "select id, username, avatar from users where lower(username) like lower($1) "
+	query := "select id, username, avatar from users where lower(username) like lower('%' || $1 || '%') " +
+		"or lower(name || surname) like lower('%' || $1 || '%') "
 	i := 1
 	var placeholders []interface{}
 	placeholders = append(placeholders, username)
 	if last > 0 {
 		i++
-		query += "and users.id < $" + strconv.Itoa(i)
+		query += "and users.id < $ " + strconv.Itoa(i)
 		placeholders = append(placeholders, last)
 	}
-	query += " order by users.id desc limit 15"
+	query += "order by users.id desc limit 15"
 	rows, err := r.db.Query(context.Background(), query, placeholders...)
 	if err != nil {
-		config.Lg("feed", "GetFeed").Error(err.Error())
+		config.Lg("search", "UserNameSearch").Error(err.Error())
 		return nil, err
 	}
 	defer rows.Close()
