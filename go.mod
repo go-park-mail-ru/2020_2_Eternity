@@ -10,6 +10,7 @@ require (
 	github.com/golang/mock v1.4.4
 	github.com/golang/protobuf v1.4.2
 	github.com/google/uuid v1.1.2
+	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
 	github.com/jackc/pgconn v1.7.0
 	github.com/jackc/pgx v3.6.2+incompatible

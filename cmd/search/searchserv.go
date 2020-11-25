@@ -3,11 +3,14 @@ package main
 import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/metric"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/proto/search"
 	grpcSearch "github.com/go-park-mail-ru/2020_2_Eternity/pkg/search/delivery/grpc"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/search/repository"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/search/usecase"
+	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"google.golang.org/grpc"
+	"log"
 	"net"
 )
 
@@ -27,6 +30,16 @@ func main() {
 	defer dbConn.Close()
 	config.Lg("searchserv", "main").Info("Connected to DB")
 
+	go metric.RouterForMetrics("localhost:7008")
+
+	m, err := metric.CreateNewMetric("search")
+	interceptor := metric.NewInterceptor(m)
+
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
 	repo := repository.NewRepository(dbConn)
 	uc := usecase.NewUsecase(repo)
 	handler := grpcSearch.NewHandler(uc)
@@ -36,7 +49,9 @@ func main() {
 		config.Lg("searchserv", "main").Fatal(err.Error())
 	}
 
-	server := grpc.NewServer()
+	server := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(grpc_recovery.UnaryServerInterceptor(), interceptor.Collect),
+	)
 	search.RegisterSearchServiceServer(server, handler)
 
 	if err := server.Serve(lis); err != nil {
