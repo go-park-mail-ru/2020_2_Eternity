@@ -4,6 +4,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/server"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/chat/delivery/ws"
 	"os"
 )
 
@@ -49,10 +50,12 @@ func main() {
 	defer dbConn.Close()
 	config.Lg("main", "main").Info("Connected to DB")
 
-
-	srv := server.New(config.Conf, dbConn)
+	wsHub := ws.NewHub()
+	wsHub.Run()
+	srv := server.New(config.Conf, dbConn, wsHub)
 
 	srv.Run()
+	wsHub.Stop()
 
 	config.Lg("main", "main").Info("Server stopped")
 }
