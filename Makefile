@@ -23,3 +23,9 @@ dbclear:
 .PHONY: build
 build:
 	go build -o build/bin/api ./cmd/api/main.go
+
+
+
+.PHONY: protochat
+protochat:
+	protoc --go_out=plugins=grpc:. --go_opt=paths=source_relative pkg/proto/chat/chat.proto

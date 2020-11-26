@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/go-park-mail-ru/2020_2_Eternity/pkg/proto/chat";
+
+package chat;
+
+service Chat {
+  // A simple RPC.
+  //
+  // Obtains the feature at a given position.
+  //
+  // A feature with an empty name is returned if there's no feature at the given
+  // position.
+ // rpc GetFeature(Point) returns (Feature) {}
+
+  // A server-to-client streaming RPC.
+  //
+  // Obtains the Features available within the given Rectangle.  Results are
+  // streamed rather than returned at once (e.g. in a response message with a
+  // repeated field), as the rectangle may cover a large area and contain a
+  // huge number of features.
+//  rpc ListFeatures(Rectangle) returns (stream Feature) {}
+
+  // A client-to-server streaming RPC.
+  //
+  // Accepts a stream of Points on a route being traversed, returning a
+  // RouteSummary when traversal is completed.
+//  rpc RecordRoute(stream Point) returns (RouteSummary) {}
+
+  rpc CreateChat(ChatCreateReq) returns (ChatResp) {}
+  rpc MarkMessagesRead(MarkMessagesReadReq) returns (ChatResp) {}
+
+  rpc RouteWs(stream WsMessage) returns (stream WsMessage) {}
+}
+
+message ChatCreateReq {
+  string UserName = 1;
+  string CollocutorName = 2;
+}
+
+
+
+message MarkMessagesReadReq {
+  int32 ChatId = 1;
+  string UserName = 2;
+}
+
+
+
+message ChatResp {
+  int32 Id = 1;
+  google.protobuf.Timestamp CreationTime = 2;
+  string LastMsgContent = 3;
+  string LastMsgUsername = 4;
+  google.protobuf.Timestamp LastMsgTime = 5;
+
+  string CollocutorName = 6;
+  string CollocutorAvatarLink = 7;
+  int32  NewMessages = 8;
+
+}
+
+
+
+message WsMessage {
+  int32 UserId = 1;
+  bytes Data = 2;
+}
+

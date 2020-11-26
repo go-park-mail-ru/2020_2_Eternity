@@ -17,6 +17,12 @@ web: {
     host: "pinterest-tp.tk",
     protocol: "http",
   },
+  chat_srv: {
+    address: "localhost",
+    port: "8000",
+    host: "pinterest-tp.tk",
+    protocol: "http",
+  },
   static: {
     dir_img: "static/img",
     url_img: "/static/img",

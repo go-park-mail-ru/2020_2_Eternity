@@ -21,6 +21,8 @@ type Config struct {
 	Logger ConfLogger `mapstructure:"logger"`
 }
 
+
+
 type ConfDB struct {
 	Postgres ConfPostgres `mapstructure:"postgres"`
 }
@@ -37,6 +39,7 @@ type ConfPostgres struct {
 
 type ConfWeb struct {
 	Server ConfServer `mapstructure:"server"`
+	Chat ConfChatMicroservice `mapstructure:"chat_srv"`
 	Static ConfStatic `mapstructure:"static"`
 }
 
@@ -47,6 +50,13 @@ type ConfToken struct {
 }
 
 type ConfServer struct {
+	Address  string `mapstructure:"address"`
+	Port     string `mapstructure:"port"`
+	Host     string `mapstructure:"host"`
+	Protocol string `mapstructure:"protocol"`
+}
+
+type ConfChatMicroservice struct {
 	Address  string `mapstructure:"address"`
 	Port     string `mapstructure:"port"`
 	Host     string `mapstructure:"host"`
@@ -110,6 +120,12 @@ func setDefaultWeb() {
 	viper.SetDefault("web.server.port", "0000")
 	viper.SetDefault("web.server.host", "pinterest-tp.tk")
 	viper.SetDefault("web.server.protocol", "http://")
+
+	viper.SetDefault("web.chat_srv.address", "localhost")
+	viper.SetDefault("web.chat_srv.port", "8000")
+	viper.SetDefault("web.chat_srv.host", "pinterest-tp.tk")
+	viper.SetDefault("web.chat_srv.protocol", "http://")
+
 	viper.SetDefault("web.static.dir_img", "img")
 	viper.SetDefault("web.static.url_img", "img")
 	viper.SetDefault("web.static.dir_avt", "/static/avatar/")

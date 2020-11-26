@@ -9,6 +9,7 @@ import (
 )
 
 type Handler struct {
+	//c chat.ChatClient
 }
 
 func NewHandler() *Handler {

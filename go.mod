@@ -3,13 +3,12 @@ module github.com/go-park-mail-ru/2020_2_Eternity
 go 1.14
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
-	github.com/bxcodec/faker v2.0.1+incompatible
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-ozzo/ozzo-validation/v4 v4.2.2
 	github.com/gofrs/uuid v3.3.0+incompatible // indirect
 	github.com/golang/mock v1.4.4
+	github.com/golang/protobuf v1.4.3
 	github.com/google/uuid v1.1.2
 	github.com/gorilla/websocket v1.4.2
 	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
@@ -30,5 +29,7 @@ require (
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 	go.mongodb.org/mongo-driver v1.4.3
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	google.golang.org/grpc v1.33.2
+	google.golang.org/protobuf v1.25.0
 
 )
