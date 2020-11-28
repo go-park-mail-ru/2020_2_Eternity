@@ -67,7 +67,7 @@ func (r *Repository) GetPinsByTitle(title string, last int) ([]domain.Pin, error
 		return nil, err
 	}
 	defer rows.Close()
-	var pins []domain.Pin
+	pins := make([]domain.Pin, 0, 15)
 	for rows.Next() {
 		pin := domain.Pin{}
 		var rank float32

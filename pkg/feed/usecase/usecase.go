@@ -20,11 +20,11 @@ func NewUseCase(r feed.IRepository) *Usecase {
 func (uc *Usecase) GetFeed(userId int, last int) ([]domain.PinResp, error) {
 	pins, err := uc.r.GetFeed(userId, last)
 	if err != nil {
-		config.Lg("feed_usecase", "GetFeed").Error("Repo: ", err.Error())
+		config.Lg("feed_usecase", "GetFeed").Error("Usecase: ", err.Error())
 		return nil, err
 	}
 
-	var pinsResp []domain.PinResp
+	pinsResp := make([]domain.PinResp, 0, len(pins))
 	for _, p := range pins {
 		pinsResp = append(pinsResp, domain.PinResp{
 			Id:      p.Id,

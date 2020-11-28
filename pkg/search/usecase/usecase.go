@@ -26,7 +26,7 @@ func (uc *Usecase) GetPinsByTitle(title string, last int) ([]domain.PinResp, err
 		return nil, err
 	}
 
-	var pinsResp []domain.PinResp
+	pinsResp := make([]domain.PinResp, 0, len(pins))
 	for _, p := range pins {
 		pinsResp = append(pinsResp, domain.PinResp{
 			Id:      p.Id,

@@ -51,7 +51,7 @@ func (h *Handler) Search(c *gin.Context) {
 			return
 		}
 
-		var rUs []domain.UserSearch
+		rUs := make([]domain.UserSearch, 0, len(users.Users))
 		for _, u := range users.Users {
 			rUs = append(rUs, domain.UserSearch{
 				ID:       int(u.Id),
@@ -71,7 +71,7 @@ func (h *Handler) Search(c *gin.Context) {
 			c.JSON(http.StatusOK, utils.Error{Error: "pins not found"})
 			return
 		}
-		var rPins []domain.PinResp
+		rPins := make([]domain.PinResp, 0, len(pins.Pins))
 		for _, p := range pins.Pins {
 			rPins = append(rPins, domain.PinResp{
 				Id:      int(p.Id),

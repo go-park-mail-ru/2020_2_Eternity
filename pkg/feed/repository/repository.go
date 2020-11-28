@@ -35,7 +35,7 @@ func (r *Repository) GetFeed(userId int, last int) ([]domain.Pin, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var pins []domain.Pin
+	pins := make([]domain.Pin, 0, 15)
 	for rows.Next() {
 		pin := domain.Pin{}
 		if err := rows.Scan(&pin.Id, &pin.Title, &pin.Content, &pin.PictureName, &pin.UserId); err != nil {

@@ -24,7 +24,7 @@ func (s *SearchHandler) GetUsersByName(ctx context.Context, userSearch *sc.UserS
 		return &sc.Users{}, err
 	}
 
-	var pUsers []*sc.User
+	pUsers := make([]*sc.User, 0, len(users))
 	for _, u := range users {
 		us := &sc.User{
 			Username: u.Username,
@@ -47,7 +47,7 @@ func (s *SearchHandler) GetPinsByTitle(ctx context.Context, pinSearch *sc.PinSea
 		return &sc.Pins{}, err
 	}
 
-	var pPins []*sc.Pin
+	pPins := make([]*sc.Pin, 0, len(pins))
 	for _, p := range pins {
 		pPins = append(pPins, &sc.Pin{
 			Id:      int64(p.Id),
