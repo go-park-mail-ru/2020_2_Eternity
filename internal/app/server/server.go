@@ -35,12 +35,12 @@ type Server struct {
 	server  *http.Server
 }
 
-func New(config *config.Config, db database.IDbConn, sc *grpc.ClientConn, ac *grpc.ClientConn) *Server {
+func New(conf *config.Config, db database.IDbConn, sc *grpc.ClientConn, ac *grpc.ClientConn) *Server {
 	logFile := setupGinLogger()
 
 	r := gin.Default()
 	r.MaxMultipartMemory = 8 << 20
-	r.Static(config.Web.Static.UrlImg, config.Web.Static.DirImg)
+	r.Static(conf.Web.Static.UrlImg, conf.Web.Static.DirImg)
 
 	m, err := metric.CreateNewMetric("main")
 
@@ -50,7 +50,7 @@ func New(config *config.Config, db database.IDbConn, sc *grpc.ClientConn, ac *gr
 
 	r.Use(metric.CollectMetrics(m))
 
-	go metric.RouterForMetrics("localhost:7007")
+	go metric.RouterForMetrics(conf.Monitoring.Api.Address + ":" + conf.Monitoring.Api.Port)
 
 	noteDelivery.AddNoteRoutes(r, db)
 
@@ -59,17 +59,17 @@ func New(config *config.Config, db database.IDbConn, sc *grpc.ClientConn, ac *gr
 	chatDelivery.AddChatRoutes(r, db, p)
 	commentDelivery.AddCommentRoutes(r, db, p)
 	userDelivery.AddUserRoutes(r, db, p, ac)
-	pinDelivery.AddPinRoutes(r, db, p, config)
+	pinDelivery.AddPinRoutes(r, db, p, conf)
 	boardDelivery.AddBoardRoutes(r, db, p)
 
-	feedDelivery.AddFeedRoutes(r, db, config)
+	feedDelivery.AddFeedRoutes(r, db, conf)
 
 	search.AddSearchRoute(r, sc)
 
 	return &Server{
 		logFile: logFile,
 		server: &http.Server{
-			Addr:    fmt.Sprintf("%s:%s", config.Web.Server.Address, config.Web.Server.Port),
+			Addr:    fmt.Sprintf("%s:%s", conf.Web.Server.Address, conf.Web.Server.Port),
 			Handler: r,
 		},
 	}

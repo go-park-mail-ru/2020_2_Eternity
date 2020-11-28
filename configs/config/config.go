@@ -15,10 +15,11 @@ var (
 )
 
 type Config struct {
-	Db     ConfDB     `mapstructure:"database"`
-	Web    ConfWeb    `mapstructure:"web"`
-	Token  ConfToken  `mapstructure:"token"`
-	Logger ConfLogger `mapstructure:"logger"`
+	Db         ConfDB     `mapstructure:"database"`
+	Web        ConfWeb    `mapstructure:"web"`
+	Monitoring ConfMon    `mapstructure:"monitoring"`
+	Token      ConfToken  `mapstructure:"token"`
+	Logger     ConfLogger `mapstructure:"logger"`
 }
 
 type ConfDB struct {
@@ -38,8 +39,14 @@ type ConfPostgres struct {
 type ConfWeb struct {
 	Server ConfServer `mapstructure:"server"`
 	Static ConfStatic `mapstructure:"static"`
-	Search ConfSearch `mapstructure:"search"`
-	Auth   ConfAuth   `mapstructure:"auth"`
+	Search ConfServer `mapstructure:"search"`
+	Auth   ConfServer `mapstructure:"auth"`
+}
+
+type ConfMon struct {
+	Api    ConfApi `mapstructure:"main"`
+	Search ConfApi `mapstructure:"search"`
+	Auth   ConfApi `mapstructure:"auth"`
 }
 
 type ConfToken struct {
@@ -61,18 +68,10 @@ type ConfStatic struct {
 	DirAvt string `mapstructure:"dir_avt"`
 }
 
-type ConfSearch struct {
-	Address  string `mapstructure:"address"`
-	Port     string `mapstructure:"port"`
-	Host     string `mapstructure:"host"`
-	Protocol string `mapstructure:"protocol"`
-}
-
-type ConfAuth struct {
-	Address  string `mapstructure:"address"`
-	Port     string `mapstructure:"port"`
-	Host     string `mapstructure:"host"`
-	Protocol string `mapstructure:"protocol"`
+type ConfApi struct {
+	Address string `mapstructure:"address"`
+	Port    string `mapstructure:"port"`
+	Host    string `mapstructure:"host"`
 }
 
 type ConfLogger struct {

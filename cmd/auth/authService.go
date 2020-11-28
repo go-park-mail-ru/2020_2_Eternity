@@ -29,7 +29,7 @@ func main() {
 	defer dbConn.Close()
 	config.Lg("authserv", "main").Info("Connected to DB")
 
-	go metric.RouterForMetrics("localhost:7009")
+	go metric.RouterForMetrics(config.Conf.Monitoring.Auth.Address + ":" + config.Conf.Monitoring.Auth.Port)
 
 	m, err := metric.CreateNewMetric("auth")
 	interceptor := metric.NewInterceptor(m)

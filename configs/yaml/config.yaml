@@ -36,6 +36,24 @@ web: {
   },
 }
 
+monitoring: {
+  main: {
+    address: "localhost",
+    port: "7007",
+    host: "pinterest-tp.tk",
+  },
+  search: {
+    address: "localhost",
+    port: "7008",
+    host: "pinterest-tp.tk",
+  },
+  auth: {
+    address: "localhost",
+    port: "7009",
+    host: "pinterest-tp.tk",
+  },
+}
+
 token: {
   secretname: "SECRET",
   cookiename: "eternity",

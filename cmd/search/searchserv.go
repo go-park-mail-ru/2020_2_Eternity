@@ -30,7 +30,7 @@ func main() {
 	defer dbConn.Close()
 	config.Lg("searchserv", "main").Info("Connected to DB")
 
-	go metric.RouterForMetrics("localhost:7008")
+	go metric.RouterForMetrics(config.Conf.Monitoring.Search.Address + ":" + config.Conf.Monitoring.Search.Port)
 
 	m, err := metric.CreateNewMetric("search")
 	interceptor := metric.NewInterceptor(m)
