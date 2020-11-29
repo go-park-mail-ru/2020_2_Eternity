@@ -97,7 +97,7 @@ func (h *Handler) Login(c *gin.Context) {
 	}
 	c.Header("X-CSRF-TOKEN", u.Tokens.CsrfT)
 	http.SetCookie(c.Writer, &cookie)
-	c.JSON(http.StatusOK, &domain.User{
+	c.JSON(http.StatusOK, domain.User{
 		Username:    u.Info.Username,
 		Email:       u.Info.Email,
 		Name:        u.Info.Name,
