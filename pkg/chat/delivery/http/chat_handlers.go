@@ -3,31 +3,56 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/chat/delivery/ws"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/chat"
+	domainChat "github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain/chat"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/ws"
+	"github.com/microcosm-cc/bluemonday"
 	"net/http"
 )
 
 type Handler struct {
-	//c chat.ChatClient
+	uc chat.IUsecase
+	p *bluemonday.Policy
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(uc chat.IUsecase, p *bluemonday.Policy) *Handler {
+	return &Handler{
+		uc: uc,
+		p: p,
+	}
 }
 
-func (h *Handler) GetMessages(c *gin.Context) {
-	_, ok := jwthelper.GetClaims(c)
-	if !ok {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		config.Lg("comment_http", "CreateComment").Error("Can't get claims")
+
+
+func (h *Handler) CreateChat(c *gin.Context) {
+	//_, ok := jwthelper.GetClaims(c)
+	//if !ok {
+	//	c.AbortWithStatus(http.StatusUnauthorized)
+	//	config.Lg("chat_http", "CreateChat").Error("Can't get claims")
+	//	return
+	//}
+
+	req := domainChat.ChatCreateReq{}
+	if err := c.BindJSON(&req); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		config.Lg("chat_http", "CreateChat").Error("BindJSON ", err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, "{}")
+	req.UserName = h.p.Sanitize(req.UserName)
+	req.CollocutorName = h.p.Sanitize(req.CollocutorName)
+
+	resp, err := h.uc.CreateChat(&req)
+	if err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		config.Lg("chat_http", "CreateChat").Error("uc.CreateChat ", err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
 }
 
-func ServeWs(h *ws.Hub) func(c *gin.Context) {
+func ServeWs(s ws.IServer) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		//userId, ok := jwthelper.GetClaims(c)
 		//if !ok {
@@ -38,14 +63,12 @@ func ServeWs(h *ws.Hub) func(c *gin.Context) {
 
 		userId := 2 // Note: for tests
 
-		conn, err := ws.Upgrader.Upgrade(c.Writer, c.Request, nil)
-		if err != nil {
+		if err := s.RegisterClient(c.Writer, c.Request, userId); err != nil {
 			c.AbortWithStatus(http.StatusInternalServerError)
 			config.Lg("chat_http", "ServeWs").Error(err.Error())
 			return
 		}
 
-		client := ws.NewClient(h, conn, userId)
-		client.Register()
+		c.Status(http.StatusOK)
 	}
 }

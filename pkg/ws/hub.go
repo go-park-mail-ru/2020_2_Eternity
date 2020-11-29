@@ -1,12 +1,21 @@
 package ws
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	"github.com/gorilla/websocket"
 	"sync"
 )
 
-type Message struct {
+type IHub interface {
+	Run()
+	Stop()
+	GetRecvChanel() chan *HubMessage
+	GetSendChanel() chan *HubMessage
+	CloseConnection(userId int)
+	RegisterClient(conn *websocket.Conn, userId int)
+}
+
+type HubMessage struct {
 	UserId int
 	Data   []byte
 }
@@ -16,8 +25,8 @@ type Hub struct {
 	mux     sync.Mutex
 	wg      sync.WaitGroup
 
-	toSend     chan *Message
-	received   chan *Message
+	toSend     chan *HubMessage
+	received   chan *HubMessage
 	register   chan *Client
 	unregister chan *Client
 }
@@ -28,11 +37,25 @@ func NewHub() *Hub {
 		mux:     sync.Mutex{},
 		wg:      sync.WaitGroup{},
 
-		toSend:     make(chan *Message, 256),
-		received:   make(chan *Message, 256),
+		toSend:     make(chan *HubMessage, 256),
+		received:   make(chan *HubMessage, 256),
 		register:   make(chan *Client, 256),
 		unregister: make(chan *Client, 256),
 	}
+}
+
+
+func (h *Hub) GetRecvChanel() chan *HubMessage {
+	return h.received
+}
+
+func (h *Hub) GetSendChanel() chan *HubMessage {
+	return h.toSend
+}
+
+func (h *Hub) RegisterClient(conn *websocket.Conn, userId int) {
+	client := NewClient(h, conn, userId)
+	client.Register()
 }
 
 func (h *Hub) registerClient() {
@@ -101,24 +124,24 @@ func (h *Hub) sendMsgWorker() {
 	}
 }
 
-func (h *Hub) receiveMsgWorker() {
-	for msg := range h.received {
-		fmt.Println(msg)
-
-		config.Lg("ws", "receiveMsgWorker").Debug(msg)
-
-		// msgs := grpc.SomeFunc(msg)
-		// send responses back
-
-		h.toSend <- &Message{2, msg.Data}
-	}
-}
+//func (h *Hub) receiveMsgWorker() {
+//	for msg := range h.received {
+//		fmt.Println(msg)
+//
+//		config.Lg("ws", "receiveMsgWorker").Debug(msg)
+//
+//		// msgs := grpc.SomeFunc(msg)
+//		// send responses back
+//
+//		h.toSend <- &HubMessage{2, msg.Data}
+//	}
+//}
 
 func (h *Hub) Run() {
 	go h.registerClient()
 	go h.unregisterClient()
 	go h.sendMsgWorker()
-	go h.receiveMsgWorker()
+	//go h.receiveMsgWorker()
 }
 
 func (h *Hub) Stop() {
@@ -140,6 +163,19 @@ func (h *Hub) Stop() {
 	close(h.received)
 }
 
+func (h *Hub) CloseConnection(userId int) {
+	h.mux.Lock()
+	clients, ok := h.clients[userId]
+	h.mux.Unlock()
+
+	if ok {
+		for _, c := range clients {
+			close(c.send)
+		}
+	}
+}
+
+
 func safeClose(ch chan []byte) (justClosed bool) {
 	defer func() {
 		if recover() != nil {
@@ -150,3 +186,5 @@ func safeClose(ch chan []byte) (justClosed bool) {
 	close(ch)
 	return true
 }
+
+

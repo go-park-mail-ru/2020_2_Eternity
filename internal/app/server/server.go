@@ -8,6 +8,8 @@ import (
 	chatDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/chat/delivery/http"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/chat/delivery/ws"
 	commentDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/delivery/http"
+	ws2 "github.com/go-park-mail-ru/2020_2_Eternity/pkg/ws"
+	"google.golang.org/grpc"
 
 	noteDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
 
@@ -35,7 +37,7 @@ type Server struct {
 	server  *http.Server
 }
 
-func New(config *config.Config, db database.IDbConn, hub *ws.Hub) *Server {
+func New(config *config.Config, db database.IDbConn, chMsConn grpc.ClientConnInterface, wsSrv ws2.IServer) *Server {
 	logFile := setupGinLogger()
 
 	r := gin.Default()
@@ -47,7 +49,8 @@ func New(config *config.Config, db database.IDbConn, hub *ws.Hub) *Server {
 
 	p := bluemonday.UGCPolicy()
 
-	chatDelivery.AddChatRoutes(r, db, p, hub)
+	chatDelivery.AddChatRoutes(r, chMsConn, p, wsSrv)
+	ws.AddChatWsRoutes(wsSrv, chMsConn)
 	commentDelivery.AddCommentRoutes(r, db, p)
 	userDelivery.AddUserRoutes(r, db, p)
 	pinDelivery.AddPinRoutes(r, db, p, config)
