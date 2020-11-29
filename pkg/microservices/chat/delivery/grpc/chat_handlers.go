@@ -28,7 +28,7 @@ func (c *ChatServer) CreateChat(ctx context.Context, pReq *proto.ChatCreateReq) 
 		CollocutorName: pReq.CollocutorName,
 	}
 
-	resp, err := c.uc.CreateChat(&req)
+	resp, err := c.uc.CreateChat(&req, int(pReq.UserId))
 
 	if err != nil {
 		config.Lg("chat_grpc_ms", "CreateChat").Error("Usecase ", err.Error())

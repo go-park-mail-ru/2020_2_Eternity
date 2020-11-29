@@ -16,19 +16,16 @@ type Message struct {
 
 
 type CreateMessageReq struct {
-	UserName string
 	ChatId int
 	Content string
 }
 
 type GetLastNMessagesReq struct {
-	UserName string
 	ChatId int
 	NMessages int
 }
 
 type GetNMessagesBeforeReq struct {
-	UserName string
 	ChatId int
 	NMessages int
 	BeforeMessageId int

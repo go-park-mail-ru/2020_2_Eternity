@@ -22,7 +22,7 @@ func NewRepo(d database.IDbConn) *Repository {
 
 // Chats
 
-func (r *Repository) StoreChat(ch *domainChat.Chat, userName string, collocutorName string) error {
+func (r *Repository) StoreChat(ch *domainChat.Chat, userId int, collocutorName string) error {
 	tx, err := r.dbConn.Begin(context.Background())
 	if err != nil {
 		config.Lg("chat_repo", "StoreChat").Error(err.Error())
@@ -45,16 +45,23 @@ func (r *Repository) StoreChat(ch *domainChat.Chat, userName string, collocutorN
 
 	_, err = tx.Exec(
 		context.Background(),
-				"WITH cr_id AS (SELECT id FROM users WHERE username = $1), " +
-					 "col_id AS (SELECT id FROM users WHERE username = $2) " +
+				"WITH col_id AS (SELECT id FROM users WHERE username = $1) " +
 				"INSERT INTO uu_chat (user_id, collocutor_id, chat_id,  last_read_msg_id, new_messages) " +
 				"VALUES " +
-					"((SELECT id FROM cr_id), (SELECT id FROM col_id), $3 , 0, 0), " +
-					"((SELECT id FROM col_id), (SELECT id FROM cr_id), $3 , 0, 0); ",
-		userName, collocutorName, ch.Id)
+					"($2, (SELECT id FROM col_id), $3 , 0, 0), " +
+					"((SELECT id FROM col_id), $2, $3 , 0, 0); ",
+		collocutorName, userId, ch.Id)
 
 
 	if err != nil {
+		config.Lg("chat_repo", "StoreChat").Error(err.Error())
+		return err
+	}
+
+	if err = tx.QueryRow(
+			context.Background(),
+			"SELECT username FROM users WHERE id = $1",
+			userId).Scan(&ch.UserName); err != nil {
 		config.Lg("chat_repo", "StoreChat").Error(err.Error())
 		return err
 	}
@@ -65,41 +72,40 @@ func (r *Repository) StoreChat(ch *domainChat.Chat, userName string, collocutorN
 	}
 
 	ch.CollocutorName = collocutorName
-	ch.UserName = userName
 
 	return nil
 }
 
 
 
-func (r *Repository) GetChatById(chatId int, userName string) (domainChat.Chat, error) {
+func (r *Repository) GetChatById(chatId int, userId int) (domainChat.Chat, error) {
 	c := domainChat.Chat{}
 	err := r.dbConn.QueryRow(
 		context.Background(),
-		"SELECT c.id, c.creation_time, c.last_msg_id, c.last_msg_content, c.last_msg_username, " +
-			"c.last_msg_time, u.username, u.avatar, uc.last_read_msg_id, uc.new_messages " +
+		"WITH usr AS (SELECT username FROM users WHERE id = $1)" +
+			"SELECT c.id, c.creation_time, c.last_msg_id, c.last_msg_content, c.last_msg_username, c.last_msg_time, " +
+			"(SELECT username FROM usr), " +
+			" u.username, u.avatar, uc.last_read_msg_id, uc.new_messages " +
 			"FROM " +
 				"chats c JOIN uu_chat uc " +
 				"ON c.id = uc.chat_id " +
 					"JOIN users u " +
 					"ON u.id = uc.collocutor_id " +
-			"WHERE uc.user_id = (SELECT id FROM users WHERE username = $1) AND c.id = $2 ",
-		userName, chatId).
+			"WHERE uc.user_id = $1 AND c.id = $2 ",
+		userId, chatId).
 			Scan(&c.Id, &c.CreationTime, &c.LastMsgId, &c.LastMsgContent, &c.LastMsgUsername,
-		&c.LastMsgTime, &c.CollocutorName, &c.CollocutorAvatarLink, &c.LastReadMsgId, &c.NewMessages)
+		&c.LastMsgTime, &c.UserName, &c.CollocutorName, &c.CollocutorAvatarLink, &c.LastReadMsgId, &c.NewMessages)
 
 	if err != nil {
 		config.Lg("chat_repo", "GetChatById").Error(err.Error())
 		return domainChat.Chat{}, err
 	}
 
-	c.UserName = userName
-
 	return c, nil
 }
 
 
-func (r *Repository) GetUserChats(userName string ) ([]domainChat.Chat, error) {
+func (r *Repository) GetUserChats(userId int) ([]domainChat.Chat, error) {
 	tx, err := r.dbConn.Begin(context.Background())
 	if err != nil {
 		config.Lg("chat_repo", "GetUserChats").Error(err.Error())
@@ -111,7 +117,7 @@ func (r *Repository) GetUserChats(userName string ) ([]domainChat.Chat, error) {
 	records := 0
 	err = tx.QueryRow(
 		context.Background(),
-		"SELECT COUNT(1) FROM users WHERE username = $1", userName).Scan(&records)
+		"SELECT COUNT(1) FROM users WHERE id = $1", userId).Scan(&records)
 
 	if err != nil {
 		config.Lg("chat_repo", "GetUserChats").Error(err.Error())
@@ -124,7 +130,7 @@ func (r *Repository) GetUserChats(userName string ) ([]domainChat.Chat, error) {
 	}
 
 
-	chats, err := r.getUserChatsInternal(&tx, userName)
+	chats, err := r.getUserChatsInternal(&tx, userId)
 	if err != nil {
 		config.Lg("chat_repo", "GetUserChats").Error(err.Error())
 		return nil, err
@@ -140,19 +146,21 @@ func (r *Repository) GetUserChats(userName string ) ([]domainChat.Chat, error) {
 }
 
 
-func (r *Repository) getUserChatsInternal(tx *pgx.Tx, userName string) ([]domainChat.Chat, error) {
+func (r *Repository) getUserChatsInternal(tx *pgx.Tx, userId int) ([]domainChat.Chat, error) {
 	rows, err := (*tx).Query(
 		context.Background(),
 		"SELECT c.id, c.creation_time, c.last_msg_id, c.last_msg_content, c.last_msg_username, " +
-			"c.last_msg_time, u.username, u.avatar, uc.last_read_msg_id, uc.new_messages " +
+			"c.last_msg_time, u_user.username, u_col.username, u_col.avatar, uc.last_read_msg_id, uc.new_messages " +
 			"FROM " +
 			"chats c JOIN uu_chat uc " +
-			"ON c.id = uc.chat_id " +
-			"JOIN users u " +
-			"ON u.id = uc.collocutor_id " +
-			"WHERE uc.user_id = (SELECT id FROM users WHERE username = $1) " +
+				"ON c.id = uc.chat_id " +
+			"JOIN users u_col " +
+				"ON u_col.id = uc.collocutor_id " +
+			"JOIN users u_user " +
+				"ON u_user.id = uc.user_id " +
+			"WHERE uc.user_id = $1 " +
 			"ORDER BY c.last_msg_time DESC, c.creation_time DESC ",
-		userName)
+		userId)
 
 	if err != nil {
 		config.Lg("chat_repo", "GetUserChatsInt").Error(err.Error())
@@ -165,9 +173,7 @@ func (r *Repository) getUserChatsInternal(tx *pgx.Tx, userName string) ([]domain
 	for rows.Next() {
 		c := domainChat.Chat{}
 		err := rows.Scan(&c.Id, &c.CreationTime, &c.LastMsgId, &c.LastMsgContent, &c.LastMsgUsername,
-			&c.LastMsgTime, &c.CollocutorName, &c.CollocutorAvatarLink, &c.LastReadMsgId, &c.NewMessages)
-
-		c.UserName = userName
+			&c.LastMsgTime, &c.UserName, &c.CollocutorName, &c.CollocutorAvatarLink, &c.LastReadMsgId, &c.NewMessages)
 
 		if err != nil {
 			config.Lg("comment_postgres", "GetUserChatsInt").Error(err.Error())
@@ -186,7 +192,7 @@ func (r *Repository) getUserChatsInternal(tx *pgx.Tx, userName string) ([]domain
 }
 
 
-func (r *Repository) MarkAllMessagesRead(chatId int, userName string) error {
+func (r *Repository) MarkAllMessagesRead(chatId int, userId int) error {
 	_, err := r.dbConn.Exec(
 		context.Background(),
 		"UPDATE uu_chat " +
@@ -194,9 +200,9 @@ func (r *Repository) MarkAllMessagesRead(chatId int, userName string) error {
 				"last_read_msg_id = chats.last_msg_id " +
 			"FROM chats " +
 			"WHERE chat_id = chats.id AND " +
-				"user_id = (SELECT id FROM users WHERE username = $1) AND " +
+				"user_id = $1 AND " +
 				"chat_id = $2 ",
-		userName, chatId)
+		userId, chatId)
 
 	if err != nil {
 		config.Lg("chat_repo", "GetChatById").Error(err.Error())
@@ -209,16 +215,16 @@ func (r *Repository) MarkAllMessagesRead(chatId int, userName string) error {
 
 // Messages
 
-func (r *Repository) StoreMessage(mReq *domainChat.CreateMessageReq) (domainChat.Message, error) {
+func (r *Repository) StoreMessage(mReq *domainChat.CreateMessageReq, userId int) (domainChat.Message, error) {
 	// TODO (Pavel S) Add protection of writing to foreign chat
 	m := domainChat.Message{}
 	err := r.dbConn.QueryRow(
 		context.Background(),
-			"WITH u AS (SELECT id, avatar FROM users WHERE username = $1) " +
+			"WITH u AS (SELECT username, avatar FROM users WHERE id = $1) " +
 			"INSERT INTO messages (content, creation_time, chat_id, user_id, username, avatar) " +
-			"VALUES ($2, $3, $4, (SELECT id FROM u), $1, (SELECT avatar FROM u)) " +
+			"VALUES ($2, $3, $4, $1, (SELECT username FROM u), (SELECT avatar FROM u)) " +
 			"RETURNING id, content, creation_time, chat_id, user_id, username, avatar ",
-			mReq.UserName, mReq.Content, time.Now(), mReq.ChatId).
+			userId, mReq.Content, time.Now(), mReq.ChatId).
 		Scan(&m.Id, &m.Content, &m.CreationTime, &m.ChatId, &m.UserId, &m.UserName, &m.UserAvatarLink)
 
 

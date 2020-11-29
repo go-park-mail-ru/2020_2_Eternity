@@ -39,7 +39,7 @@ func TestMain(m *testing.M) {
 //
 //	p := domainChat.Chat{}
 //
-//	assert.Nil(t, r.StoreChat(&p, "name", "name2"))
+//	assert.Nil(t, r.StoreChat(&p, 2, "name2"))
 //	fmt.Println(p)
 //
 //}
@@ -49,7 +49,7 @@ func TestMain(m *testing.M) {
 //func TestGetUserChats(t *testing.T) {
 //	r := NewRepo(db)
 //
-//	chats, err := r.GetUserChats("na3")
+//	chats, err := r.GetUserChats(2)
 //
 //	assert.Nil(t, err)
 //	fmt.Println(chats)
@@ -59,7 +59,7 @@ func TestMain(m *testing.M) {
 //func TestChatById(t *testing.T) {
 //	r := NewRepo(db)
 //
-//	chat, err := r.GetChatById(1, "na")
+//	chat, err := r.GetChatById(1, 2)
 //
 //	assert.Nil(t, err)
 //	fmt.Println(chat)
@@ -68,7 +68,7 @@ func TestMain(m *testing.M) {
 //func TestChatMkRead(t *testing.T) {
 //	r := NewRepo(db)
 //
-//	err := r.MarkAllMessagesRead(1, "name3")
+//	err := r.MarkAllMessagesRead(1, 10)
 //
 //	assert.Nil(t, err)
 //}
@@ -77,12 +77,11 @@ func TestMain(m *testing.M) {
 //	r := NewRepo(db)
 //
 //	mReq := domainChat.CreateMessageReq{
-//		UserName: "name",
 //		ChatId: 1,
-//		Content: "I'm fine",
+//		Content: "jopa",
 //	}
 //
-//	m, err := r.StoreMessage(&mReq)
+//	m, err := r.StoreMessage(&mReq, 2)
 //
 //	fmt.Println(m)
 //

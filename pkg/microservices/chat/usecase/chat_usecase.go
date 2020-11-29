@@ -15,9 +15,9 @@ func NewUsecase(r chat.IRepository) *Usecase {
 	}
 }
 
-func (uc *Usecase) CreateChat(req *domainChat.ChatCreateReq) (domainChat.ChatResp, error) {
+func (uc *Usecase) CreateChat(req *domainChat.ChatCreateReq, userId int) (domainChat.ChatResp, error) {
 	ch := domainChat.Chat{}
-	err := uc.repo.StoreChat(&ch, req.UserName, req.CollocutorName)
+	err := uc.repo.StoreChat(&ch, userId, req.CollocutorName)
 
 	resp := domainChat.ChatResp{
 		Id: ch.Id,

@@ -38,6 +38,7 @@ service Chat {
 message ChatCreateReq {
   string UserName = 1;
   string CollocutorName = 2;
+  int32 UserId = 3;
 }
 
 
