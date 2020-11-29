@@ -39,7 +39,6 @@ func (h *Handler) CreateChat(c *gin.Context) {
 		return
 	}
 
-	req.UserName = h.p.Sanitize(req.UserName)
 	req.CollocutorName = h.p.Sanitize(req.CollocutorName)
 
 	resp, err := h.uc.CreateChat(&req)

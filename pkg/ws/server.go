@@ -19,9 +19,12 @@ type IServer interface{
 
 
 type Context struct {
-	req domainWs.Message
-	resp []domainWs.Message
+	Req  domainWs.Message
+	Resp []domainWs.Message
+	Status int
 }
+
+
 
 // Router
 type Router struct {
@@ -108,8 +111,8 @@ func (s *Server) handleMessages() {
 	for m := range s.received {
 
 		// For tests
-		s.toSend <- m
-		continue
+		//s.toSend <- m
+		//continue
 		// For tests
 
 		msg := domainWs.Message{}
@@ -121,18 +124,18 @@ func (s *Server) handleMessages() {
 		}
 		msg.UserId = m.UserId
 
-		c := Context{req: msg}
+		c := Context{Req: msg}
 
-		handler, ok := s.routes[c.req.Type]
+		handler, ok := s.routes[c.Req.Type]
 		if !ok {
 			config.Lg("ws", "handleMessages").
-				Errorf("Handler for type '%s' not exists", c.req.Type)
+				Errorf("Handler for type '%s' not exists", c.Req.Type)
 			continue
 		}
 
 		handler(&c)
 
-		for _, resp := range c.resp {
+		for _, resp := range c.Resp {
 			s.SendMessage(&resp)
 		}
 	}

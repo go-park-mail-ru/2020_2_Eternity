@@ -23,14 +23,12 @@ type Chat struct {
 
 
 type ChatCreateReq struct {
-	UserName string  `json:"user_name"`
 	CollocutorName string  `json:"collocutor_name"`
 }
 
 
 
 type MarkMessagesReadReq struct {
-	ChatId int  `json:"chat_id"`
 	UserName string  `json:"username"`
 }
 

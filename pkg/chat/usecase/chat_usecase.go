@@ -22,10 +22,10 @@ func NewUsecase(conn grpc.ClientConnInterface) *Usecase {
 }
 
 
+// Chat
 
 func (uc *Usecase) CreateChat(req *domainChat.ChatCreateReq) (domainChat.ChatResp, error) {
 	pResp, err := uc.client.CreateChat(context.Background(), &proto.ChatCreateReq{
-		UserName: req.UserName,
 		CollocutorName: req.CollocutorName,
 	})
 
@@ -47,6 +47,16 @@ func (uc *Usecase) CreateChat(req *domainChat.ChatCreateReq) (domainChat.ChatRes
 
 	return resp, nil
 }
+
+
+// Message
+
+//func (uc *Usecase) CreateMessage(req *domainChat.CreateMessageReq) (domainChat.MessageResp, error) {
+//
+//}
+
+
+
 
 
 func (uc *Usecase) errorHandle(err error) {

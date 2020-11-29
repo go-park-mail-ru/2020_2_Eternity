@@ -33,10 +33,96 @@ func (uc *Usecase) CreateChat(req *domainChat.ChatCreateReq, userId int) (domain
 	return resp, err
 }
 
+func (uc *Usecase) GetChatById(chatId int, userId int) (domainChat.ChatResp, error) {
+	ch, err := uc.repo.GetChatById(chatId, userId)
+	if err != nil {
+		return domainChat.ChatResp{}, err
+	}
 
-//GetChatById(chatId int, userName string) (domainChat.Chat, error)
-//GetUserChats(userName string ) ([]domainChat.Chat, error)
-//MarkAllMessagesRead(chatId int, userName string) error
-//StoreMessage(mReq *domainChat.CreateMessageReq) (domainChat.Message, error)
-//DeleteMessage(msgId int) error
-//GetLastNMessages(mReq *domainChat.GetLastNMessagesReq) ([]domainChat.Message, error)
+	resp := domainChat.ChatResp{
+		Id: ch.Id,
+		CreationTime: ch.CreationTime,
+		LastMsgContent: ch.LastMsgContent,
+		LastMsgUsername: ch.LastMsgUsername,
+		LastMsgTime: ch.LastMsgTime,
+		CollocutorName: ch.CollocutorName,
+		CollocutorAvatarLink: ch.CollocutorAvatarLink,
+		NewMessages: ch.NewMessages,
+	}
+
+	return resp, nil
+}
+
+func (uc *Usecase) GetUserChats(userId int) ([]domainChat.ChatResp, error) {
+	chats, err := uc.repo.GetUserChats(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := []domainChat.ChatResp{}
+	for _, ch := range chats {
+		resp = append(resp, domainChat.ChatResp{
+			Id: ch.Id,
+			CreationTime: ch.CreationTime,
+			LastMsgContent: ch.LastMsgContent,
+			LastMsgUsername: ch.LastMsgUsername,
+			LastMsgTime: ch.LastMsgTime,
+			CollocutorName: ch.CollocutorName,
+			CollocutorAvatarLink: ch.CollocutorAvatarLink,
+			NewMessages: ch.NewMessages,
+		})
+	}
+
+	return resp, nil
+}
+
+
+func (uc *Usecase) MarkAllMessagesRead(chatId int, userId int) error {
+	return uc.repo.MarkAllMessagesRead(chatId, userId)
+}
+
+func (uc *Usecase) CreateMessage(mReq *domainChat.CreateMessageReq, userId int) (domainChat.MessageResp, error) {
+	m, err := uc.repo.StoreMessage(mReq, userId)
+	if err != nil {
+		return domainChat.MessageResp{}, err
+	}
+
+	resp := domainChat.MessageResp{
+		Id: m.Id,
+		Content: m.Content,
+		CreationTime: m.CreationTime,
+		ChatId: m.ChatId,
+		UserName: m.UserName,
+		UserAvatarLink: m.UserAvatarLink,
+		Files: m.Files,
+	}
+
+	return resp, nil
+}
+
+func (uc *Usecase) DeleteMessage(msgId int) error {
+	return uc.repo.DeleteMessage(msgId)
+}
+
+
+func (uc *Usecase) GetLastNMessages(mReq *domainChat.GetLastNMessagesReq) ([]domainChat.MessageResp, error) {
+	msgs, err := uc.repo.GetLastNMessages(mReq)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := []domainChat.MessageResp{}
+	for _, m := range msgs {
+		resp = append(resp, domainChat.MessageResp{
+			Id: m.Id,
+			Content: m.Content,
+			CreationTime: m.CreationTime,
+			ChatId: m.ChatId,
+			UserName: m.UserName,
+			UserAvatarLink: m.UserAvatarLink,
+			Files: m.Files,
+		})
+	}
+
+	return resp, nil
+}

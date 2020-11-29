@@ -2,6 +2,16 @@ package domainChat
 
 import "time"
 
+var (
+	CreateMessageReqType = "CreateMessageReq"
+	GetLastNMessagesReqType = "GetLastNMessagesReq"
+	GetNMessagesBeforeReqType = "GetNMessagesBeforeReq"
+
+	// ??
+	MessageRespOne = "MessageRespOne"
+	MessageRespMany = "MessageRespMany"
+)
+
 // model
 type Message struct {
 	Id int
@@ -16,19 +26,19 @@ type Message struct {
 
 
 type CreateMessageReq struct {
-	ChatId int
-	Content string
+	ChatId int  `json:"chat_id"`
+	Content string  `json:"content"`
 }
 
 type GetLastNMessagesReq struct {
-	ChatId int
-	NMessages int
+	ChatId int	`json:"chat_id"`
+	NMessages int `json:"messages"`
 }
 
 type GetNMessagesBeforeReq struct {
-	ChatId int
-	NMessages int
-	BeforeMessageId int
+	ChatId int  `json:"chat_id"`
+	NMessages int `json:"n_messages"`
+	BeforeMessageId int  `json:"message_id"`
 }
 
 
@@ -41,12 +51,11 @@ type FileInfo struct {
 
 
 type MessageResp struct {
-	Id int
-	Content string
-	CreationTime time.Time
-	ChatId int
-	IsRead bool
-	UserName string
-	UserAvatarLink string
-	Files []FileInfo
+	Id int  `json:"id"`
+	Content string  `json:"content"`
+	CreationTime time.Time  `json:"time"`
+	ChatId int `json:"chat_id"`
+	UserName string  `json:"username"`
+	UserAvatarLink string  `json:"avatar"`
+	Files []FileInfo  `json:"-"`
 }
