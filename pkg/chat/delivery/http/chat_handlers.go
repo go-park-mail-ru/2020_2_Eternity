@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/chat"
 	domainChat "github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain/chat"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/ws"
 	"github.com/microcosm-cc/bluemonday"
 	"net/http"
@@ -25,12 +26,12 @@ func NewHandler(uc chat.IUsecase, p *bluemonday.Policy) *Handler {
 
 
 func (h *Handler) CreateChat(c *gin.Context) {
-	//_, ok := jwthelper.GetClaims(c)
-	//if !ok {
-	//	c.AbortWithStatus(http.StatusUnauthorized)
-	//	config.Lg("chat_http", "CreateChat").Error("Can't get claims")
-	//	return
-	//}
+	userId, ok := jwthelper.GetClaims(c)
+	if !ok {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		config.Lg("chat_http", "CreateChat").Error("Can't get claims")
+		return
+	}
 
 	req := domainChat.ChatCreateReq{}
 	if err := c.BindJSON(&req); err != nil {
@@ -41,7 +42,7 @@ func (h *Handler) CreateChat(c *gin.Context) {
 
 	req.CollocutorName = h.p.Sanitize(req.CollocutorName)
 
-	resp, err := h.uc.CreateChat(&req)
+	resp, err := h.uc.CreateChat(&req, userId)
 	if err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		config.Lg("chat_http", "CreateChat").Error("uc.CreateChat ", err.Error())

@@ -29,7 +29,7 @@ type ChatCreateReq struct {
 
 
 type MarkMessagesReadReq struct {
-	UserName string  `json:"username"`
+	ChatId int  `json:"chat_id"`
 }
 
 

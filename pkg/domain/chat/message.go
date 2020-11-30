@@ -25,6 +25,8 @@ type Message struct {
 }
 
 
+
+
 type CreateMessageReq struct {
 	ChatId int  `json:"chat_id"`
 	Content string  `json:"content"`
