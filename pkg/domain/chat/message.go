@@ -4,12 +4,15 @@ import "time"
 
 var (
 	CreateMessageReqType = "CreateMessageReq"
+	DeleteMessageReqType = "DeleteMessageReq"
 	GetLastNMessagesReqType = "GetLastNMessagesReq"
 	GetNMessagesBeforeReqType = "GetNMessagesBeforeReq"
 
-	// ??
-	MessageRespOne = "MessageRespOne"
-	MessageRespMany = "MessageRespMany"
+
+	CreateMessageRespType = "CreateMessageResp"
+	DeleteMessageRespType = "DeleteMessageResp"
+	GetLastNMessagesRespType = "GetLastNMessagesResp"
+	GetNMessagesBeforeRespType = "GetNMessagesBeforeResp"
 )
 
 // model
@@ -30,6 +33,10 @@ type Message struct {
 type CreateMessageReq struct {
 	ChatId int  `json:"chat_id"`
 	Content string  `json:"content"`
+}
+
+type DeleteMessageReq struct {
+	MsgId int `json:"message_id"`
 }
 
 type GetLastNMessagesReq struct {

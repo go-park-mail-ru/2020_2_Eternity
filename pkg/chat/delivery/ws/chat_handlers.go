@@ -23,15 +23,59 @@ func NewHandler(uc chat.IUsecase, p *bluemonday.Policy) *Handler {
 }
 
 func (h *Handler) CreateMessage(c *ws.Context) {
+	userId := c.Req.UserId
 	req := domainChat.CreateMessageReq{}
 	if err := json.Unmarshal(c.Req.Data, &req); err != nil {
-		c.Status = http.StatusBadRequest
+		c.AbortWithStatus(domainChat.CreateMessageRespType, userId, http.StatusBadRequest)
 		config.Lg("chat_ws", "CreateMessage").Error("Unmarshal: ", err.Error())
 		return
 	}
 
+	resp, err := h.uc.CreateMessage(&req, userId)
+	if err != nil {
+		c.AbortWithStatus(domainChat.CreateMessageRespType, userId, http.StatusBadRequest)
+		config.Lg("chat_ws", "CreateMessage").Error("Usecase: ", err.Error())
+		return
+	}
 
-
+	c.AddResponse(resp, domainChat.CreateMessageRespType, userId, http.StatusOK)
 }
 
 
+func (h *Handler) DeleteMessage(c *ws.Context) {
+	userId := c.Req.UserId
+	req := domainChat.DeleteMessageReq{}
+	if err := json.Unmarshal(c.Req.Data, &req); err != nil {
+		c.AbortWithStatus(domainChat.DeleteMessageRespType, userId, http.StatusBadRequest)
+		config.Lg("chat_ws", "GetLastNMessages").Error("Unmarshal: ", err.Error())
+		return
+	}
+
+	err := h.uc.DeleteMessage(req.MsgId)
+	if err != nil {
+		c.AbortWithStatus(domainChat.DeleteMessageRespType, userId, http.StatusBadRequest)
+		config.Lg("chat_ws", "GetLastNMessages").Error("Usecase: ", err.Error())
+		return
+	}
+
+	c.AbortWithStatus(domainChat.DeleteMessageRespType, userId, http.StatusOK)
+}
+
+func (h *Handler) GetLastNMessages(c *ws.Context) {
+	userId := c.Req.UserId
+	req := domainChat.GetLastNMessagesReq{}
+	if err := json.Unmarshal(c.Req.Data, &req); err != nil {
+		c.AbortWithStatus(domainChat.GetLastNMessagesRespType, userId, http.StatusBadRequest)
+		config.Lg("chat_ws", "GetLastNMessages").Error("Unmarshal: ", err.Error())
+		return
+	}
+
+	resp, err := h.uc.GetLastNMessages(&req)
+	if err != nil {
+		c.AbortWithStatus(domainChat.GetLastNMessagesRespType, userId, http.StatusBadRequest)
+		config.Lg("chat_ws", "GetLastNMessages").Error("Usecase: ", err.Error())
+		return
+	}
+
+	c.AddResponse(resp, domainChat.GetLastNMessagesRespType, userId, http.StatusOK)
+}

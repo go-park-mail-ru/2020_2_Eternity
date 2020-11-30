@@ -12,17 +12,43 @@ type IServer interface{
 	SetHandler(msgType string, handler func(c *Context))
 	Run()
 	Stop()
-	SendMessage(msg *domainWs.Message)
+	SendMessage(msg *domainWs.MessageResp)
 	CloseConnection(userId int)
 	RegisterClient(w http.ResponseWriter, req *http.Request, userId int) error
 }
 
 
 type Context struct {
-	Req  domainWs.Message
-	Resp []domainWs.Message
-	Status int
+	Req  domainWs.MessageReq
+	Resp []domainWs.MessageResp
 }
+
+func (c *Context) AbortWithStatus(msgType string, userId, status int) {
+	c.Resp = append(c.Resp, domainWs.MessageResp{
+		UserId: userId,
+		Type: msgType,
+		Status: status,
+	})
+}
+
+func (c *Context) AddResponse(msg interface{}, msgType string, userId, status int) {
+	data, err := json.Marshal(msg)
+	if err != nil {
+		config.Lg("ws_server", "AddResponse").
+			Error("Marshal: ", err.Error())
+
+		c.AbortWithStatus(msgType, userId, status)
+		return
+	}
+
+	c.Resp = append(c.Resp, domainWs.MessageResp{
+		UserId: userId,
+		Type: msgType,
+		Status: status,
+		Data: data,
+	})
+}
+
 
 
 
@@ -69,7 +95,7 @@ func (s *Server) Stop() {
 	s.hub.Stop()
 }
 
-func (s *Server) SendMessage(msg *domainWs.Message) {
+func (s *Server) SendMessage(msg *domainWs.MessageResp) {
 	defer func() {
 		if recover() != nil {
 			config.Lg("ws_server", "SendMessage").
@@ -115,7 +141,7 @@ func (s *Server) handleMessages() {
 		//continue
 		// For tests
 
-		msg := domainWs.Message{}
+		msg := domainWs.MessageReq{}
 
 		if err := json.Unmarshal(m.Data, &msg); err != nil {
 			config.Lg("ws", "handleMessages").
