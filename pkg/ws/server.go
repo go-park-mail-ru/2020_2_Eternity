@@ -136,10 +136,11 @@ func (s *Server) RegisterClient(w http.ResponseWriter, req *http.Request, userId
 func (s *Server) handleMessages() {
 	for m := range s.received {
 
-		// For tests
-		//s.toSend <- m
-		//continue
-		// For tests
+		//For tests
+		s.toSend<- &HubMessage{2, m.Data}
+		continue
+		//For tests
+
 
 		msg := domainWs.MessageReq{}
 
