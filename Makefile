@@ -22,7 +22,10 @@ dbclear:
 # Build target api
 .PHONY: build
 build:
-	go build -o build/bin/api ./cmd/api/main.go
+	go build -o build/bin/api ./cmd/api/main.go;
+	go build -o build/bin/chat ./cmd/chat/main.go;
+	go build -o build/bin/auth ./cmd/auth/authService.go;
+	go build -o build/bin/search ./cmd/search/searchserv.go;
 
 
 

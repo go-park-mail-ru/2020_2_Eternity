@@ -1,7 +1,12 @@
 #!/bin/bash
 
 numParams=1
+
 serviceName=pinterest
+authMsName=pinterest-auth
+chatMsName=pinterest-chat
+searchMsName=pinterest-search
+
 usage="Usage. Run from root project dir:
 >>>  ./scripts/deploy/deploy.sh [branch-name] (service-name)
 
@@ -48,7 +53,19 @@ else
   fi
 
   sudo systemctl stop $serviceName || { echo "systemctl: can't stop $serviceName"  ; exit 1; }
+  sudo systemctl stop $authMsName || { echo "systemctl: can't stop $authMsName"  ; exit 1; }
+  sudo systemctl stop $chatMsName || { echo "systemctl: can't stop $chatMsName"  ; exit 1; }
+  sudo systemctl stop $searchMsName || { echo "systemctl: can't stop $searchMsName"  ; exit 1; }
+
   sudo cp build/bin/api /bin/pinterest/api || { echo "cp error"  ; exit 1; }
+  sudo cp build/bin/chat /bin/pinterest/chat || { echo "cp error"  ; exit 1; }
+  sudo cp build/bin/auth /bin/pinterest/auth || { echo "cp error"  ; exit 1; }
+  sudo cp build/bin/search /bin/pinterest/search || { echo "cp error"  ; exit 1; }
+
+
+  sudo systemctl start $authMsName || { echo "systemctl: can't stop $authMsName"  ; exit 1; }
+  sudo systemctl start $chatMsName || { echo "systemctl: can't stop $chatMsName"  ; exit 1; }
+  sudo systemctl start $searchMsName || { echo "systemctl: can't stop $searchMsName"  ; exit 1; }
   sudo systemctl start $serviceName || { echo "systemctl: can't start $serviceName"  ; exit 1; }
 
   echo "Success! New implementation of service is running"
