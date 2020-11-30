@@ -120,3 +120,5 @@ $ins_pin_vct$ LANGUAGE plpgsql;
 CREATE TRIGGER ins_pin_vct_trg
 AFTER INSERT OR UPDATE ON pins
     FOR EACH ROW EXECUTE PROCEDURE ins_pin_vct();
+
+insert into pins_vectors(idv, vec) select id, to_tsvector(title) from pins on conflict do nothing
