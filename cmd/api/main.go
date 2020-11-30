@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/server"
 	"google.golang.org/grpc"
+	ws2 "github.com/go-park-mail-ru/2020_2_Eternity/pkg/ws"
 	"os"
 )
 
@@ -65,6 +66,7 @@ func main() {
 	defer dbConn.Close()
 	config.Lg("main", "main").Info("Connected to DB")
 
+
 	sc, ac, err := InitClientConnections()
 	if err != nil {
 		config.Lg("main", "search").Fatal("Connection grpc refused")
@@ -73,8 +75,17 @@ func main() {
 	defer sc.Close()
 	defer ac.Close()
 
-	srv := server.New(config.Conf, dbConn, sc, ac)
 
+
+	wsSrv := ws2.NewServer()
+	wsSrv.Run()
+	defer wsSrv.Stop()
+
+	chMsConn := server.NewChatMsConnection()
+	defer chMsConn.Close()
+
+
+	srv := server.New(config.Conf, dbConn, sc, ac, chMsConn, wsSrv)
 	srv.Run()
 
 	config.Lg("main", "main").Info("Server stopped")

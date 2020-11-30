@@ -6,8 +6,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	chatDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/chat/delivery/http"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/chat/delivery/ws"
 	commentDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/delivery/http"
+
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/metric"
+
+	ws2 "github.com/go-park-mail-ru/2020_2_Eternity/pkg/ws"
+
+
 	noteDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
 	search "github.com/go-park-mail-ru/2020_2_Eternity/pkg/search/delivery/http"
 	"google.golang.org/grpc"
@@ -35,7 +41,12 @@ type Server struct {
 	server  *http.Server
 }
 
-func New(conf *config.Config, db database.IDbConn, sc *grpc.ClientConn, ac *grpc.ClientConn) *Server {
+
+
+
+func New(conf *config.Config, db database.IDbConn, sc *grpc.ClientConn, ac *grpc.ClientConn,
+	chMsConn grpc.ClientConnInterface, wsSrv ws2.IServer) *Server {
+
 	logFile := setupGinLogger()
 
 	r := gin.Default()
@@ -56,7 +67,8 @@ func New(conf *config.Config, db database.IDbConn, sc *grpc.ClientConn, ac *grpc
 
 	p := bluemonday.UGCPolicy()
 
-	chatDelivery.AddChatRoutes(r, db, p)
+	chatDelivery.AddChatRoutes(r, chMsConn, p, wsSrv)
+	ws.AddChatWsRoutes(wsSrv, chMsConn)
 	commentDelivery.AddCommentRoutes(r, db, p)
 	userDelivery.AddUserRoutes(r, db, p, ac)
 	pinDelivery.AddPinRoutes(r, db, p, conf)

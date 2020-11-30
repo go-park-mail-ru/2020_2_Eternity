@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/go-park-mail-ru/2020_2_Eternity/pkg/proto/chat";
+
+package chat;
+
+service Chat {
+  rpc CreateChat(ChatCreateReq) returns (ChatResp) {}
+  //rpc RouteWs(stream WsMessage) returns (stream WsMessage) {}
+  rpc GetChatById(GetChatByIdReq) returns (ChatResp) {}
+  rpc GetUserChats(Id) returns (ChatRespArray) {}
+  rpc MarkMessagesRead(MarkMessagesReadReq) returns (google.protobuf.Empty) {}
+  rpc CreateMessage(CreateMessageReq) returns (MessageResp) {}
+  rpc DeleteMessage(Id) returns (google.protobuf.Empty) {}
+  rpc GetLastNMessages(GetLastNMessagesReq) returns (MessageRespArray) {}
+}
+
+// Requests
+
+message ChatCreateReq {
+  int32 UserId = 1;
+  string CollocutorName = 2;
+}
+
+message GetChatByIdReq {
+  int32 UserId = 1;
+  int32 ChatId = 2;
+}
+
+message Id {
+  int32 Id = 1;
+}
+
+
+message MarkMessagesReadReq {
+  int32 UserId = 1;
+  int32 ChatId = 2;
+}
+
+message CreateMessageReq {
+  int32 UserId = 1;
+  int32 ChatId = 2;
+  string Content = 3;
+}
+
+message GetLastNMessagesReq {
+  int32 UserId = 1;
+  int32 ChatId = 2;
+  int32 NMessages = 3;
+}
+
+
+// Responses
+
+message MessageRespArray {
+  repeated MessageResp Messages = 1;
+}
+
+message MessageResp {
+  int32 Id = 1;
+  string Content = 2;
+  google.protobuf.Timestamp CreationTime = 3;
+  int32 ChatId = 4;
+  string UserName = 5;
+  string UserAvatarLink = 6;
+}
+
+message ChatRespArray {
+  repeated ChatResp Chats = 1;
+}
+
+message ChatResp {
+  int32 Id = 1;
+  google.protobuf.Timestamp CreationTime = 2;
+  string LastMsgContent = 3;
+  string LastMsgUsername = 4;
+  google.protobuf.Timestamp LastMsgTime = 5;
+
+  string CollocutorName = 6;
+  string CollocutorAvatarLink = 7;
+  int32  NewMessages = 8;
+}
+
+
+
+message WsMessage {
+  int32 UserId = 1;
+  bytes Data = 2;
+}
+
