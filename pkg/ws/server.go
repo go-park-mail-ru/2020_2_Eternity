@@ -137,8 +137,8 @@ func (s *Server) handleMessages() {
 	for m := range s.received {
 
 		//For tests
-		s.toSend<- &HubMessage{2, m.Data}
-		continue
+		//s.toSend<- &HubMessage{2, m.Data}
+		//continue
 		//For tests
 
 
