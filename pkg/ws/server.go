@@ -2,6 +2,7 @@ package ws
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	domainWs "github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain/ws"
 	"net/http"
@@ -21,7 +22,54 @@ type IServer interface{
 type Context struct {
 	Req  domainWs.MessageReq
 	Resp []domainWs.MessageResp
+	vars map[string]interface{}
+	handlers []func(c *Context)
+	currentHandler int
 }
+
+func NewContext(req domainWs.MessageReq, handlers []func(c *Context)) *Context {
+	return &Context{
+		Req: req,
+		handlers: handlers,
+		currentHandler: 0,
+	}
+}
+
+
+func (c *Context) Next() {
+	if c.currentHandler >= len(c.handlers) {
+		config.Lg("ws", "Next").
+			Errorf("currentHandler index = %d out of range = %d", c.currentHandler, len(c.handlers))
+		return
+	}
+
+	curr := c.currentHandler
+	c.currentHandler += 1
+
+	c.handlers[curr](c)
+}
+
+func (c *Context) Set(varName string, variable interface{}) {
+	if c.vars == nil {
+		c.vars = make(map[string]interface{})
+	}
+
+	c.vars[varName] = variable
+}
+
+func (c *Context) Get(varName string) (interface{}, error) {
+	if c.vars == nil {
+		return nil, errors.New("Map not created")
+	}
+
+	value, ok := c.vars[varName]
+	if !ok {
+		return nil, errors.New("Value not exists")
+	}
+
+	return value, nil
+}
+
 
 func (c *Context) AbortWithStatus(msgType string, userId, status int) {
 	c.Resp = append(c.Resp, domainWs.MessageResp{
@@ -54,18 +102,21 @@ func (c *Context) AddResponse(msg interface{}, msgType string, userId, status in
 
 // Router
 type Router struct {
-	routes map[string]func(c *Context)
+	routes map[string][]func(c *Context)
 }
 
 func NewRouter() *Router {
 	return &Router{
-		routes: make(map[string]func(c *Context)),
+		routes: make(map[string][]func(c *Context)),
 	}
 }
 
-func (r *Router) SetHandler(msgType string, handler func(c *Context))  {
-	r.routes[msgType] = handler
+func (r *Router) SetHandler(msgType string, handlers ...func(c *Context))  {
+	for _, h := range handlers {
+		r.routes[msgType] = append(r.routes[msgType], h)
+	}
 }
+
 
 
 // Server
@@ -151,16 +202,19 @@ func (s *Server) handleMessages() {
 		}
 		msg.UserId = m.UserId
 
-		c := Context{Req: msg}
+		//c := Context{Req: msg}
 
-		handler, ok := s.routes[c.Req.Type]
+		handlers, ok := s.routes[msg.Type]
 		if !ok {
 			config.Lg("ws", "handleMessages").
-				Errorf("Handler for type '%s' not exists", c.Req.Type)
+				Errorf("Handler for type '%s' not exists", msg.Type)
 			continue
 		}
 
-		handler(&c)
+		//handler(&c)
+
+		c := NewContext(msg, handlers)
+		c.Next()
 
 		for _, resp := range c.Resp {
 			s.SendMessage(&resp)
