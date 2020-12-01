@@ -30,13 +30,13 @@ web: {
   },
   search: {
     address: "localhost",
-    port: "8000",
+    port: "8001",
     host: "pinterest-tp.tk",
     protocol: "tcp",
   },
   auth: {
     address: "localhost",
-    port: "8001",
+    port: "8002",
     host: "pinterest-tp.tk",
     protocol: "tcp",
   },
