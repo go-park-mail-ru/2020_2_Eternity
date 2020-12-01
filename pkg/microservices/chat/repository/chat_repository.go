@@ -324,3 +324,17 @@ func (r *Repository) GetNMessagesBefore(mReq *domainChat.GetNMessagesBeforeReq) 
 
 	return msgs, nil
 }
+
+func (r *Repository) GetCollocutorId(userId int, chatId int) (int, error) {
+	collocutorId := 0
+	if err := r.dbConn.QueryRow(
+			context.Background(),
+			"SELECT collocutor_id FROM uu_chat WHERE user_id = $1 AND chat_id = $2 ",
+			userId, chatId).
+			Scan(&collocutorId); err != nil {
+		config.Lg("chat_repo", "DeleteMessage").Error(err.Error())
+		return 0, err
+	}
+
+	return collocutorId, nil
+}

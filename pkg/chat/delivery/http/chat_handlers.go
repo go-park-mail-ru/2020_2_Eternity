@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/chat"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	domainChat "github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain/chat"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
@@ -55,6 +56,17 @@ func (h *Handler) CreateChat(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, resp)
+	c.Set(domain.NotificationKey, domain.NoteChat{
+		Id: resp.Id,
+		CreatorId: userId,
+		CreationTime: resp.CreationTime,
+		LastMsgContent: resp.LastMsgContent,
+		LastMsgUsername: resp.LastMsgUsername,
+		LastMsgTime: resp.LastMsgTime,
+		CollocutorName: resp.CollocutorName,
+		CollocutorAvatarLink: resp.CollocutorAvatarLink,
+		NewMessages: resp.NewMessages,
+	})
 }
 
 func (h *Handler) GetChatById(c *gin.Context) {

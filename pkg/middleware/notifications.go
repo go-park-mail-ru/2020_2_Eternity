@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/ws"
 )
 
 func SendNotification(uc notifications.IUsecase) gin.HandlerFunc {
@@ -20,6 +21,25 @@ func SendNotification(uc notifications.IUsecase) gin.HandlerFunc {
 
 		if err := uc.CreateNotes(note); err != nil {
 			config.Lg("Middleware", "SendNotification").Error(err.Error())
+			return
+		}
+
+	}
+}
+
+func SendNotificationWs(uc notifications.IUsecase) func(c *ws.Context) {
+	return func(c *ws.Context) {
+		c.Next()
+
+		note, err := c.Get(domain.NotificationKey)
+		if err != nil {
+			config.Lg("Middleware", "SendNotificationWs").
+				Error("Notification not given: ", err.Error())
+			return
+		}
+
+		if err := uc.CreateNotes(note); err != nil {
+			config.Lg("Middleware", "SendNotificationWs").Error(err.Error())
 			return
 		}
 

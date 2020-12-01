@@ -10,7 +10,7 @@ import (
 
 
 type IServer interface{
-	SetHandler(msgType string, handler func(c *Context))
+	SetHandler(msgType string, handlers ...func(c *Context))
 	Run()
 	Stop()
 	SendMessage(msg *domainWs.MessageResp)

@@ -9,6 +9,8 @@ const (
 	NoteCommentRespType = "NoteCommentResp"
 	NotePinRespType = "NotePinResp"
 	NoteFollowRespType = "NoteFollowResp"
+	NoteChatRespType = "NoteChatResp"
+	NoteMessageRespType = "NoteMessageResp"
 )
 
 // Model
@@ -55,5 +57,29 @@ type NoteFollow struct {
 	UserId  int `bson:"user_id"`
 }
 
+
+type NoteChat struct {
+	Id int `json:"id"`
+	CreatorId int `json:"-"`
+	CreationTime time.Time `json:"creation_time"`
+	LastMsgContent string `json:"last_msg_content"`
+	LastMsgUsername string `json:"last_msg_username"`
+	LastMsgTime time.Time  `json:"last_msg_time"`
+
+	CollocutorName string `json:"collocutor_name"`
+	CollocutorAvatarLink string `json:"collocutor_ava"`
+	NewMessages int `json:"new_messages"`
+}
+
+type NoteMessage struct {
+	Id int  `json:"id"`
+	CreatorId int `json:"-"`
+	Content string  `json:"content"`
+	CreationTime time.Time  `json:"time"`
+	ChatId int `json:"chat_id"`
+	UserName string  `json:"username"`
+	UserAvatarLink string  `json:"avatar"`
+}
+
 // Notes for likes
-// Notes for chat
+

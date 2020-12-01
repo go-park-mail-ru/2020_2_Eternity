@@ -67,8 +67,8 @@ func New(conf *config.Config, db database.IDbConn, sc *grpc.ClientConn, ac *grpc
 
 	p := bluemonday.UGCPolicy()
 
-	chatDelivery.AddChatRoutes(r, chMsConn, p, wsSrv)
-	ws.AddChatWsRoutes(wsSrv, chMsConn)
+	chatDelivery.AddChatRoutes(r, db, chMsConn, p, wsSrv)
+	ws.AddChatWsRoutes(wsSrv, db, chMsConn)
 	commentDelivery.AddCommentRoutes(r, db, p, wsSrv)
 	userDelivery.AddUserRoutes(r, db, p, ac, wsSrv)
 	pinDelivery.AddPinRoutes(r, db, p, conf, wsSrv)

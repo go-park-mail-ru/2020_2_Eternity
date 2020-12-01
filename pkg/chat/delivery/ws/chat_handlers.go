@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/chat"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	domainChat "github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain/chat"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/ws"
 	"github.com/microcosm-cc/bluemonday"
@@ -39,6 +40,15 @@ func (h *Handler) CreateMessage(c *ws.Context) {
 	}
 
 	c.AddResponse(resp, domainChat.CreateMessageRespType, userId, http.StatusOK)
+	c.Set(domain.NotificationKey, domain.NoteMessage{
+		Id: resp.Id,
+		CreatorId: userId,
+		Content: resp.Content,
+		CreationTime: resp.CreationTime,
+		ChatId: resp.ChatId,
+		UserName: resp.UserName,
+		UserAvatarLink: resp.UserAvatarLink,
+	})
 }
 
 

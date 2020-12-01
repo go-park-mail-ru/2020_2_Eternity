@@ -11,4 +11,5 @@ type IRepository interface {
 	DeleteMessage(msgId int) error
 	GetLastNMessages(mReq *domainChat.GetLastNMessagesReq) ([]domainChat.Message, error)
 	GetNMessagesBefore(mReq *domainChat.GetNMessagesBeforeReq) ([]domainChat.Message, error)
+	GetCollocutorId(userId int, chatId int) (int, error)
 }
