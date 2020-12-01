@@ -7,8 +7,8 @@ const (
 	NotificationKey = "notification"
 
 	NoteCommentRespType = "NoteCommentResp"
-	NotePinRespType = "NotePinRespType"
-	NoteFollowRespType = "NoteFollowRespType"
+	NotePinRespType = "NotePinResp"
+	NoteFollowRespType = "NoteFollowResp"
 )
 
 // Model
