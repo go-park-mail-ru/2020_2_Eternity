@@ -7,8 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	mock_database "github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database/mock"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/proto/auth"
+	mock_auth "github.com/go-park-mail-ru/2020_2_Eternity/pkg/proto/auth/mock"
 	mock_user "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/mock"
 	"github.com/golang/mock/gomock"
 	"github.com/microcosm-cc/bluemonday"
@@ -35,7 +36,8 @@ func TestDelivery_SignUpSuccess(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 
@@ -73,7 +75,8 @@ func TestDelivery_SignUpValidP(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 
@@ -103,7 +106,8 @@ func TestDelivery_LoginF(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 
@@ -118,8 +122,7 @@ func TestDelivery_LoginF(t *testing.T) {
 		log.Fatal("cant marshal")
 		return
 	}
-	respUser := &domain.User{}
-	userMockUsecase.EXPECT().GetUserByNameWithFollowers(gomock.Any()).Return(respUser, nil)
+	userAs.EXPECT().Login(gomock.Any(), gomock.Any()).Return(nil, errors.New("Erorr"))
 
 	req, err := http.NewRequest("POST", path, bytes.NewReader(body))
 	_, r := gin.CreateTestContext(w)
@@ -134,7 +137,8 @@ func TestDelivery_Login(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 
@@ -154,12 +158,15 @@ func TestDelivery_Login(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	respUser := &domain.User{
+	u := &auth.User{
 		Username: "21savage",
 		Password: string(hash),
 	}
-	userMockUsecase.EXPECT().GetUserByNameWithFollowers(gomock.Any()).Return(respUser, nil)
+
+	userAs.EXPECT().Login(gomock.Any(), gomock.Any()).Return(&auth.LoginInfo{
+		Info:   u,
+		Tokens: &auth.Token{},
+	}, nil)
 
 	req, err := http.NewRequest("POST", path, bytes.NewReader(body))
 	_, r := gin.CreateTestContext(w)
@@ -174,7 +181,8 @@ func TestDelivery_LogoutF(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 
@@ -196,7 +204,8 @@ func TestDelivery_LogoutS(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 
@@ -236,7 +245,8 @@ func TestDelivery_UpdateS(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 
@@ -270,7 +280,8 @@ func TestDelivery_UpdateC(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 
@@ -303,7 +314,8 @@ func TestDelivery_UpdateUserUnAuth(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 
@@ -321,7 +333,8 @@ func TestDelivery_UpdateUserFail(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 
@@ -352,7 +365,8 @@ func TestDelivery_UpdatePasswordF(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 
@@ -383,7 +397,8 @@ func TestDelivery_UpdatePassword(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 
@@ -425,7 +440,8 @@ func TestDelivery_UpdatePasswordU(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 
@@ -467,7 +483,8 @@ func TestDelivery_UpdatePasswordG(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 
@@ -502,7 +519,8 @@ func TestDelivery_UpdatePasswordAuth(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 
@@ -530,7 +548,8 @@ func TestDelivery_UpdatePasswordW(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 
@@ -565,7 +584,8 @@ func TestDelivery_GetProfileUnAuth(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 	path := "/user/profile"
@@ -583,7 +603,8 @@ func TestDelivery_GetProfile(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 	path := "/user/profile"
@@ -605,7 +626,8 @@ func TestDelivery_GetProfileFail(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 	path := "/user/profile"
@@ -627,7 +649,8 @@ func TestDelivery_GetAvatarFail(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	w := httptest.NewRecorder()
 	path := "/image/avatar/fff"
@@ -645,7 +668,8 @@ func TestDelivery_Follow(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	f := api.UserAct{
 		Username: "21savage",
@@ -678,7 +702,8 @@ func TestDelivery_FollowE(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	f := api.UserAct{
 		Username: "21savage",
@@ -711,7 +736,8 @@ func TestDelivery_FollowV(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	f := api.UserAct{
 		Username: "21",
@@ -740,7 +766,8 @@ func TestDelivery_FollowF(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	f := api.UserAct{
 		Username: "21savage",
@@ -768,7 +795,8 @@ func TestDelivery_UnFollow(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	f := api.UserAct{
 		Username: "21savage",
@@ -801,7 +829,8 @@ func TestDelivery_UnFollowE(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	f := api.UserAct{
 		Username: "21savage",
@@ -833,7 +862,8 @@ func TestDelivery_UnFollowW(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	f := api.UserAct{
 		Username: "21savage",
@@ -866,7 +896,8 @@ func TestDelivery_UnFollowF(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	f := api.UserAct{
 		Username: "21savage",
@@ -894,7 +925,8 @@ func TestDelivery_UserPageS(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	u := &domain.User{Username: "21savage"}
 
@@ -915,7 +947,8 @@ func TestDelivery_UserPageF(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	u := &domain.User{Username: "21"}
 
@@ -936,7 +969,8 @@ func TestDelivery_GetFollowersS(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	var users []domain.User
 
@@ -957,7 +991,8 @@ func TestDelivery_GetFollowersF(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	var users []domain.User
 
@@ -978,7 +1013,8 @@ func TestDelivery_GetFollowingS(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	var users []domain.User
 
@@ -999,7 +1035,8 @@ func TestDelivery_GetFollowingF(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 
 	var users []domain.User
 
@@ -1020,7 +1057,8 @@ func TestHandler_IsFollowing(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 	w := httptest.NewRecorder()
 
 	path := "/isfollowing/21savage"
@@ -1041,7 +1079,8 @@ func TestHandler_IsFollowingF(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 	w := httptest.NewRecorder()
 
 	path := "/isfollowing/21"
@@ -1062,7 +1101,8 @@ func TestHandler_IsFollowingU(t *testing.T) {
 	defer ctrl.Finish()
 
 	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userHandler := NewHandler(userMockUsecase, p)
+	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+	userHandler := NewHandler(userMockUsecase, p, userAs)
 	w := httptest.NewRecorder()
 
 	path := "/isfollowing/21savage"
@@ -1073,16 +1113,4 @@ func TestHandler_IsFollowingU(t *testing.T) {
 	r.GET("/isfollowing/:username", userHandler.IsFollowing)
 	r.ServeHTTP(c.Writer, req)
 	assert.Equal(t, 401, c.Writer.Status())
-}
-
-
-func TestCreateRoutes(t *testing.T) {
-	mockCtr := gomock.NewController(t)
-	defer mockCtr.Finish()
-
-	writerResp := httptest.NewRecorder()
-	_, r := gin.CreateTestContext(writerResp)
-
-	mockDatabase := mock_database.NewMockIDbConn(mockCtr)
-	AddUserRoutes(r, mockDatabase, bluemonday.NewPolicy())
 }
