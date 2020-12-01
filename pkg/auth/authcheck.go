@@ -45,6 +45,7 @@ func AuthCheck() gin.HandlerFunc {
 		cookie, err := c.Cookie(config.Conf.Token.CookieName)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "bad cookie"})
+			config.Lg("auth", "AuthCheck").Error( "bad cookie,", err.Error())
 			return
 		}
 
@@ -52,10 +53,12 @@ func AuthCheck() gin.HandlerFunc {
 		token, err := jwthelper.ParseToken(cookie, &claims)
 		if token == nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "bad token"})
+			config.Lg("auth", "AuthCheck").Error( "bad token")
 			return
 		}
 		if !token.Valid {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "fake token"})
+			config.Lg("auth", "AuthCheck").Error( "fake token")
 			return
 		}
 		c.Set("info", int(claims.Id))
