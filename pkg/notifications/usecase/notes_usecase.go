@@ -1,12 +1,16 @@
 package usecase
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
+	domainWs "github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain/ws"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/microservices/chat"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/ws"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -20,9 +24,11 @@ type Usecase struct {
 	noteRepo  notifications.IRepository
 	pinRepo pin.IRepository
 	userRepo user.IRepository
+	chatRepo chat.IRepository
+	wsServer ws.IServer
 }
 
-func NewUsecase(nr notifications.IRepository, pr pin.IRepository, ur user.IRepository) *Usecase {
+func NewUsecase(nr notifications.IRepository, pr pin.IRepository, ur user.IRepository, cr chat.IRepository, server ws.IServer) *Usecase {
 	return &Usecase{
 		noteRepo:  nr,
 		pinRepo: pr,
@@ -40,6 +46,42 @@ func (uc *Usecase) getDstNoteComment (n *domain.NoteComment) ([]int, error) {
 
 	return toUsers, nil
 }
+
+func (uc *Usecase) sendNotes(n interface{}, noteType int, toUsers []int)  {
+	data, err := json.Marshal(n)
+	if err != nil {
+		config.Lg("notifications_usecase", "sendNotes").
+			Error("Marshal: ", err.Error())
+
+		return
+	}
+
+	noteTypeWs := ""
+
+	switch noteType {
+	case NoteComment:
+		noteTypeWs = domain.NoteCommentRespType
+	case NotePin:
+		noteTypeWs = domain.NotePinRespType
+	case NoteFollow:
+		noteTypeWs = domain.NoteFollowRespType
+	default:
+		config.Lg("notifications_usecase", "sendNotes").
+			Error("switch: Can't find needed note type")
+	}
+
+	for _, id := range toUsers {
+		wsNote := domainWs.MessageResp{
+			UserId: id,
+			Type: noteTypeWs,
+			Status: 200,
+			Data: data,
+		}
+
+		uc.wsServer.SendMessage(&wsNote)
+	}
+}
+
 
 func (uc *Usecase) getDstNotePin (p *domain.NotePin) ([]int, error) {
 	toUsers, err := uc.userRepo.GetFollowersIds(p.UserId)
@@ -64,12 +106,15 @@ func (uc *Usecase) CreateNotes(iNote interface{}) error {
 	case domain.NoteComment:
 		noteType = NoteComment
 		toUsers, err = uc.getDstNoteComment(&note)
+		uc.sendNotes(note, noteType, toUsers)
 	case domain.NotePin:
 		noteType = NotePin
 		toUsers, err = uc.getDstNotePin(&note)
+		uc.sendNotes(note, noteType, toUsers)
 	case domain.NoteFollow:
 		noteType = NoteFollow
 		toUsers, err = uc.getDstNoteFollow(&note)
+		uc.sendNotes(note, noteType, toUsers)
 	default:
 		config.Lg("notifications_usecase", "CreateNote").Error("Unknown notification type")
 		return errors.New("Unknown notification type")

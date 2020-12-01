@@ -63,15 +63,15 @@ func New(conf *config.Config, db database.IDbConn, sc *grpc.ClientConn, ac *grpc
 
 	go metric.RouterForMetrics(conf.Monitoring.Api.Address + ":" + conf.Monitoring.Api.Port)
 
-	noteDelivery.AddNoteRoutes(r, db)
+	noteDelivery.AddNoteRoutes(r, db, wsSrv)
 
 	p := bluemonday.UGCPolicy()
 
 	chatDelivery.AddChatRoutes(r, chMsConn, p, wsSrv)
 	ws.AddChatWsRoutes(wsSrv, chMsConn)
-	commentDelivery.AddCommentRoutes(r, db, p)
-	userDelivery.AddUserRoutes(r, db, p, ac)
-	pinDelivery.AddPinRoutes(r, db, p, conf)
+	commentDelivery.AddCommentRoutes(r, db, p, wsSrv)
+	userDelivery.AddUserRoutes(r, db, p, ac, wsSrv)
+	pinDelivery.AddPinRoutes(r, db, p, conf, wsSrv)
 	boardDelivery.AddBoardRoutes(r, db, p)
 
 	feedDelivery.AddFeedRoutes(r, db, conf)

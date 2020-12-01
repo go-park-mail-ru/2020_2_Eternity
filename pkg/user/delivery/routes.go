@@ -9,11 +9,12 @@ import (
 	proto_auth "github.com/go-park-mail-ru/2020_2_Eternity/pkg/proto/auth"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/repository"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/usecase"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/ws"
 	"github.com/microcosm-cc/bluemonday"
 	"google.golang.org/grpc"
 )
 
-func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, ac *grpc.ClientConn) {
+func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, ac *grpc.ClientConn, server ws.IServer) {
 	rep := repository.NewRepo(db)
 	uc := usecase.NewUsecase(rep)
 	client := proto_auth.NewAuthServiceClient(ac)
@@ -36,7 +37,7 @@ func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, ac 
 		authorized.PUT("/user/profile", handler.UpdateUser)
 		authorized.POST("/user/profile/avatar", handler.SetAvatar)
 
-		authorized.Group("/", middleware.SendNotification(note_http.CreateNoteUsecase(db))).
+		authorized.Group("/", middleware.SendNotification(note_http.CreateNoteUsecase(db, server))).
 			POST("/follow", handler.Follow)
 
 		authorized.POST("/unfollow", handler.Unfollow)

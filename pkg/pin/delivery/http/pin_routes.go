@@ -10,10 +10,11 @@ import (
 	fstorage "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/repository/filestorage"
 	pin_postgres "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/repository/postgres"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/usecase"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/ws"
 	"github.com/microcosm-cc/bluemonday"
 )
 
-func AddPinRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, conf *config.Config) {
+func AddPinRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, conf *config.Config, server ws.IServer) {
 	rep := pin_postgres.NewRepo(db)
 	store := fstorage.NewStorage(conf)
 	uc := usecase.NewUsecase(rep, store)
@@ -25,6 +26,6 @@ func AddPinRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, conf
 
 	authorized := r.Group("/", auth.AuthCheck()) // authorized.Use(csrf.CSRFCheck()) на фронте его еще нет, поэтому закомменчен
 
-	authorized.POST("/user/pin", middleware.SendNotification(note_http.CreateNoteUsecase(db)), handler.CreatePin)
+	authorized.POST("/user/pin", middleware.SendNotification(note_http.CreateNoteUsecase(db, server)), handler.CreatePin)
 
 }
