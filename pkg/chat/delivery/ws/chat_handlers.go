@@ -79,3 +79,22 @@ func (h *Handler) GetLastNMessages(c *ws.Context) {
 
 	c.AddResponse(resp, domainChat.GetLastNMessagesRespType, userId, http.StatusOK)
 }
+
+func (h *Handler) GetNMessagesBefore(c *ws.Context) {
+	userId := c.Req.UserId
+	req := domainChat.GetNMessagesBeforeReq{}
+	if err := json.Unmarshal(c.Req.Data, &req); err != nil {
+		c.AbortWithStatus(domainChat.GetNMessagesBeforeRespType, userId, http.StatusBadRequest)
+		config.Lg("chat_ws", "GetNMessagesBefore").Error("Unmarshal: ", err.Error())
+		return
+	}
+
+	resp, err := h.uc.GetNMessagesBefore(&req)
+	if err != nil {
+		c.AbortWithStatus(domainChat.GetNMessagesBeforeRespType, userId, http.StatusBadRequest)
+		config.Lg("chat_ws", "GetNMessagesBefore").Error("Usecase: ", err.Error())
+		return
+	}
+
+	c.AddResponse(resp, domainChat.GetNMessagesBeforeRespType, userId, http.StatusOK)
+}

@@ -10,4 +10,5 @@ type IUsecase interface {
 	CreateMessage(mReq *domainChat.CreateMessageReq, userId int) (domainChat.MessageResp, error)
 	DeleteMessage(msgId int) error
 	GetLastNMessages(mReq *domainChat.GetLastNMessagesReq) ([]domainChat.MessageResp, error)
+	GetNMessagesBefore(mReq *domainChat.GetNMessagesBeforeReq) ([]domainChat.MessageResp, error)
 }

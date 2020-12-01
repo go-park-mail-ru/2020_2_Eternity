@@ -10,4 +10,5 @@ type IRepository interface {
 	StoreMessage(mReq *domainChat.CreateMessageReq, userId int) (domainChat.Message, error)
 	DeleteMessage(msgId int) error
 	GetLastNMessages(mReq *domainChat.GetLastNMessagesReq) ([]domainChat.Message, error)
+	GetNMessagesBefore(mReq *domainChat.GetNMessagesBeforeReq) ([]domainChat.Message, error)
 }

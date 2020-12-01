@@ -256,7 +256,7 @@ func (r *Repository) GetLastNMessages(mReq *domainChat.GetLastNMessagesReq) ([]d
 				"WHERE chat_id = $1 " +
 				"ORDER BY id DESC " +
 				"LIMIT $2) t " +
-			"ORDER BY id ",
+			"ORDER BY id DESC",
 			mReq.ChatId, mReq.NMessages)
 
 	if err != nil {
@@ -287,3 +287,40 @@ func (r *Repository) GetLastNMessages(mReq *domainChat.GetLastNMessagesReq) ([]d
 	return msgs, nil
 }
 
+func (r *Repository) GetNMessagesBefore(mReq *domainChat.GetNMessagesBeforeReq) ([]domainChat.Message, error) {
+	rows, err := r.dbConn.Query(
+		context.Background(),
+		"SELECT id, content, creation_time, chat_id, user_id, username, avatar " +
+			"FROM messages " +
+			"WHERE chat_id = $1 AND id < $2 " +
+			"ORDER BY id DESC " +
+			"LIMIT $3 ",
+		mReq.ChatId, mReq.BeforeMessageId, mReq.NMessages)
+
+	if err != nil {
+		config.Lg("chat_repo", "GetNMessagesBefore").Error(err.Error())
+		return nil,  err
+	}
+
+	defer rows.Close()
+
+	msgs := []domainChat.Message{}
+	for rows.Next() {
+		m := domainChat.Message{}
+		err := rows.Scan(&m.Id, &m.Content, &m.CreationTime, &m.ChatId, &m.UserId, &m.UserName, &m.UserAvatarLink)
+
+		if err != nil {
+			config.Lg("comment_postgres", "GetNMessagesBefore").Error(err.Error())
+			return nil, err
+		}
+
+		msgs = append(msgs, m)
+	}
+
+	if rows.Err() != nil {
+		config.Lg("comment_postgres", "GetNMessagesBefore").Error(rows.Err())
+		return nil, rows.Err()
+	}
+
+	return msgs, nil
+}

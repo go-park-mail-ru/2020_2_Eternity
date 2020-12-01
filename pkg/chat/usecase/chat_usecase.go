@@ -180,6 +180,34 @@ func (uc *Usecase) GetLastNMessages(mReq *domainChat.GetLastNMessagesReq) ([]dom
 }
 
 
+func (uc *Usecase) GetNMessagesBefore(mReq *domainChat.GetNMessagesBeforeReq) ([]domainChat.MessageResp, error) {
+	pRespArr, err := uc.client.GetNMessagesBefore(context.Background(), &proto.GetNMessagesReq{
+		ChatId: int32(mReq.ChatId),
+		NMessages: int32(mReq.NMessages),
+		MessageId: int32(mReq.BeforeMessageId),
+	})
+
+	if err != nil {
+		config.Lg("chat_usecase", "GetNMessagesBefore").Error("client: ", err.Error())
+		return nil, err
+	}
+
+	respArr := []domainChat.MessageResp{}
+	for _, pResp := range pRespArr.Messages {
+		respArr = append(respArr, domainChat.MessageResp{
+			Id: int(pResp.Id),
+			Content: pResp.Content,
+			CreationTime: pResp.CreationTime.AsTime(),
+			ChatId: int(pResp.ChatId),
+			UserName: pResp.UserName,
+			UserAvatarLink: pResp.UserAvatarLink,
+		})
+	}
+
+	return respArr, nil
+}
+
+
 
 func (uc *Usecase) errorHandle(err error) {
 	errStatus, _ := status.FromError(err)

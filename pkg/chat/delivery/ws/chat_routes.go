@@ -15,4 +15,5 @@ func AddChatWsRoutes(server ws.IServer, conn grpc.ClientConnInterface,) {
 	server.SetHandler(domainChat.CreateMessageReqType, handler.CreateMessage)
 	server.SetHandler(domainChat.DeleteMessageReqType, handler.DeleteMessage)
 	server.SetHandler(domainChat.GetLastNMessagesReqType, handler.GetLastNMessages)
+	server.SetHandler(domainChat.GetNMessagesBeforeReqType, handler.GetNMessagesBefore)
 }

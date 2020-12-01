@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	domainChat "github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain/chat"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 )
@@ -101,9 +103,8 @@ func TestMain(m *testing.M) {
 //	r := NewRepo(db)
 //
 //	mReq := domainChat.GetLastNMessagesReq{
-//		UserName: "name",
 //		ChatId: 1,
-//		NMessages: 3,
+//		NMessages: 6,
 //	}
 //
 //	m, err := r.GetLastNMessages(&mReq)
@@ -112,3 +113,19 @@ func TestMain(m *testing.M) {
 //
 //	assert.Nil(t, err)
 //}
+
+func TestGetLastNMsgs(t *testing.T) {
+	r := NewRepo(db)
+
+	mReq := domainChat.GetNMessagesBeforeReq{
+		ChatId: 1,
+		NMessages: 2,
+		BeforeMessageId: 8,
+	}
+
+	m, err := r.GetNMessagesBefore(&mReq)
+
+	fmt.Println(m)
+
+	assert.Nil(t, err)
+}

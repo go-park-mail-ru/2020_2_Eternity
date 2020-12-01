@@ -126,3 +126,25 @@ func (uc *Usecase) GetLastNMessages(mReq *domainChat.GetLastNMessagesReq) ([]dom
 
 	return resp, nil
 }
+
+func (uc *Usecase) GetNMessagesBefore(mReq *domainChat.GetNMessagesBeforeReq) ([]domainChat.MessageResp, error) {
+	msgs, err := uc.repo.GetNMessagesBefore(mReq)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := []domainChat.MessageResp{}
+	for _, m := range msgs {
+		resp = append(resp, domainChat.MessageResp{
+			Id: m.Id,
+			Content: m.Content,
+			CreationTime: m.CreationTime,
+			ChatId: m.ChatId,
+			UserName: m.UserName,
+			UserAvatarLink: m.UserAvatarLink,
+			Files: m.Files,
+		})
+	}
+
+	return resp, nil
+}

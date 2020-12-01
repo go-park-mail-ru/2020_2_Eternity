@@ -5,11 +5,11 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	domainChat "github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain/chat"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/microservices/chat"
+	proto "github.com/go-park-mail-ru/2020_2_Eternity/pkg/proto/chat"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	proto "github.com/go-park-mail-ru/2020_2_Eternity/pkg/proto/chat"
 )
 
 
@@ -209,6 +209,40 @@ func (c *ChatServer) GetLastNMessages(ctx context.Context, pReq *proto.GetLastNM
 
 	return &pReps, nil
 }
+func (c *ChatServer) GetNMessagesBefore(ctx context.Context, pReq *proto.GetNMessagesReq) (*proto.MessageRespArray, error) {
+	req := domainChat.GetNMessagesBeforeReq{
+		ChatId: int(pReq.ChatId),
+		NMessages: int(pReq.NMessages),
+		BeforeMessageId: int(pReq.MessageId),
+	}
+
+	respArr, err := c.uc.GetNMessagesBefore(&req)
+	if err != nil {
+		config.Lg("chat_grpc_ms", "GetNMessagesBefore").Error("Usecase: ", err.Error())
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	pReps := proto.MessageRespArray{}
+
+	for _, resp := range respArr {
+		crTime, err := ptypes.TimestampProto(resp.CreationTime)
+		if err != nil {
+			config.Lg("chat_grpc_ms", "GetNMessagesBefore").Error("Time ", err.Error())
+		}
+
+		pReps.Messages = append(pReps.Messages, &proto.MessageResp{
+			Id: int32(resp.Id),
+			Content: resp.Content,
+			CreationTime: crTime,
+			ChatId: int32(resp.ChatId),
+			UserName: resp.UserName,
+			UserAvatarLink: resp.UserAvatarLink,
+		})
+	}
+
+	return &pReps, nil
+}
+
 
 
 

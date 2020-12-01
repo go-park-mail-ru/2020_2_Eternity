@@ -16,6 +16,7 @@ service Chat {
   rpc CreateMessage(CreateMessageReq) returns (MessageResp) {}
   rpc DeleteMessage(Id) returns (google.protobuf.Empty) {}
   rpc GetLastNMessages(GetLastNMessagesReq) returns (MessageRespArray) {}
+  rpc GetNMessagesBefore(GetNMessagesReq) returns (MessageRespArray) {}
 }
 
 // Requests
@@ -52,6 +53,13 @@ message GetLastNMessagesReq {
   int32 NMessages = 3;
 }
 
+
+message GetNMessagesReq {
+  int32 UserId = 1;
+  int32 ChatId = 2;
+  int32 NMessages = 3;
+  int32 MessageId = 4;
+}
 
 // Responses
 
