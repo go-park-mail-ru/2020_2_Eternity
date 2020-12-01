@@ -36,6 +36,8 @@ func NewUsecase(nr notifications.IRepository, pr pin.IRepository, ur user.IRepos
 		noteRepo:  nr,
 		pinRepo: pr,
 		userRepo: ur,
+		chatRepo: cr,
+		wsServer: server,
 	}
 }
 
