@@ -20,15 +20,15 @@ func NewRepo(db database.IDbConn) *Repository {
 
 func (r *Repository) GetFeed(userId int, last int) ([]domain.Pin, error) {
 	query := "select pins.id, title, content, name, user_id " +
-		"from pins join pin_images on pins.id = pin_images.pin_id "
+		"from pins join pin_images on pins.id = pin_images.pin_id"
 	var placeholders []interface{}
 	i := 0
 	if last > 0 {
 		i++
-		query += "where pins.id < $" + strconv.Itoa(i)
+		query += " where pins.id < $" + strconv.Itoa(i)
 		placeholders = append(placeholders, last)
 	}
-	query += "order by pins.id desc limit 15"
+	query += " order by pins.id desc limit 15"
 	rows, err := r.db.Query(context.Background(), query, placeholders...)
 	if err != nil {
 		config.Lg("feed", "GetFeed").Error(err.Error())

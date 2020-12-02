@@ -13,10 +13,9 @@ func NewChatMsConnection() *grpc.ClientConn {
 	opts = append(opts, grpc.WithInsecure())
 	opts = append(opts, grpc.WithBlock())
 
-
 	serverAddr := fmt.Sprintf("%s:%s", config.Conf.Web.Chat.Address, config.Conf.Web.Chat.Port)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 2)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
 	defer cancel()
 
 	conn, err := grpc.DialContext(ctx, serverAddr, opts...)

@@ -21,7 +21,7 @@ func TestBoardUsecase_CreateBoard(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	userMockRepository := mock_board.NewMockIUsecase(ctrl)
+	userMockRepository := mock_board.NewMockIRepository(ctrl)
 	usecase := NewUsecase(userMockRepository)
 
 	testBoard := api.CreateBoard{
@@ -40,7 +40,7 @@ func TestBoardUsecase_GetBoard(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	userMockRepository := mock_board.NewMockIUsecase(ctrl)
+	userMockRepository := mock_board.NewMockIRepository(ctrl)
 	usecase := NewUsecase(userMockRepository)
 
 	b := &domain.Board{}
@@ -55,7 +55,7 @@ func TestBoardUsecase_GetAllBoardsByUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	userMockRepository := mock_board.NewMockIUsecase(ctrl)
+	userMockRepository := mock_board.NewMockIRepository(ctrl)
 	usecase := NewUsecase(userMockRepository)
 
 	username := "21savage"
@@ -71,7 +71,7 @@ func TestBoardUsecase_CheckOwner(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	userMockRepository := mock_board.NewMockIUsecase(ctrl)
+	userMockRepository := mock_board.NewMockIRepository(ctrl)
 	usecase := NewUsecase(userMockRepository)
 
 	userMockRepository.EXPECT().CheckOwner(1, 1).Return(nil)
@@ -85,7 +85,7 @@ func TestBoardUsecase_AttachPin(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	userMockRepository := mock_board.NewMockIUsecase(ctrl)
+	userMockRepository := mock_board.NewMockIRepository(ctrl)
 	usecase := NewUsecase(userMockRepository)
 
 	userMockRepository.EXPECT().AttachPin(1, 1).Return(nil)
@@ -99,7 +99,7 @@ func TestBoardUsecase_DetachPin(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	userMockRepository := mock_board.NewMockIUsecase(ctrl)
+	userMockRepository := mock_board.NewMockIRepository(ctrl)
 	usecase := NewUsecase(userMockRepository)
 
 	userMockRepository.EXPECT().DetachPin(1, 1).Return(nil)

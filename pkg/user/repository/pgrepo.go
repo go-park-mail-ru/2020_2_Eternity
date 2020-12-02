@@ -24,8 +24,8 @@ func NewRepo(d database.IDbConn) *Repository {
 
 func (r *Repository) CreateUser(user *api.SignUp) (*domain.User, error) {
 	u := &domain.User{}
-	if _, err := r.dbConn.Exec(context.Background(), "insert into users(username, email, password, name, surname, description, birthdate, reg_date, avatar) values($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-		user.Username, user.Email, user.Password, user.Name, user.Surname, user.Description, user.BirthDate, time.Now(), ""); err != nil {
+	if err := r.dbConn.QueryRow(context.Background(), "insert into users(username, email, password, name, surname, description, birthdate, reg_date, avatar) values($1, $2, $3, $4, $5, $6, $7, $8, $9) returning id",
+		user.Username, user.Email, user.Password, user.Name, user.Surname, user.Description, user.BirthDate, time.Now(), "").Scan(&u.ID); err != nil {
 		config.Lg("user", "CreateUser").Error("r.CreateUser: ", err.Error())
 		return u, errors.New("user exists")
 	}
@@ -130,10 +130,6 @@ func (r *Repository) GetAvatar(id int) (error, string) {
 	return nil, avatar
 }
 
-func (r *Repository) DeleteByName(username string) error {
-	return nil
-}
-
 func (r *Repository) Follow(following int, id int) error {
 	if _, err := r.dbConn.Exec(context.Background(), "insert into follows(id1, id2) values($1, $2)", following, id); err != nil {
 		config.Lg("user", "Follow").Error("r.UpdatePassword: ", err.Error())
@@ -192,6 +188,7 @@ func (r *Repository) GetFollowers(username string) ([]domain.User, error) {
 	}
 	return users, nil
 }
+
 func (r *Repository) GetFollowing(username string) ([]domain.User, error) {
 	rows, err := r.dbConn.Query(context.Background(), "select us.username, us.avatar from (users as u join follows on u.id = id1) "+
 		"p join users as us on p.id2 = us.id where lower(p.username) = lower($1)", username)

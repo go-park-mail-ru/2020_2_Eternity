@@ -14,7 +14,8 @@ import (
 	"google.golang.org/grpc"
 )
 
-func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, ac *grpc.ClientConn, server ws.IServer) {
+
+func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, ac grpc.ClientConnInterface,  server ws.IServer) {
 	rep := repository.NewRepo(db)
 	uc := usecase.NewUsecase(rep)
 	client := proto_auth.NewAuthServiceClient(ac)

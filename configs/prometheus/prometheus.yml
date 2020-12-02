@@ -17,7 +17,7 @@ scrape_configs:
   - job_name: 'prometheus'
 
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ['89.208.211.100:9090']
 
   - job_name: 'node_localhost'
     static_configs:

@@ -7,6 +7,15 @@ database: {
     ssl_mode: "disable",
     host: "localhost",
     max_conn: 10
+  },
+  test: {
+    driver_name: "postgres",
+    username: "pinterest_user",
+    password: "662f2710-4e08-4be7-a278-a53ae86ba7f6",
+    db_name: "pinterest_db_test",
+    ssl_mode: "disable",
+    host: "localhost",
+    max_conn: 10
   }
 }
 

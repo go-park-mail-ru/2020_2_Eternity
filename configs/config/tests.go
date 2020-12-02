@@ -22,7 +22,7 @@ func setDefaultDbTst() {
 	viper.SetDefault("database.postgres.driver_name", "postgres")
 	viper.SetDefault("database.postgres.username", "pinterest_user")
 	viper.SetDefault("database.postgres.password", "662f2710-4e08-4be7-a278-a53ae86ba7f6")
-	viper.SetDefault("database.postgres.db_name", "pinterest_db")
+	viper.SetDefault("database.postgres.db_name", "pinterest_db_test")
 	viper.SetDefault("database.postgres.ssl_mode", "disable")
 	viper.SetDefault("database.postgres.host", "localhost")
 }
