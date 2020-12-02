@@ -34,3 +34,7 @@ scrape_configs:
   - job_name: 'pint_auth'
     static_configs:
       - targets: ['localhost:7009']
+
+  - job_name: 'pint_chat'
+    static_configs:
+      - targets: ['localhost:7010']

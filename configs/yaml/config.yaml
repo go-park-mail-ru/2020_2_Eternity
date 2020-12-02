@@ -58,6 +58,11 @@ monitoring: {
     port: "7009",
     host: "pinterest-tp.tk",
   },
+  chat: {
+    address: "localhost",
+    port: "7010",
+    host: "pinterest-tp.tk",
+  },
 }
 
 token: {
