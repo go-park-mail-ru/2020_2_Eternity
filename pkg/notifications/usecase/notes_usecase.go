@@ -12,7 +12,6 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/ws"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 const (
@@ -177,7 +176,7 @@ func (uc *Usecase) CreateNotes(iNote interface{}) error {
 		return err
 	}
 
-	encoded, err := bson.Marshal(iNote)
+	encoded, err := json.Marshal(iNote)
 	if err != nil {
 		config.Lg("notifications_usecase", "CreateNote").Error(err.Error())
 		return err
