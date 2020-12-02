@@ -115,7 +115,7 @@ func (uc *Usecase) getDstNoteChat (n *domain.NoteChat) ([]int, error) {
 }
 
 func (uc *Usecase) getDstNoteMessage(n *domain.NoteMessage) ([]int, error) {
-	collocId, err := uc.chatRepo.GetCollocutorId(n.CreatorId, n.Id)
+	collocId, err := uc.chatRepo.GetCollocutorId(n.CreatorId, n.ChatId)
 	if err != nil {
 		config.Lg("notifications_usecase", "getDstNoteMessage").Error(err.Error())
 		return nil, err
