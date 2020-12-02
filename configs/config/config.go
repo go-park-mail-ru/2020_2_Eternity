@@ -22,8 +22,6 @@ type Config struct {
 	Logger     ConfLogger `mapstructure:"logger"`
 }
 
-
-
 type ConfDB struct {
 	Postgres ConfPostgres `mapstructure:"postgres"`
 }
@@ -39,17 +37,18 @@ type ConfPostgres struct {
 }
 
 type ConfWeb struct {
-	Server ConfServer `mapstructure:"server"`
-	Chat ConfChatMicroservice `mapstructure:"chat_srv"`
-	Static ConfStatic `mapstructure:"static"`
-	Search ConfServer `mapstructure:"search"`
-	Auth   ConfServer `mapstructure:"auth"`
+	Server ConfServer           `mapstructure:"server"`
+	Chat   ConfChatMicroservice `mapstructure:"chat_srv"`
+	Static ConfStatic           `mapstructure:"static"`
+	Search ConfServer           `mapstructure:"search"`
+	Auth   ConfServer           `mapstructure:"auth"`
 }
 
 type ConfMon struct {
 	Api    ConfApi `mapstructure:"main"`
 	Search ConfApi `mapstructure:"search"`
 	Auth   ConfApi `mapstructure:"auth"`
+	Chat   ConfApi `mapstructure:"chat"`
 }
 
 type ConfToken struct {

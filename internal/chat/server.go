@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/metric"
 	chatGrpc "github.com/go-park-mail-ru/2020_2_Eternity/pkg/microservices/chat/delivery/grpc"
 	chatRepo "github.com/go-park-mail-ru/2020_2_Eternity/pkg/microservices/chat/repository"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/microservices/chat/usecase"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/proto/chat"
+	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"google.golang.org/grpc"
 	"net"
 	"os"
@@ -30,12 +32,17 @@ func New(db database.IDbConn) *Server {
 		config.Lg("chat_server", "New").Fatal("Failed to listen: ", err.Error())
 	}
 
+	go metric.RouterForMetrics(config.Conf.Monitoring.Chat.Address + ":" + config.Conf.Monitoring.Chat.Port)
+
+	m, err := metric.CreateNewMetric("chat")
+	interceptor := metric.NewInterceptor(m)
 
 	repo := chatRepo.NewRepo(db)
 	uc := usecase.NewUsecase(repo)
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(grpc_recovery.UnaryServerInterceptor(), interceptor.Collect),
+	)
 	chat.RegisterChatServer(grpcServer, chatGrpc.NewChatServer(uc))
-
 
 	return &Server{
 		srv: grpcServer,
