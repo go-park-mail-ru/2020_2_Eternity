@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"context"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
@@ -18,13 +17,11 @@ func NewRepo(d database.IDbConn) *Repository {
 	}
 }
 
-
 func (r *Repository) StoreNote(n *domain.Notification) error {
 	err := r.dbConn.QueryRow(
-		context.Background(),
-		"INSERT INTO notifications " +
-			"(to_user_id, type, encoded_data, creation_time, is_read) " +
-			"VALUES ($1, $2, $3, $4, $5) " +
+		"INSERT INTO notifications "+
+			"(to_user_id, type, encoded_data, creation_time, is_read) "+
+			"VALUES ($1, $2, $3, $4, $5) "+
 			"RETURNING id, creation_time, is_read",
 		n.ToUserId, n.Type, n.EncodedData, time.Now(), false).Scan(&n.Id, &n.CreationTime, &n.IsRead)
 
@@ -39,9 +36,8 @@ func (r *Repository) StoreNote(n *domain.Notification) error {
 func (r *Repository) GetNoteById(noteId int) (domain.Notification, error) {
 	n := domain.Notification{}
 	err := r.dbConn.QueryRow(
-		context.Background(),
-		"SELECT id, to_user_id, type, encoded_data, creation_time, is_read " +
-			"FROM notifications " +
+		"SELECT id, to_user_id, type, encoded_data, creation_time, is_read "+
+			"FROM notifications "+
 			"WHERE id = $1",
 		noteId).Scan(&n.Id, &n.ToUserId, &n.Type, &n.EncodedData, &n.CreationTime, &n.IsRead)
 
@@ -53,13 +49,11 @@ func (r *Repository) GetNoteById(noteId int) (domain.Notification, error) {
 	return n, nil
 }
 
-
 func (r *Repository) GetNotesToUser(userId int) ([]domain.Notification, error) {
 	rows, err := r.dbConn.Query(
-		context.Background(),
-		"SELECT id, to_user_id, type, encoded_data, creation_time, is_read " +
-			"FROM notifications " +
-			"WHERE to_user_id = $1 " +
+		"SELECT id, to_user_id, type, encoded_data, creation_time, is_read "+
+			"FROM notifications "+
+			"WHERE to_user_id = $1 "+
 			"ORDER BY creation_time ",
 		userId)
 
@@ -88,17 +82,15 @@ func (r *Repository) GetNotesToUser(userId int) ([]domain.Notification, error) {
 		return nil, rows.Err()
 	}
 
-
 	return notes, nil
 }
 
 func (r *Repository) UpdateNoteIsRead(noteId int) error {
 	_, err := r.dbConn.Exec(
-		context.Background(),
-		"UPDATE notifications " +
-			"SET is_read = true " +
+		"UPDATE notifications "+
+			"SET is_read = true "+
 			"WHERE id = $1 ",
-			noteId)
+		noteId)
 
 	if err != nil {
 		config.Lg("notes_repo", " UpdateNoteIsRead").Error(err.Error())
@@ -110,9 +102,8 @@ func (r *Repository) UpdateNoteIsRead(noteId int) error {
 
 func (r *Repository) UpdateUserNotes(userId int) error {
 	_, err := r.dbConn.Exec(
-		context.Background(),
-		"UPDATE notifications " +
-			"SET is_read = true " +
+		"UPDATE notifications "+
+			"SET is_read = true "+
 			"WHERE to_user_id = $1 ",
 		userId)
 

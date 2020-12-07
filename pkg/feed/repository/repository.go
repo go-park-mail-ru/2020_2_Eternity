@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"context"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
@@ -29,7 +28,7 @@ func (r *Repository) GetFeed(userId int, last int) ([]domain.Pin, error) {
 		placeholders = append(placeholders, last)
 	}
 	query += " order by pins.id desc limit 15"
-	rows, err := r.db.Query(context.Background(), query, placeholders...)
+	rows, err := r.db.Query(query, placeholders...)
 	if err != nil {
 		config.Lg("feed", "GetFeed").Error(err.Error())
 		return nil, err

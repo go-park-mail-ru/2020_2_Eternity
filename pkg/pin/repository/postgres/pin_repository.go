@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"context"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
@@ -19,7 +18,6 @@ func NewRepo(d database.IDbConn) *Repository {
 
 func (r *Repository) StorePin(p *domain.Pin) error {
 	err := r.dbConn.QueryRow(
-		context.Background(),
 		"with rows as "+
 			"(insert into pins (title, content, user_id) "+
 			"values($1, $2, $3) returning id) "+
@@ -36,7 +34,6 @@ func (r *Repository) StorePin(p *domain.Pin) error {
 
 func (r *Repository) GetPin(id int) (domain.Pin, error) {
 	row := r.dbConn.QueryRow(
-		context.Background(),
 		"select pins.id, title, content, name, user_id "+
 			"from pins join pin_images "+
 			"on pins.id = pin_images.pin_id "+
@@ -55,7 +52,6 @@ func (r *Repository) GetPin(id int) (domain.Pin, error) {
 
 func (r *Repository) GetPinList(username string) ([]domain.Pin, error) {
 	rows, err := r.dbConn.Query(
-		context.Background(),
 		"select pins.id, title, content, name, user_id "+
 			"from pins join pin_images "+
 			"on pins.id = pin_images.pin_id "+
@@ -83,7 +79,6 @@ func (r *Repository) GetPinList(username string) ([]domain.Pin, error) {
 
 func (r *Repository) GetPinBoardList(boardId int) ([]domain.Pin, error) {
 	rows, err := r.dbConn.Query(
-		context.Background(),
 		"select res.id, title, content, name, user_id from (pins join boards_pins on pins.id = boards_pins.pin_id)"+
 			" res join pin_images on res.id = pin_images.pin_id"+
 			" where res.board_id=$1;", boardId)

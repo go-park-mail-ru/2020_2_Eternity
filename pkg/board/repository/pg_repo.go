@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"context"
 	"errors"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
@@ -21,13 +20,13 @@ func NewRepo(d database.IDbConn) *Repository {
 
 func (r *Repository) CreateBoard(userId int, b *api.CreateBoard) (*domain.Board, error) {
 	rb := &domain.Board{}
-	if err := r.dbConn.QueryRow(context.Background(), "insert into boards(title, content, user_id) values($1, $2, $3) returning id", b.Title, b.Content, userId).Scan(&rb.ID); err != nil {
+	if err := r.dbConn.QueryRow("insert into boards(title, content, user_id) values($1, $2, $3) returning id", b.Title, b.Content, userId).Scan(&rb.ID); err != nil {
 		config.Lg("board", "CreateBoard").Error(err.Error())
 		return rb, errors.New("bad board")
 	}
 	rb.Title = b.Title
 	rb.Content = b.Content
-	if err := r.dbConn.QueryRow(context.Background(), "select username from users where id = $1", userId).Scan(&rb.Username); err != nil {
+	if err := r.dbConn.QueryRow("select username from users where id = $1", userId).Scan(&rb.Username); err != nil {
 		config.Lg("board", "CreateBoard").Error(err.Error())
 		return rb, errors.New("bad uid")
 	}
@@ -37,7 +36,7 @@ func (r *Repository) GetBoard(id int) (*domain.Board, error) {
 	b := &domain.Board{
 		ID: id,
 	}
-	if err := r.dbConn.QueryRow(context.Background(), "select title, content, username from boards join users on users.id = boards.user_id where boards.id = $1", b.ID).Scan(&b.Title, &b.Content, &b.Username); err != nil {
+	if err := r.dbConn.QueryRow("select title, content, username from boards join users on users.id = boards.user_id where boards.id = $1", b.ID).Scan(&b.Title, &b.Content, &b.Username); err != nil {
 		config.Lg("board", "GetBoard").Error(err.Error())
 		return b, errors.New("bad id")
 	}
@@ -47,7 +46,7 @@ func (r *Repository) GetBoard(id int) (*domain.Board, error) {
 func (r *Repository) GetAllBoardsByUser(username string) ([]domain.Board, error) {
 	var boards []domain.Board
 
-	rows, err := r.dbConn.Query(context.Background(), "select boards.id, title, content from boards join users on users.id = boards.user_id where lower(username) = lower($1)", username)
+	rows, err := r.dbConn.Query("select boards.id, title, content from boards join users on users.id = boards.user_id where lower(username) = lower($1)", username)
 	if err != nil {
 		config.Lg("board", "GetAllBoardsByUserId").Error(err.Error())
 		return boards, errors.New("bad id")
@@ -68,7 +67,7 @@ func (r *Repository) GetAllBoardsByUser(username string) ([]domain.Board, error)
 
 func (r *Repository) CheckOwner(userId int, boardId int) error {
 	var owner int
-	if err := r.dbConn.QueryRow(context.Background(), "select user_id from boards where id = $1", boardId).Scan(&owner); err != nil {
+	if err := r.dbConn.QueryRow("select user_id from boards where id = $1", boardId).Scan(&owner); err != nil {
 		config.Lg("board", "CheckOwner").Error(err.Error())
 		return err
 	}
@@ -82,7 +81,7 @@ func (r *Repository) CheckOwner(userId int, boardId int) error {
 }
 
 func (r *Repository) AttachPin(boardId int, pinId int) error {
-	if _, err := r.dbConn.Exec(context.Background(), "insert into boards_pins(board_id, pin_id) values($1, $2)", boardId, pinId); err != nil {
+	if _, err := r.dbConn.Exec("insert into boards_pins(board_id, pin_id) values($1, $2)", boardId, pinId); err != nil {
 		config.Lg("board", "AttachPin").Error(err.Error())
 		return err
 	}
@@ -90,7 +89,7 @@ func (r *Repository) AttachPin(boardId int, pinId int) error {
 }
 
 func (r *Repository) DetachPin(boardId int, pinId int) error {
-	if _, err := r.dbConn.Exec(context.Background(), "delete from boards_pins where board_id = $1 and pin_id = $2", boardId, pinId); err != nil {
+	if _, err := r.dbConn.Exec("delete from boards_pins where board_id = $1 and pin_id = $2", boardId, pinId); err != nil {
 		config.Lg("board", "DetachPin").Error(err.Error())
 		return err
 	}

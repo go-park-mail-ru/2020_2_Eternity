@@ -1,16 +1,11 @@
 package repository
 
 import (
-	"context"
-	"fmt"
-	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/stretchr/testify/assert"
-	"os"
 	"testing"
 )
 
-var db *pgxpool.Pool
+/*var db *pgxpool.Pool
 
 func TestMain(m *testing.M) {
 	config.Conf = config.NewConfig()
@@ -32,8 +27,7 @@ func TestMain(m *testing.M) {
 
 	db.Close()
 	os.Exit(code)
-}
-
+}*/
 
 //func TestStore(t *testing.T) {
 //	r := NewRepo(db)
@@ -44,8 +38,6 @@ func TestMain(m *testing.M) {
 //	fmt.Println(p)
 //
 //}
-
-
 
 //func TestGetUserChats(t *testing.T) {
 //	r := NewRepo(db)
@@ -131,7 +123,6 @@ func TestMain(m *testing.M) {
 
 func TestGeCollId(t *testing.T) {
 	r := NewRepo(db)
-
 
 	id, err := r.GetCollocutorId(2, 1)
 

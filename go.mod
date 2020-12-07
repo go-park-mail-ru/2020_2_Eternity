@@ -16,7 +16,8 @@ require (
 	github.com/jackc/pgconn v1.7.0
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jackc/pgx/v4 v4.9.0
-	github.com/lib/pq v1.8.0 // indirect
+	github.com/jmoiron/sqlx v1.2.0
+	github.com/lib/pq v1.8.0
 	github.com/magiconair/properties v1.8.1
 	github.com/mailru/easyjson v0.7.6
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect

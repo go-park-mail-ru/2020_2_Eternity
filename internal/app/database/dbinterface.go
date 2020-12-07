@@ -1,14 +1,13 @@
 package database
 
 import (
-	"context"
-	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx/v4"
+	"database/sql"
+	_ "github.com/lib/pq"
 )
 
 type IDbConn interface {
-	Begin(ctx context.Context) (pgx.Tx, error)
-	Exec(ctx context.Context, sql string, arguments ...interface{}) (pgconn.CommandTag, error)
-	Query(ctx context.Context, sql string, optionsAndArgs ...interface{}) (pgx.Rows, error)
-	QueryRow(ctx context.Context, sql string, optionsAndArgs ...interface{}) pgx.Row
+	Begin() (*sql.Tx, error)
+	Exec(sql string, arguments ...interface{}) (sql.Result, error)
+	Query(sql string, optionsAndArgs ...interface{}) (*sql.Rows, error)
+	QueryRow(sql string, optionsAndArgs ...interface{}) *sql.Row
 }

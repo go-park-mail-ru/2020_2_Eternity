@@ -30,7 +30,7 @@ func (r *Repository) GetUsersByName(username string, last int) ([]domain.UserSea
 		placeholders = append(placeholders, last)
 	}
 	query += " order by users.id desc limit 15"
-	rows, err := r.db.Query(context.Background(), query, placeholders...)
+	rows, err := r.db.Query(query, placeholders...)
 	if err != nil {
 		config.Lg("search", "UserNameSearch").Error(err.Error())
 		return nil, err
@@ -61,7 +61,7 @@ func (r *Repository) GetPinsByTitle(title string, last int) ([]domain.Pin, error
 		placeholders = append(placeholders, last)
 	}
 	query += " order by ts_rank(\"vec\", plainto_tsquery($1)), p.id desc limit 15"
-	rows, err := r.db.Query(context.Background(), query, placeholders...)
+	rows, err := r.db.Query(query, placeholders...)
 	if err != nil {
 		config.Lg("search", "GetPinsSearch").Error(err.Error())
 		return nil, err

@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"context"
 	"errors"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
@@ -19,19 +18,17 @@ func NewRepo(d database.IDbConn) *Repository {
 	}
 }
 
-
 func (r *Repository) StoreChildComment(c *domain.Comment, parentId int) error {
 	// TODO (Pavel S) query should check if parent comment exists
 	err := r.dbConn.QueryRow(
-		context.Background(),
 		"with ins as "+
-				"(insert into comments (path, content, pin_id, user_id) "+
-				"values("+
-				"(select path from comments where id = $1) || (select currval('comments_id_seq')::integer), "+
-				"$2, $3, $4 "+
-				") returning id, path, user_id) " +
-			"select ins.id, ins.path, u.username " +
-			"from ins join users u " +
+			"(insert into comments (path, content, pin_id, user_id) "+
+			"values("+
+			"(select path from comments where id = $1) || (select currval('comments_id_seq')::integer), "+
+			"$2, $3, $4 "+
+			") returning id, path, user_id) "+
+			"select ins.id, ins.path, u.username "+
+			"from ins join users u "+
 			"on ins.user_id = u.id",
 		parentId, c.Content, c.PinId, c.UserId).Scan(&c.Id, &c.Path, &c.Username)
 
@@ -41,7 +38,7 @@ func (r *Repository) StoreChildComment(c *domain.Comment, parentId int) error {
 	}
 
 	if len(c.Path) < 2 {
-		if _, err := r.dbConn.Exec(context.Background(),"delete from comments where id = $1", c.Id); err != nil {
+		if _, err := r.dbConn.Exec("delete from comments where id = $1", c.Id); err != nil {
 			config.Lg("comment_postgres", "StoreChildComment").
 				Error("Can't delete wrongly created comment")
 
@@ -53,21 +50,19 @@ func (r *Repository) StoreChildComment(c *domain.Comment, parentId int) error {
 		return errors.New("Given parent id not found in table")
 	}
 
-
 	return nil
 }
 
 func (r *Repository) StoreRootComment(c *domain.Comment) error {
 	err := r.dbConn.QueryRow(
-		context.Background(),
-		"with ins as " +
-				"(insert into comments (path, content, pin_id, user_id) "+
-				"values("+
-				"ARRAY(select currval('comments_id_seq')::integer), "+
-				"$1, $2, $3 "+
-				") returning id, path, user_id) " +
-			"select ins.id, ins.path, u.username " +
-			"from ins join users u " +
+		"with ins as "+
+			"(insert into comments (path, content, pin_id, user_id) "+
+			"values("+
+			"ARRAY(select currval('comments_id_seq')::integer), "+
+			"$1, $2, $3 "+
+			") returning id, path, user_id) "+
+			"select ins.id, ins.path, u.username "+
+			"from ins join users u "+
 			"on ins.user_id = u.id ",
 		c.Content, c.PinId, c.UserId).Scan(&c.Id, &c.Path, &c.Username)
 
@@ -82,9 +77,8 @@ func (r *Repository) StoreRootComment(c *domain.Comment) error {
 func (r *Repository) GetComment(commentId int) (domain.Comment, error) {
 	c := domain.Comment{}
 	err := r.dbConn.QueryRow(
-		context.Background(),
 		"select c.id, c.path, c.content, c.pin_id, c.user_id, u.username "+
-			"from comments c join users u " +
+			"from comments c join users u "+
 			"on c.user_id = u.id "+
 			"where c.id = $1 ",
 		commentId).Scan(&c.Id, &c.Path, &c.Content, &c.PinId, &c.UserId, &c.Username)
@@ -99,9 +93,8 @@ func (r *Repository) GetComment(commentId int) (domain.Comment, error) {
 
 func (r *Repository) GetPinComments(pinId int) ([]domain.Comment, error) {
 	rows, err := r.dbConn.Query(
-		context.Background(),
 		"select c.id, c.path, c.content, c.pin_id, c.user_id, u.username "+
-			"from comments c join users u " +
+			"from comments c join users u "+
 			"on c.user_id = u.id "+
 			"where pin_id = $1 "+
 			"order by path",
