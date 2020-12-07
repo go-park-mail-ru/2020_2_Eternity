@@ -94,31 +94,31 @@ create table if not exists boards_pins(
 );
 
 
-create table pins_vectors (
+create table pins_vectors_content (
     idv int unique not null,
     vec tsvector,
 	foreign key(idv) references pins(id)
 );
 
-CREATE INDEX idx_gin_pins_title
-ON pins_vectors
+CREATE INDEX idx_gin_pins_content
+ON pins_vectors_content
 USING gin ("vec");
 
-CREATE OR REPLACE FUNCTION ins_pin_vct() RETURNS TRIGGER AS $ins_pin_vct$
+CREATE OR REPLACE FUNCTION ins_pin_vct_con() RETURNS TRIGGER AS $ins_pin_vct_con$
     BEGIN
         IF (TG_OP = 'UPDATE') THEN
-            update pins_vectors set vec=to_tsvector(new.title) where old.idv = idv;
+            update pins_vectors_content set vec=to_tsvector(new.content) where old.idv = idv;
             RETURN OLD;
         ELSIF (TG_OP = 'INSERT') THEN
-			insert into pins_vectors(idv, vec) values(new.id, to_tsvector(new.title));
+			insert into pins_vectors_content(idv, vec) values(new.id, to_tsvector(new.content));
             RETURN NEW;
         END IF;
         RETURN NULL; -- возвращаемое значение для триггера AFTER игнорируется
     END;
-$ins_pin_vct$ LANGUAGE plpgsql;
+$ins_pin_vct_con$ LANGUAGE plpgsql;
 
-CREATE TRIGGER ins_pin_vct_trg
+CREATE TRIGGER ins_pin_vct_con_trg
 AFTER INSERT OR UPDATE ON pins
-    FOR EACH ROW EXECUTE PROCEDURE ins_pin_vct();
+    FOR EACH ROW EXECUTE PROCEDURE ins_pin_vct_con();
 
-insert into pins_vectors(idv, vec) select id, to_tsvector(title) from pins on conflict do nothing
+insert into pins_vectors_content(idv, vec) select id, to_tsvector(content) from pins on conflict do nothing;

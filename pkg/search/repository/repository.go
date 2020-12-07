@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"context"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
@@ -49,18 +48,20 @@ func (r *Repository) GetUsersByName(username string, last int) ([]domain.UserSea
 }
 
 func (r *Repository) GetPinsByTitle(title string, last int) ([]domain.Pin, error) {
-	query := "select p.id, title, content, name, user_id, ts_rank(\"vec\", plainto_tsquery($1)) from (pins " +
-		"left join pins_vectors on pins.id = pins_vectors.idv) p join pin_images on p.id = pin_images.pin_id " +
-		"where \"vec\" @@ plainto_tsquery($1)"
+	query := "select p.id, title, content, name, user_id from pin_images join (select id, title, content, user_id " +
+		"from (pins left join pins_vectors_content on pins.id = pins_vectors_content.idv) " +
+		"where \"vec\" @@ plainto_tsquery($1) union select pins.id, pins.title, pins.content, user_id from pins " +
+		"where lower(title) like lower('%' || $1 || '%')) p " +
+		"on p.id = pin_images.id "
 	i := 1
 	var placeholders []interface{}
 	placeholders = append(placeholders, title)
 	if last > 0 {
 		i++
-		query += " and p.id < $" + strconv.Itoa(i)
+		query += "where p.id < $" + strconv.Itoa(i)
 		placeholders = append(placeholders, last)
 	}
-	query += " order by ts_rank(\"vec\", plainto_tsquery($1)), p.id desc limit 15"
+	query += " order by p.id desc limit 15"
 	rows, err := r.db.Query(query, placeholders...)
 	if err != nil {
 		config.Lg("search", "GetPinsSearch").Error(err.Error())
@@ -70,8 +71,8 @@ func (r *Repository) GetPinsByTitle(title string, last int) ([]domain.Pin, error
 	pins := make([]domain.Pin, 0, 15)
 	for rows.Next() {
 		pin := domain.Pin{}
-		var rank float32
-		if err := rows.Scan(&pin.Id, &pin.Title, &pin.Content, &pin.PictureName, &pin.UserId, &rank); err != nil {
+
+		if err := rows.Scan(&pin.Id, &pin.Title, &pin.Content, &pin.PictureName, &pin.UserId); err != nil {
 			config.Lg("search", "GetPinSearch").Error(err.Error())
 			return nil, err
 		}
