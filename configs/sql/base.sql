@@ -122,3 +122,32 @@ AFTER INSERT OR UPDATE ON pins
     FOR EACH ROW EXECUTE PROCEDURE ins_pin_vct_con();
 
 insert into pins_vectors_content(idv, vec) select id, to_tsvector(content) from pins on conflict do nothing;
+
+create table boards_vectors_content (
+    idv int unique not null,
+    vec tsvector,
+	foreign key(idv) references boards(id)
+);
+
+CREATE INDEX idx_gin_boards_content
+ON boards_vectors_content
+USING gin ("vec");
+
+CREATE OR REPLACE FUNCTION ins_board_vct_con() RETURNS TRIGGER AS $ins_board_vct_con$
+    BEGIN
+        IF (TG_OP = 'UPDATE') THEN
+            update boards_vectors_content set vec=to_tsvector(new.content) where old.idv = idv;
+            RETURN OLD;
+        ELSIF (TG_OP = 'INSERT') THEN
+			insert into boards_vectors_content(idv, vec) values(new.id, to_tsvector(new.content));
+            RETURN NEW;
+        END IF;
+        RETURN NULL; -- возвращаемое значение для триггера AFTER игнорируется
+    END;
+$ins_board_vct_con$ LANGUAGE plpgsql;
+
+CREATE TRIGGER ins_board_vct_con_trg
+AFTER INSERT OR UPDATE ON boards
+    FOR EACH ROW EXECUTE PROCEDURE ins_board_vct_con();
+
+insert into boards_vectors_content(idv, vec) select id, to_tsvector(content) from boards on conflict do nothing;

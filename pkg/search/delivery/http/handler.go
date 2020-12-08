@@ -20,13 +20,6 @@ func NewHandler(sc sc.SearchServiceClient) *Handler {
 }
 
 func (h *Handler) Search(c *gin.Context) {
-	/*claimsId, ok := jwthelper.GetClaims(c)
-
-	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "invalid token"})
-		return
-	}*/
-
 	sType := c.Query("type")
 	cont := c.Query("content")
 	if cont == "" {
@@ -52,11 +45,11 @@ func (h *Handler) Search(c *gin.Context) {
 		}
 
 		rUs := make([]domain.UserSearch, 0, len(users.Users))
-		for _, u := range users.Users {
+		for _, u := range users.GetUsers() {
 			rUs = append(rUs, domain.UserSearch{
-				ID:       int(u.Id),
-				Username: u.Username,
-				Avatar:   u.Avatar,
+				ID:       int(u.GetId()),
+				Username: u.GetUsername(),
+				Avatar:   u.GetAvatar(),
 			})
 		}
 		c.JSON(http.StatusOK, rUs)
@@ -72,19 +65,40 @@ func (h *Handler) Search(c *gin.Context) {
 			return
 		}
 		rPins := make([]domain.PinResp, 0, len(pins.Pins))
-		for _, p := range pins.Pins {
+		for _, p := range pins.GetPins() {
 			rPins = append(rPins, domain.PinResp{
-				Id:      int(p.Id),
-				Title:   p.Title,
-				Content: p.Content,
-				UserId:  int(p.UserId),
-				ImgLink: p.ImgLink,
+				Id:      int(p.GetId()),
+				Title:   p.GetTitle(),
+				Content: p.GetContent(),
+				UserId:  int(p.GetUserId()),
+				ImgLink: p.GetImgLink(),
 			})
 		}
 		c.JSON(http.StatusOK, rPins)
 		return
+	case "board":
+		boards, err := h.sc.GetBoardsByTitle(c, &sc.BoardSearch{
+			Title: cont,
+			Last:  int32(last),
+		})
+		if err != nil {
+			config.Lg("deliverySearch", "Boards").Error(err.Error())
+			c.JSON(http.StatusOK, utils.Error{Error: "boards not found"})
+			return
+		}
+
+		rBoards := make([]domain.Board, 0, len(boards.GetBoards()))
+		for _, p := range boards.GetBoards() {
+			rBoards = append(rBoards, domain.Board{
+				ID:       int(p.GetId()),
+				Title:    p.GetTitle(),
+				Content:  p.GetContent(),
+				Username: p.GetUsername(),
+			})
+		}
+		c.JSON(http.StatusOK, rBoards)
+		return
 	default:
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: fmt.Sprintf("Bad search type %s. Can search by user and pin", sType)})
 	}
-
 }

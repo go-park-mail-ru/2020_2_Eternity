@@ -39,3 +39,7 @@ func (uc *Usecase) GetPinsByTitle(title string, last int) ([]domain.PinResp, err
 
 	return pinsResp, nil
 }
+
+func (uc *Usecase) GetBoardsByTitle(title string, last int) ([]domain.Board, error) {
+	return uc.r.GetBoardsByTitle(title, last)
+}

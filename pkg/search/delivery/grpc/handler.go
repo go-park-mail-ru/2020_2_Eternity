@@ -63,3 +63,27 @@ func (s *SearchHandler) GetPinsByTitle(ctx context.Context, pinSearch *sc.PinSea
 	}, nil
 
 }
+
+func (s *SearchHandler) GetBoardsByTitle(ctx context.Context, boardSearch *sc.BoardSearch) (*sc.Boards, error) {
+	boards, err := s.uc.GetBoardsByTitle(boardSearch.Title, int(boardSearch.Last))
+
+	if err != nil {
+		config.Lg("grpc", "GetPins").Error(err.Error())
+		return &sc.Boards{}, err
+	}
+
+	pBoards := make([]*sc.Board, 0, len(boards))
+	for _, b := range boards {
+		pBoards = append(pBoards, &sc.Board{
+			Id:       int64(b.ID),
+			Title:    b.Title,
+			Content:  b.Content,
+			Username: b.Username,
+		})
+	}
+
+	return &sc.Boards{
+		Boards: pBoards,
+	}, nil
+
+}

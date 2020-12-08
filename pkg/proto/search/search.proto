@@ -36,7 +36,25 @@ message Pins {
   int32 Error = 2;
 }
 
+message BoardSearch {
+  string title=1;
+  int32 last=2;
+}
+
+message Board {
+  int64 Id = 1;
+  string Title = 2;
+  string Content = 3;
+  string Username = 4;
+}
+
+message Boards {
+  repeated Board Boards = 1;
+  int32 Error = 2;
+}
+
 service SearchService {
   rpc GetUsersByName(UserSearch) returns (Users) {}
   rpc GetPinsByTitle(PinSearch) returns (Pins) {}
+  rpc GetBoardsByTitle(BoardSearch) returns (Boards) {}
 }

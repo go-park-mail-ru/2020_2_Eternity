@@ -8,14 +8,13 @@ import (
 	chatDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/chat/delivery/http"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/chat/delivery/ws"
 	commentDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/comment/delivery/http"
+	search "github.com/go-park-mail-ru/2020_2_Eternity/pkg/search/delivery/http"
 
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/metric"
 
 	ws2 "github.com/go-park-mail-ru/2020_2_Eternity/pkg/ws"
 
-
 	noteDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
-	search "github.com/go-park-mail-ru/2020_2_Eternity/pkg/search/delivery/http"
 	"google.golang.org/grpc"
 
 	boardDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/board/delivery"
@@ -41,9 +40,6 @@ type Server struct {
 	server  *http.Server
 }
 
-
-
-
 func New(conf *config.Config, db database.IDbConn, sc *grpc.ClientConn, ac *grpc.ClientConn,
 	chMsConn grpc.ClientConnInterface, wsSrv ws2.IServer) *Server {
 
@@ -67,6 +63,7 @@ func New(conf *config.Config, db database.IDbConn, sc *grpc.ClientConn, ac *grpc
 
 	p := bluemonday.UGCPolicy()
 
+	search.AddSearchRoute(r, sc)
 	chatDelivery.AddChatRoutes(r, db, chMsConn, p, wsSrv)
 	ws.AddChatWsRoutes(wsSrv, db, chMsConn)
 	commentDelivery.AddCommentRoutes(r, db, p, wsSrv)
@@ -75,8 +72,6 @@ func New(conf *config.Config, db database.IDbConn, sc *grpc.ClientConn, ac *grpc
 	boardDelivery.AddBoardRoutes(r, db, p)
 
 	feedDelivery.AddFeedRoutes(r, db, conf)
-
-	search.AddSearchRoute(r, sc)
 
 	return &Server{
 		logFile: logFile,
