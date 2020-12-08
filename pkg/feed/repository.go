@@ -6,4 +6,5 @@ import (
 
 type IRepository interface {
 	GetFeed(userId int, last int) ([]domain.Pin, error)
+	GetSubFeed(userId int, last int) ([]domain.Pin, error)
 }
