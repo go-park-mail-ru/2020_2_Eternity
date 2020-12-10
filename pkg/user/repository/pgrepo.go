@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"database/sql"
 	"errors"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
@@ -156,13 +157,17 @@ func (r *Repository) GetUserByNameWithFollowers(username string) (*domain.User, 
 }
 
 func (r *Repository) GetFollowersIds(userId int) ([]int, error) {
-	followers := []int{}
+	followersSql := []sql.NullInt32{}
 	row := r.dbConn.QueryRow(
 		"select ARRAY(select id1 from follows where id2 = $1)",
 		userId)
-	if err := row.Scan(&followers); err != nil {
+	if err := row.Scan(&followersSql); err != nil {
 		config.Lg("user", "GetFollowersIds").Println(err)
 		return []int{}, err
+	}
+	followers := make([]int, 0, len(followersSql))
+	for _, f := range followersSql {
+		followers = append(followers, int(f.Int32))
 	}
 	return followers, nil
 }
