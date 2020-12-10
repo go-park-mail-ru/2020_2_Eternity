@@ -7,6 +7,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	"github.com/lib/pq"
+	"log"
 	"strconv"
 )
 
@@ -135,10 +136,12 @@ func (r *Repository) GetPinComments(pinId int) ([]domain.Comment, error) {
 			config.Lg("comment_postgres", "GetPinComments").Error(err.Error())
 			return nil, err
 		}
-		//c.Path = make([]int32, 0, len(path))
+		c.Path = make([]int32, 0, len(path))
+
 		for _, p := range path {
 			c.Path = append(c.Path, p.Int32)
 		}
+		log.Println(c.Content)
 
 		comments = append(comments, c)
 	}
