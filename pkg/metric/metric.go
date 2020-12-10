@@ -7,6 +7,7 @@ import (
 type Metric struct {
 	TotalHits prometheus.Counter
 	Hits      *prometheus.CounterVec
+	Errors    *prometheus.CounterVec
 	Durations *prometheus.HistogramVec
 }
 
@@ -29,6 +30,15 @@ func CreateNewMetric(name string) (*Metric, error) {
 	if err := prometheus.Register(m.Hits); err != nil {
 		return nil, err
 	}
+
+	m.Errors = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: name + "_errors",
+	}, []string{"status", "method", "path"},
+	)
+	if err := prometheus.Register(m.Errors); err != nil {
+		return nil, err
+	}
+
 	m.Durations = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name: name + "_durations",
 	}, []string{"status", "method", "path"},

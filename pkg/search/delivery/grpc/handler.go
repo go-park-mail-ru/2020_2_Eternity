@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"errors"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	sc "github.com/go-park-mail-ru/2020_2_Eternity/pkg/proto/search"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/search"
@@ -21,7 +22,7 @@ func (s *SearchHandler) GetUsersByName(ctx context.Context, userSearch *sc.UserS
 	users, err := s.uc.GetUsersByName(userSearch.Username, int(userSearch.Last))
 	if err != nil {
 		config.Lg("grpc", "GetUsers").Error(err.Error())
-		return &sc.Users{}, err
+		return &sc.Users{}, errors.New("users search error")
 	}
 
 	pUsers := make([]*sc.User, 0, len(users))
@@ -44,7 +45,7 @@ func (s *SearchHandler) GetPinsByTitle(ctx context.Context, pinSearch *sc.PinSea
 
 	if err != nil {
 		config.Lg("grpc", "GetPins").Error(err.Error())
-		return &sc.Pins{}, err
+		return &sc.Pins{}, errors.New("pins search error")
 	}
 
 	pPins := make([]*sc.Pin, 0, len(pins))
@@ -69,7 +70,7 @@ func (s *SearchHandler) GetBoardsByTitle(ctx context.Context, boardSearch *sc.Bo
 
 	if err != nil {
 		config.Lg("grpc", "GetPins").Error(err.Error())
-		return &sc.Boards{}, err
+		return &sc.Boards{}, errors.New("boards search error")
 	}
 
 	pBoards := make([]*sc.Board, 0, len(boards))

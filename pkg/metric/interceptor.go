@@ -3,6 +3,7 @@ package metric
 import (
 	"context"
 	"google.golang.org/grpc"
+	"strconv"
 	"time"
 )
 
@@ -20,12 +21,14 @@ func (i *Interceptor) Collect(ctx context.Context, req interface{}, info *grpc.U
 	t := time.Now()
 
 	resp, err := handler(ctx, req)
-	result := "OK"
+	result := "100"
 	if err != nil {
-		result = err.Error()
+		result = strconv.Itoa(fromErrorToCode(err.Error()))
+		i.m.Errors.WithLabelValues(result, info.FullMethod, info.FullMethod).Inc()
+	} else {
+		i.m.Hits.WithLabelValues(result, info.FullMethod, info.FullMethod).Inc()
 	}
 	i.m.TotalHits.Inc()
-	i.m.Hits.WithLabelValues(result, info.FullMethod, info.FullMethod).Inc()
 	i.m.Durations.WithLabelValues(result, info.FullMethod, info.FullMethod).Observe(time.Since(t).Seconds())
 	return resp, err
 }
