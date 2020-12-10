@@ -40,10 +40,11 @@ func (r *Repository) StoreChildComment(c *domain.Comment, parentId int) error {
 		return err
 	}
 
-	c.Path = make([]int32, 0, len(path))
+	temp := make([]int32, 0, len(path))
 	for _, p := range path {
-		c.Path = append(c.Path, p.Int32)
+		temp = append(c.Path, p.Int32)
 	}
+	c.Path = temp
 
 	if len(c.Path) < 2 {
 		if _, err := r.dbConn.Exec("delete from comments where id = $1", c.Id); err != nil {
@@ -79,10 +80,11 @@ func (r *Repository) StoreRootComment(c *domain.Comment) error {
 		config.Lg("comment_postgres", "StoreRootComment").Error(err.Error())
 		return err
 	}
-	c.Path = make([]int32, 0, len(path))
+	temp := make([]int32, 0, len(path))
 	for _, p := range path {
-		c.Path = append(c.Path, p.Int32)
+		temp = append(c.Path, p.Int32)
 	}
+	c.Path = temp
 
 	return nil
 }
@@ -101,10 +103,11 @@ func (r *Repository) GetComment(commentId int) (domain.Comment, error) {
 		config.Lg("comment_postgres", "GetComment").Error(err.Error())
 		return domain.Comment{}, err
 	}
-	c.Path = make([]int32, 0, len(path))
+	temp := make([]int32, 0, len(path))
 	for _, p := range path {
-		c.Path = append(c.Path, p.Int32)
+		temp = append(c.Path, p.Int32)
 	}
+	c.Path = temp
 
 	return c, nil
 }
@@ -135,10 +138,11 @@ func (r *Repository) GetPinComments(pinId int) ([]domain.Comment, error) {
 			config.Lg("comment_postgres", "GetPinComments").Error(err.Error())
 			return nil, err
 		}
-		c.Path = make([]int32, 0, len(path))
+		temp := make([]int32, 0, len(path))
 		for _, p := range path {
-			c.Path = append(c.Path, p.Int32)
+			temp = append(c.Path, p.Int32)
 		}
+		c.Path = temp
 
 		comments = append(comments, c)
 	}
