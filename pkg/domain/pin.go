@@ -21,8 +21,8 @@ type PinReq struct {
 
 func (p PinReq) Validate() error {
 	return validation.ValidateStruct(&p,
-		validation.Field(&p.Title, validation.Required, validation.Length(0, 250)),
-		validation.Field(&p.Content, validation.Required, validation.Length(0, 500)),
+		validation.Field(&p.Title, validation.Length(0, 250)),
+		validation.Field(&p.Content, validation.Length(0, 500)),
 	)
 }
 

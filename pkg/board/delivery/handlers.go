@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/board"
@@ -36,7 +37,10 @@ func (h *Handler) CreateBoard(c *gin.Context) {
 		return
 	}
 
-	h.sanitize(&b)
+	if err := h.sanitize(&b); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: err.Error()})
+		return
+	}
 
 	rb, err := h.uc.CreateBoard(claimsId, &b)
 	if err != nil {
@@ -112,7 +116,11 @@ func (h *Handler) prepAtDet(c *gin.Context) (*api.AttachDetachPin, int, *utils.E
 	return &bp, http.StatusOK, nil
 }
 
-func (h *Handler) sanitize(b *api.CreateBoard) {
+func (h *Handler) sanitize(b *api.CreateBoard) error {
 	b.Content = h.p.Sanitize(b.Content)
 	b.Title = h.p.Sanitize(b.Title)
+	if b.Content == "" && b.Title == "" {
+		return errors.New("empty board")
+	}
+	return nil
 }

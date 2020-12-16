@@ -1,6 +1,7 @@
 package http
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
@@ -56,7 +57,12 @@ func (h *Handler) CreatePin(c *gin.Context) {
 		return
 	}
 
-	h.sanitize(formPin.CreatePinReq)
+	if err := h.sanitize(formPin.CreatePinReq); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{
+			Error: err.Error(),
+		})
+		return
+	}
 
 	pinResp, err := h.uc.CreatePin(formPin.CreatePinReq, formPin.Avatar, userId)
 	if err != nil {
@@ -122,7 +128,11 @@ func (h *Handler) GetPinsFromBoard(c *gin.Context) {
 	c.JSON(http.StatusOK, pins)
 }
 
-func (h *Handler) sanitize(f *domain.PinReq) {
+func (h *Handler) sanitize(f *domain.PinReq) error {
 	f.Title = h.p.Sanitize(f.Title)
 	f.Content = h.p.Sanitize(f.Content)
+	if f.Title == "" && f.Content == "" {
+		return errors.New("empty pin")
+	}
+	return nil
 }
