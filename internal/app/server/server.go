@@ -20,6 +20,7 @@ import (
 	boardDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/board/delivery"
 	feedDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/feed/delivery"
 	pinDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/delivery/http"
+	reportDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/report/delivery"
 	userDelivery "github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/delivery"
 	"github.com/microcosm-cc/bluemonday"
 
@@ -70,7 +71,7 @@ func New(conf *config.Config, db database.IDbConn, sc *grpc.ClientConn, ac *grpc
 	userDelivery.AddUserRoutes(r, db, p, ac, wsSrv)
 	pinDelivery.AddPinRoutes(r, db, p, conf, wsSrv)
 	boardDelivery.AddBoardRoutes(r, db, p)
-
+	reportDelivery.AddReportRoutes(r, db, p)
 	feedDelivery.AddFeedRoutes(r, db, conf)
 
 	return &Server{
