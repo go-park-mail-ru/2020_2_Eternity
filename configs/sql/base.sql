@@ -154,3 +154,16 @@ AFTER INSERT OR UPDATE ON boards
     FOR EACH ROW EXECUTE PROCEDURE ins_board_vct_con();
 
 insert into boards_vectors_content(idv, vec) select id, to_tsvector(content) from boards on conflict do nothing;
+
+create table if not exists reports(
+	id serial primary key,
+	pin_id integer default 0,
+	owner text not null,
+	message text not null,
+	user_id integer not null,
+	type int default 0,
+
+	foreign key(user_id) references users(id),
+	foreign key(pin_id) references pins(id),
+	unique(user_id, pin_id)
+);
