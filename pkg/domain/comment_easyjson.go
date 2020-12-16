@@ -67,7 +67,7 @@ func easyjsonE9abebc9DecodeGithubComGoParkMailRu20202EternityPkgDomain(in *jlexe
 			out.PinId = int(in.Int())
 		case "user_id":
 			out.UserId = int(in.Int())
-		case "Username":
+		case "username":
 			out.Username = string(in.String())
 		default:
 			in.SkipRecursive()
@@ -120,7 +120,7 @@ func easyjsonE9abebc9EncodeGithubComGoParkMailRu20202EternityPkgDomain(out *jwri
 		out.Int(int(in.UserId))
 	}
 	{
-		const prefix string = ",\"Username\":"
+		const prefix string = ",\"username\":"
 		out.RawString(prefix)
 		out.String(string(in.Username))
 	}

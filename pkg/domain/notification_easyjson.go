@@ -313,7 +313,110 @@ func (v *NotePin) UnmarshalJSON(data []byte) error {
 func (v *NotePin) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain2(l, v)
 }
-func easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain3(in *jlexer.Lexer, out *NoteFollow) {
+func easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain3(in *jlexer.Lexer, out *NoteMessage) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeFieldName(false)
+		in.WantColon()
+		if in.IsNull() {
+			in.Skip()
+			in.WantComma()
+			continue
+		}
+		switch key {
+		case "id":
+			out.Id = int(in.Int())
+		case "content":
+			out.Content = string(in.String())
+		case "time":
+			if data := in.Raw(); in.Ok() {
+				in.AddError((out.CreationTime).UnmarshalJSON(data))
+			}
+		case "chat_id":
+			out.ChatId = int(in.Int())
+		case "username":
+			out.UserName = string(in.String())
+		case "avatar":
+			out.UserAvatarLink = string(in.String())
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain3(out *jwriter.Writer, in NoteMessage) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"id\":"
+		out.RawString(prefix[1:])
+		out.Int(int(in.Id))
+	}
+	{
+		const prefix string = ",\"content\":"
+		out.RawString(prefix)
+		out.String(string(in.Content))
+	}
+	{
+		const prefix string = ",\"time\":"
+		out.RawString(prefix)
+		out.Raw((in.CreationTime).MarshalJSON())
+	}
+	{
+		const prefix string = ",\"chat_id\":"
+		out.RawString(prefix)
+		out.Int(int(in.ChatId))
+	}
+	{
+		const prefix string = ",\"username\":"
+		out.RawString(prefix)
+		out.String(string(in.UserName))
+	}
+	{
+		const prefix string = ",\"avatar\":"
+		out.RawString(prefix)
+		out.String(string(in.UserAvatarLink))
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v NoteMessage) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain3(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v NoteMessage) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain3(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *NoteMessage) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain3(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *NoteMessage) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain3(l, v)
+}
+func easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain4(in *jlexer.Lexer, out *NoteFollow) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -346,7 +449,7 @@ func easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain3(in *jlexer
 		in.Consumed()
 	}
 }
-func easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain3(out *jwriter.Writer, in NoteFollow) {
+func easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain4(out *jwriter.Writer, in NoteFollow) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -366,27 +469,27 @@ func easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain3(out *jwrit
 // MarshalJSON supports json.Marshaler interface
 func (v NoteFollow) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain3(&w, v)
+	easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain4(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v NoteFollow) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain3(w, v)
+	easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain4(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *NoteFollow) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain3(&r, v)
+	easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain4(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *NoteFollow) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain3(l, v)
+	easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain4(l, v)
 }
-func easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain4(in *jlexer.Lexer, out *NoteComment) {
+func easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain5(in *jlexer.Lexer, out *NoteComment) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -446,7 +549,7 @@ func easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain4(in *jlexer
 		in.Consumed()
 	}
 }
-func easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain4(out *jwriter.Writer, in NoteComment) {
+func easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain5(out *jwriter.Writer, in NoteComment) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -492,23 +595,142 @@ func easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain4(out *jwrit
 // MarshalJSON supports json.Marshaler interface
 func (v NoteComment) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain4(&w, v)
+	easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain5(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v NoteComment) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain4(w, v)
+	easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain5(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *NoteComment) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain4(&r, v)
+	easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain5(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *NoteComment) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain4(l, v)
+	easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain5(l, v)
+}
+func easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain6(in *jlexer.Lexer, out *NoteChat) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeFieldName(false)
+		in.WantColon()
+		if in.IsNull() {
+			in.Skip()
+			in.WantComma()
+			continue
+		}
+		switch key {
+		case "id":
+			out.Id = int(in.Int())
+		case "creation_time":
+			if data := in.Raw(); in.Ok() {
+				in.AddError((out.CreationTime).UnmarshalJSON(data))
+			}
+		case "last_msg_content":
+			out.LastMsgContent = string(in.String())
+		case "last_msg_username":
+			out.LastMsgUsername = string(in.String())
+		case "last_msg_time":
+			if data := in.Raw(); in.Ok() {
+				in.AddError((out.LastMsgTime).UnmarshalJSON(data))
+			}
+		case "collocutor_name":
+			out.CollocutorName = string(in.String())
+		case "collocutor_ava":
+			out.CollocutorAvatarLink = string(in.String())
+		case "new_messages":
+			out.NewMessages = int(in.Int())
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain6(out *jwriter.Writer, in NoteChat) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"id\":"
+		out.RawString(prefix[1:])
+		out.Int(int(in.Id))
+	}
+	{
+		const prefix string = ",\"creation_time\":"
+		out.RawString(prefix)
+		out.Raw((in.CreationTime).MarshalJSON())
+	}
+	{
+		const prefix string = ",\"last_msg_content\":"
+		out.RawString(prefix)
+		out.String(string(in.LastMsgContent))
+	}
+	{
+		const prefix string = ",\"last_msg_username\":"
+		out.RawString(prefix)
+		out.String(string(in.LastMsgUsername))
+	}
+	{
+		const prefix string = ",\"last_msg_time\":"
+		out.RawString(prefix)
+		out.Raw((in.LastMsgTime).MarshalJSON())
+	}
+	{
+		const prefix string = ",\"collocutor_name\":"
+		out.RawString(prefix)
+		out.String(string(in.CollocutorName))
+	}
+	{
+		const prefix string = ",\"collocutor_ava\":"
+		out.RawString(prefix)
+		out.String(string(in.CollocutorAvatarLink))
+	}
+	{
+		const prefix string = ",\"new_messages\":"
+		out.RawString(prefix)
+		out.Int(int(in.NewMessages))
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v NoteChat) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain6(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v NoteChat) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain6(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *NoteChat) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain6(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *NoteChat) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain6(l, v)
 }

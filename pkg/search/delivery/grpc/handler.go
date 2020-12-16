@@ -51,11 +51,13 @@ func (s *SearchHandler) GetPinsByTitle(ctx context.Context, pinSearch *sc.PinSea
 	pPins := make([]*sc.Pin, 0, len(pins))
 	for _, p := range pins {
 		pPins = append(pPins, &sc.Pin{
-			Id:      int64(p.Id),
-			Title:   p.Title,
-			Content: p.Content,
-			UserId:  int32(p.UserId),
-			ImgLink: p.ImgLink,
+			Id:            int64(p.Id),
+			Title:         p.Title,
+			Content:       p.Content,
+			PictureHeight: int32(p.PictureHeight),
+			PictureWidth:  int32(p.PictureWidth),
+			UserId:        int32(p.UserId),
+			ImgLink:       p.ImgLink,
 		})
 	}
 

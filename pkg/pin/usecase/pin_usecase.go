@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
+	"log"
 	"mime/multipart"
 )
 
@@ -27,16 +28,21 @@ func (u *Usecase) CreatePin(pin *domain.PinReq, file *multipart.FileHeader, user
 		return domain.PinResp{}, err
 	}
 
-	if err := u.fileStorage.SaveUploadedFile(file, fileName); err != nil {
+	h, w, err := u.fileStorage.SaveUploadedFile(file, fileName)
+	if err != nil {
 		config.Lg("pin_usecase", "CreatePin").Error("SaveUploadedFile: ", err.Error())
 		return domain.PinResp{}, err
 	}
 
+	log.Println(h, w)
+
 	modelPin := domain.Pin{
-		Title:       pin.Title,
-		Content:     pin.Content,
-		PictureName: fileName,
-		UserId:      userId,
+		Title:         pin.Title,
+		Content:       pin.Content,
+		PictureName:   fileName,
+		PictureHeight: h,
+		PictureWidth:  w,
+		UserId:        userId,
 	}
 
 	if err := u.repository.StorePin(&modelPin); err != nil {
@@ -50,11 +56,13 @@ func (u *Usecase) CreatePin(pin *domain.PinReq, file *multipart.FileHeader, user
 			modelPin.Id, modelPin.Title, modelPin.Content, modelPin.PictureName, modelPin.UserId)
 
 	return domain.PinResp{
-		Id:      modelPin.Id,
-		Title:   modelPin.Title,
-		Content: modelPin.Content,
-		ImgLink: utils.GetUrlImg(modelPin.PictureName),
-		UserId:  modelPin.UserId,
+		Id:            modelPin.Id,
+		Title:         modelPin.Title,
+		Content:       modelPin.Content,
+		PictureHeight: modelPin.PictureHeight,
+		PictureWidth:  modelPin.PictureWidth,
+		ImgLink:       utils.GetUrlImg(modelPin.PictureName),
+		UserId:        modelPin.UserId,
 	}, nil
 }
 
@@ -67,11 +75,13 @@ func (u *Usecase) GetPin(id int) (domain.PinResp, error) {
 	}
 
 	return domain.PinResp{
-		Id:      modelPin.Id,
-		Title:   modelPin.Title,
-		Content: modelPin.Content,
-		ImgLink: utils.GetUrlImg(modelPin.PictureName),
-		UserId:  modelPin.UserId,
+		Id:            modelPin.Id,
+		Title:         modelPin.Title,
+		Content:       modelPin.Content,
+		PictureHeight: modelPin.PictureHeight,
+		PictureWidth:  modelPin.PictureWidth,
+		ImgLink:       utils.GetUrlImg(modelPin.PictureName),
+		UserId:        modelPin.UserId,
 	}, nil
 }
 
@@ -85,11 +95,13 @@ func (u *Usecase) GetPinList(username string) ([]domain.PinResp, error) {
 	var pinsResp []domain.PinResp
 	for _, p := range pins {
 		pinsResp = append(pinsResp, domain.PinResp{
-			Id:      p.Id,
-			Title:   p.Title,
-			Content: p.Content,
-			ImgLink: utils.GetUrlImg(p.PictureName),
-			UserId:  p.UserId,
+			Id:            p.Id,
+			Title:         p.Title,
+			Content:       p.Content,
+			PictureHeight: p.PictureHeight,
+			PictureWidth:  p.PictureWidth,
+			ImgLink:       utils.GetUrlImg(p.PictureName),
+			UserId:        p.UserId,
 		})
 	}
 
@@ -106,11 +118,13 @@ func (u *Usecase) GetPinBoardList(boardId int) ([]domain.PinResp, error) {
 	var pinsResp []domain.PinResp
 	for _, p := range pins {
 		pinsResp = append(pinsResp, domain.PinResp{
-			Id:      p.Id,
-			Title:   p.Title,
-			Content: p.Content,
-			ImgLink: utils.GetUrlImg(p.PictureName),
-			UserId:  p.UserId,
+			Id:            p.Id,
+			Title:         p.Title,
+			Content:       p.Content,
+			PictureHeight: p.PictureHeight,
+			PictureWidth:  p.PictureWidth,
+			ImgLink:       utils.GetUrlImg(p.PictureName),
+			UserId:        p.UserId,
 		})
 	}
 

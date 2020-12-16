@@ -67,11 +67,13 @@ func (h *Handler) Search(c *gin.Context) {
 		rPins := make([]domain.PinResp, 0, len(pins.Pins))
 		for _, p := range pins.GetPins() {
 			rPins = append(rPins, domain.PinResp{
-				Id:      int(p.GetId()),
-				Title:   p.GetTitle(),
-				Content: p.GetContent(),
-				UserId:  int(p.GetUserId()),
-				ImgLink: p.GetImgLink(),
+				Id:            int(p.GetId()),
+				Title:         p.GetTitle(),
+				Content:       p.GetContent(),
+				PictureHeight: int(p.GetPictureHeight()),
+				PictureWidth:  int(p.GetPictureWidth()),
+				UserId:        int(p.GetUserId()),
+				ImgLink:       p.GetImgLink(),
 			})
 		}
 		c.JSON(http.StatusOK, rPins)

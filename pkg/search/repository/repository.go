@@ -48,9 +48,9 @@ func (r *Repository) GetUsersByName(username string, last int) ([]domain.UserSea
 }
 
 func (r *Repository) GetPinsByTitle(title string, last int) ([]domain.Pin, error) {
-	query := "select p.id, title, content, name, user_id from pin_images join (select id, title, content, user_id " +
+	query := "select p.id, title, content, name, user_id, height, width from pin_images join (select id, title, content, user_id, height, width " +
 		"from (pins join pins_vectors_content on pins.id = pins_vectors_content.idv) " +
-		"where \"vec\" @@ plainto_tsquery($1) union select pins.id, pins.title, pins.content, user_id from pins " +
+		"where \"vec\" @@ plainto_tsquery($1) union select pins.id, pins.title, pins.content, user_id, height, width from pins " +
 		"where lower(title) like lower('%' || $1 || '%')) p " +
 		"on p.id = pin_images.id "
 	i := 1
@@ -72,7 +72,7 @@ func (r *Repository) GetPinsByTitle(title string, last int) ([]domain.Pin, error
 	for rows.Next() {
 		pin := domain.Pin{}
 
-		if err := rows.Scan(&pin.Id, &pin.Title, &pin.Content, &pin.PictureName, &pin.UserId); err != nil {
+		if err := rows.Scan(&pin.Id, &pin.Title, &pin.Content, &pin.PictureName, &pin.UserId, &pin.PictureHeight, &pin.PictureWidth); err != nil {
 			config.Lg("search", "GetPinSearch").Error(err.Error())
 			return nil, err
 		}

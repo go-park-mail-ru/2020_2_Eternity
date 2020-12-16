@@ -6,11 +6,13 @@ import (
 
 // Model
 type Pin struct {
-	Id          int    `json:"id"`
-	Title       string `json:"title"`
-	Content     string `json:"content"`
-	PictureName string `json:"picture_name"`
-	UserId      int    `json:"user_id"`
+	Id            int    `json:"id"`
+	Title         string `json:"title"`
+	Content       string `json:"content"`
+	PictureName   string `json:"picture_name"`
+	PictureHeight int    `json:"height,omitempty"`
+	PictureWidth  int    `json:"width,omitempty"`
+	UserId        int    `json:"user_id"`
 }
 
 // Create req
@@ -34,9 +36,11 @@ type PinEditReq struct {
 }
 
 type PinResp struct {
-	Id      int    `json:"id"`
-	Title   string `json:"title"`
-	Content string `json:"content"`
-	ImgLink string `json:"img_link"`
-	UserId  int    `json:"user_id"`
+	Id            int    `json:"id"`
+	Title         string `json:"title"`
+	Content       string `json:"content"`
+	PictureHeight int    `json:"height,omitempty"`
+	PictureWidth  int    `json:"width,omitempty"`
+	ImgLink       string `json:"img_link"`
+	UserId        int    `json:"user_id"`
 }

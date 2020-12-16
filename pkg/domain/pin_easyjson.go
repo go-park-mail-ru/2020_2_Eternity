@@ -42,6 +42,10 @@ func easyjsonD6aedbb7DecodeGithubComGoParkMailRu20202EternityPkgDomain(in *jlexe
 			out.Title = string(in.String())
 		case "content":
 			out.Content = string(in.String())
+		case "height":
+			out.PictureHeight = int(in.Int())
+		case "width":
+			out.PictureWidth = int(in.Int())
 		case "img_link":
 			out.ImgLink = string(in.String())
 		case "user_id":
@@ -74,6 +78,16 @@ func easyjsonD6aedbb7EncodeGithubComGoParkMailRu20202EternityPkgDomain(out *jwri
 		const prefix string = ",\"content\":"
 		out.RawString(prefix)
 		out.String(string(in.Content))
+	}
+	if in.PictureHeight != 0 {
+		const prefix string = ",\"height\":"
+		out.RawString(prefix)
+		out.Int(int(in.PictureHeight))
+	}
+	if in.PictureWidth != 0 {
+		const prefix string = ",\"width\":"
+		out.RawString(prefix)
+		out.Int(int(in.PictureWidth))
 	}
 	{
 		const prefix string = ",\"img_link\":"
@@ -270,6 +284,10 @@ func easyjsonD6aedbb7DecodeGithubComGoParkMailRu20202EternityPkgDomain3(in *jlex
 			out.Content = string(in.String())
 		case "picture_name":
 			out.PictureName = string(in.String())
+		case "height":
+			out.PictureHeight = int(in.Int())
+		case "width":
+			out.PictureWidth = int(in.Int())
 		case "user_id":
 			out.UserId = int(in.Int())
 		default:
@@ -305,6 +323,16 @@ func easyjsonD6aedbb7EncodeGithubComGoParkMailRu20202EternityPkgDomain3(out *jwr
 		const prefix string = ",\"picture_name\":"
 		out.RawString(prefix)
 		out.String(string(in.PictureName))
+	}
+	if in.PictureHeight != 0 {
+		const prefix string = ",\"height\":"
+		out.RawString(prefix)
+		out.Int(int(in.PictureHeight))
+	}
+	if in.PictureWidth != 0 {
+		const prefix string = ",\"width\":"
+		out.RawString(prefix)
+		out.Int(int(in.PictureWidth))
 	}
 	{
 		const prefix string = ",\"user_id\":"

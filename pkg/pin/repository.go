@@ -14,5 +14,5 @@ type IRepository interface {
 }
 
 type IStorage interface {
-	SaveUploadedFile(file *multipart.FileHeader, filename string) error
+	SaveUploadedFile(file *multipart.FileHeader, filename string) (int, int, error)
 }

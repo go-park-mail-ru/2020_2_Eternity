@@ -2,6 +2,10 @@ package filestorage
 
 import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"io"
 	"mime/multipart"
 	"os"
@@ -18,18 +22,18 @@ func NewStorage(c *config.Config) *Storage {
 	}
 }
 
-func (s *Storage) SaveUploadedFile(file *multipart.FileHeader, filename string) error {
+func (s *Storage) SaveUploadedFile(file *multipart.FileHeader, filename string) (int, int, error) {
 	if err := os.MkdirAll(s.conf.Web.Static.DirImg, 0777|os.ModeDir); err != nil {
 		config.Lg("pin_filestorage", "SaveUploadedFile").
 			Error("MkAllDir: ", err.Error())
-		return err
+		return 0, 0, err
 	}
 
 	src, err := file.Open()
 	if err != nil {
 		config.Lg("pin_filestorage", "SaveUploadedFile").
 			Error("MkAllDir: ", err.Error())
-		return err
+		return 0, 0, err
 	}
 	defer src.Close()
 
@@ -39,10 +43,16 @@ func (s *Storage) SaveUploadedFile(file *multipart.FileHeader, filename string) 
 	if err != nil {
 		config.Lg("pin_filestorage", "SaveUploadedFile").
 			Error("MkAllDir: ", err.Error())
-		return err
+		return 0, 0, err
 	}
 	defer out.Close()
 
+	im, _, err := image.DecodeConfig(src)
+	if err != nil {
+		config.Lg("pin_filestorage", "SaveUploadedFileImage").Error(err.Error())
+		return 0, 0, err
+	}
+
 	_, err = io.Copy(out, src)
-	return err
+	return im.Height, im.Width, err
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
+	"github.com/lib/pq"
 	"strconv"
 	"strings"
 	"time"
@@ -161,7 +162,7 @@ func (r *Repository) GetFollowersIds(userId int) ([]int, error) {
 	row := r.dbConn.QueryRow(
 		"select ARRAY(select id1 from follows where id2 = $1)",
 		userId)
-	if err := row.Scan(&followersSql); err != nil {
+	if err := row.Scan(pq.Array(&followersSql)); err != nil {
 		config.Lg("user", "GetFollowersIds").Println(err)
 		return []int{}, err
 	}

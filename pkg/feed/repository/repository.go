@@ -18,7 +18,7 @@ func NewRepo(db database.IDbConn) *Repository {
 }
 
 func (r *Repository) GetFeed(userId int, last int) ([]domain.Pin, error) {
-	query := "select pins.id, title, content, name, user_id " +
+	query := "select pins.id, title, content, name, user_id, height, width " +
 		"from pins join pin_images on pins.id = pin_images.pin_id"
 	var placeholders []interface{}
 	i := 0
@@ -37,7 +37,7 @@ func (r *Repository) GetFeed(userId int, last int) ([]domain.Pin, error) {
 	pins := make([]domain.Pin, 0, 15)
 	for rows.Next() {
 		pin := domain.Pin{}
-		if err := rows.Scan(&pin.Id, &pin.Title, &pin.Content, &pin.PictureName, &pin.UserId); err != nil {
+		if err := rows.Scan(&pin.Id, &pin.Title, &pin.Content, &pin.PictureName, &pin.UserId, &pin.PictureHeight, &pin.PictureWidth); err != nil {
 			return nil, err
 		}
 		pins = append(pins, pin)
@@ -46,7 +46,7 @@ func (r *Repository) GetFeed(userId int, last int) ([]domain.Pin, error) {
 }
 
 func (r *Repository) GetSubFeed(userId int, last int) ([]domain.Pin, error) {
-	query := "select p.id, title, content, name, user_id " +
+	query := "select p.id, title, content, name, user_id, height, width " +
 		"from (pins join follows on user_id = follows.id2 and follows.id1 = $1) p " +
 		"join pin_images on p.id = pin_images.pin_id "
 	var placeholders []interface{}
@@ -67,7 +67,7 @@ func (r *Repository) GetSubFeed(userId int, last int) ([]domain.Pin, error) {
 	pins := make([]domain.Pin, 0, 15)
 	for rows.Next() {
 		pin := domain.Pin{}
-		if err := rows.Scan(&pin.Id, &pin.Title, &pin.Content, &pin.PictureName, &pin.UserId); err != nil {
+		if err := rows.Scan(&pin.Id, &pin.Title, &pin.Content, &pin.PictureName, &pin.UserId, &pin.PictureHeight, &pin.PictureWidth); err != nil {
 			return nil, err
 		}
 		pins = append(pins, pin)

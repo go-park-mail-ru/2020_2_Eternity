@@ -27,11 +27,13 @@ func (uc *Usecase) GetFeed(userId int, last int) ([]domain.PinResp, error) {
 	pinsResp := make([]domain.PinResp, 0, len(pins))
 	for _, p := range pins {
 		pinsResp = append(pinsResp, domain.PinResp{
-			Id:      p.Id,
-			Title:   p.Title,
-			Content: p.Content,
-			ImgLink: utils.GetUrlImg(p.PictureName),
-			UserId:  p.UserId,
+			Id:            p.Id,
+			Title:         p.Title,
+			Content:       p.Content,
+			PictureHeight: p.PictureHeight,
+			PictureWidth:  p.PictureWidth,
+			ImgLink:       utils.GetUrlImg(p.PictureName),
+			UserId:        p.UserId,
 		})
 	}
 
@@ -48,11 +50,13 @@ func (uc *Usecase) GetSubFeed(userId int, last int) ([]domain.PinResp, error) {
 	pinsResp := make([]domain.PinResp, 0, len(pins))
 	for _, p := range pins {
 		pinsResp = append(pinsResp, domain.PinResp{
-			Id:      p.Id,
-			Title:   p.Title,
-			Content: p.Content,
-			ImgLink: utils.GetUrlImg(p.PictureName),
-			UserId:  p.UserId,
+			Id:            p.Id,
+			Title:         p.Title,
+			Content:       p.Content,
+			PictureHeight: p.PictureHeight,
+			PictureWidth:  p.PictureWidth,
+			ImgLink:       utils.GetUrlImg(p.PictureName),
+			UserId:        p.UserId,
 		})
 	}
 

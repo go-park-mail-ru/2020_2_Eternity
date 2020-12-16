@@ -26,6 +26,9 @@ create table if not exists pin_images(
 	foreign key(pin_id) references pins(id) on delete cascade
 );
 
+alter table pins add column if not exists height integer default 0;
+alter table pins add column if not exists width integer default 0;
+
 create table if not exists follows(
 	id1 int not null,
 	id2 int not null,
