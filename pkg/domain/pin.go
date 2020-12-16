@@ -13,6 +13,7 @@ type Pin struct {
 	PictureHeight int    `json:"height,omitempty"`
 	PictureWidth  int    `json:"width,omitempty"`
 	UserId        int    `json:"user_id"`
+	Username      string `json:"username,omitempty"`
 }
 
 // Create req
@@ -43,4 +44,5 @@ type PinResp struct {
 	PictureWidth  int    `json:"width,omitempty"`
 	ImgLink       string `json:"img_link"`
 	UserId        int    `json:"user_id"`
+	Username      string `json:"username"`
 }

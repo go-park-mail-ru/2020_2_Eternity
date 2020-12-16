@@ -34,14 +34,14 @@ func (r *Repository) StorePin(p *domain.Pin) error {
 
 func (r *Repository) GetPin(id int) (domain.Pin, error) {
 	row := r.dbConn.QueryRow(
-		"select pins.id, title, content, name, user_id, height, width "+
-			"from pins join pin_images "+
-			"on pins.id = pin_images.pin_id "+
-			"where pins.id=$1;",
+		"select p.pin_id, title, content, p.name, user_id, height, width, username "+
+			"from (pins join pin_images "+
+			"on pins.id = pin_images.pin_id) p join users on p.user_id = users.id "+
+			"where p.pin_id=$1",
 		id)
 
 	p := domain.Pin{}
-	if err := row.Scan(&p.Id, &p.Title, &p.Content, &p.PictureName, &p.UserId, &p.PictureHeight, &p.PictureWidth); err != nil {
+	if err := row.Scan(&p.Id, &p.Title, &p.Content, &p.PictureName, &p.UserId, &p.PictureHeight, &p.PictureWidth, &p.Username); err != nil {
 		config.Lg("pin", "pin.GetPin").Error(err.Error())
 		return domain.Pin{}, err
 	}

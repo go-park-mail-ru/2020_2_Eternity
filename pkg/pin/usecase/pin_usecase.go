@@ -82,6 +82,7 @@ func (u *Usecase) GetPin(id int) (domain.PinResp, error) {
 		PictureWidth:  modelPin.PictureWidth,
 		ImgLink:       utils.GetUrlImg(modelPin.PictureName),
 		UserId:        modelPin.UserId,
+		Username:      modelPin.Username,
 	}, nil
 }
 
