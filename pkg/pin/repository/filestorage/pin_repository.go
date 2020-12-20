@@ -48,10 +48,12 @@ func (s *Storage) SaveUploadedFile(file *multipart.FileHeader, filename string) 
 	defer out.Close()
 
 	_, err = io.Copy(out, src)
-	im, _, err := image.DecodeConfig(out)
+
+	im, _, err := image.DecodeConfig(src)
 	if err != nil {
 		config.Lg("pin_filestorage", "SaveUploadedFileImage").Error(err.Error())
 		return 0, 0, err
 	}
+
 	return im.Height, im.Width, err
 }
