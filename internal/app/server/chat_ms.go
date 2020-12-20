@@ -11,7 +11,7 @@ import (
 func NewChatMsConnection() *grpc.ClientConn {
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
-	opts = append(opts, grpc.WithBlock())
+	//opts = append(opts, grpc.WithBlock())
 
 	serverAddr := fmt.Sprintf("%s:%s", config.Conf.Web.Chat.Address, config.Conf.Web.Chat.Port)
 
