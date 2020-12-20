@@ -35,7 +35,7 @@ web: {
   static: {
     dir_img: "static/img",
     url_img: "/static/img",
-    dir_avt: "/api/static/avatar/",
+    dir_avt: "/static/avatar/",
   },
   search: {
     address: "localhost",
