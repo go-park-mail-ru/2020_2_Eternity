@@ -13,16 +13,13 @@ import (
 	"testing"
 )
 
-
-
 var (
 	userId   = 3
 	pinId    = 4
 	username = "username123"
 
-	boardId = 6
+	boardId     = 6
 	pictureName = "picture"
-
 
 	pinReq = domain.PinReq{
 		Title:   "title",
@@ -30,11 +27,11 @@ var (
 	}
 
 	pinResp = domain.PinResp{
-		Id: 		 pinId,
-		Title:       pinReq.Title,
-		Content:     pinReq.Content,
-		ImgLink: 	 "utils.GetUrlImg(pictureName)",
-		UserId:      userId,
+		Id:      pinId,
+		Title:   pinReq.Title,
+		Content: pinReq.Content,
+		ImgLink: "utils.GetUrlImg(pictureName)",
+		UserId:  userId,
 	}
 
 	pinRespMany = []domain.PinResp{
@@ -55,13 +52,11 @@ var (
 	}
 )
 
-
 //var _ = func() bool {
 //	testing.Init()
 //	config.Conf = config.NewTestConfig()
 //	return true
 //}()
-
 
 func TestMain(m *testing.M) {
 	config.Conf = config.NewConfigTst()
@@ -132,7 +127,6 @@ func TestCreatePin(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-
 func TestGetPin(t *testing.T) {
 	mockCtr := gomock.NewController(t)
 	defer mockCtr.Finish()
@@ -147,7 +141,7 @@ func TestGetPin(t *testing.T) {
 	mockRepo.EXPECT().
 		GetPin(gomock.Eq(pinId)).
 		Return(domain.Pin{
-			Id: 		 pinResp.Id,
+			Id:          pinResp.Id,
 			Title:       pinResp.Title,
 			Content:     pinResp.Content,
 			PictureName: pictureName,
@@ -173,9 +167,7 @@ func TestGetPin(t *testing.T) {
 	_, err = uc.GetPin(pinId)
 	assert.NotNil(t, err)
 
-
 }
-
 
 func TestGetPinList(t *testing.T) {
 	mockCtr := gomock.NewController(t)
@@ -190,7 +182,7 @@ func TestGetPinList(t *testing.T) {
 
 	mockRepo.EXPECT().
 		GetPinList(gomock.Eq(username)).
-		DoAndReturn(func (u string) ([]domain.Pin, error) {
+		DoAndReturn(func(u string) ([]domain.Pin, error) {
 			ps := []domain.Pin{}
 			for _, p := range pinRespMany {
 				ps = append(ps, domain.Pin{
@@ -210,7 +202,6 @@ func TestGetPinList(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, pinRespMany, psResp)
 
-
 	// Fail
 
 	mockRepo.EXPECT().
@@ -221,7 +212,6 @@ func TestGetPinList(t *testing.T) {
 	_, err = uc.GetPinList(username)
 	assert.NotNil(t, err)
 }
-
 
 func TestGetPinBoardList(t *testing.T) {
 	mockCtr := gomock.NewController(t)
@@ -236,7 +226,7 @@ func TestGetPinBoardList(t *testing.T) {
 
 	mockRepo.EXPECT().
 		GetPinBoardList(gomock.Eq(boardId)).
-		DoAndReturn(func (b int) ([]domain.Pin, error) {
+		DoAndReturn(func(b int) ([]domain.Pin, error) {
 			ps := []domain.Pin{}
 			for _, p := range pinRespMany {
 				ps = append(ps, domain.Pin{
@@ -255,7 +245,6 @@ func TestGetPinBoardList(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Equal(t, pinRespMany, psResp)
-
 
 	// Fail
 

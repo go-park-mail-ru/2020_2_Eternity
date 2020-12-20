@@ -47,3 +47,18 @@ func (mr *MockIUseCaseMockRecorder) GetFeed(userId, last interface{}) *gomock.Ca
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeed", reflect.TypeOf((*MockIUseCase)(nil).GetFeed), userId, last)
 }
+
+// GetSubFeed mocks base method
+func (m *MockIUseCase) GetSubFeed(userId, last int) ([]domain.PinResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSubFeed", userId, last)
+	ret0, _ := ret[0].([]domain.PinResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSubFeed indicates an expected call of GetSubFeed
+func (mr *MockIUseCaseMockRecorder) GetSubFeed(userId, last interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSubFeed", reflect.TypeOf((*MockIUseCase)(nil).GetSubFeed), userId, last)
+}

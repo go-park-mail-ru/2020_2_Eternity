@@ -47,6 +47,9 @@ func New(conf *config.Config, db database.IDbConn, sc *grpc.ClientConn, ac *grpc
 	logFile := setupGinLogger()
 
 	r := gin.Default()
+
+	r.RouterGroup = *r.Group("/api")
+
 	r.MaxMultipartMemory = 8 << 20
 	r.Static(conf.Web.Static.UrlImg, conf.Web.Static.DirImg)
 

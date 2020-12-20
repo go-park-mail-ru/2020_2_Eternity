@@ -62,3 +62,18 @@ func (mr *MockIRepositoryMockRecorder) GetPinsByTitle(title, last interface{}) *
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPinsByTitle", reflect.TypeOf((*MockIRepository)(nil).GetPinsByTitle), title, last)
 }
+
+// GetBoardsByTitle mocks base method
+func (m *MockIRepository) GetBoardsByTitle(title string, last int) ([]domain.Board, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBoardsByTitle", title, last)
+	ret0, _ := ret[0].([]domain.Board)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBoardsByTitle indicates an expected call of GetBoardsByTitle
+func (mr *MockIRepositoryMockRecorder) GetBoardsByTitle(title, last interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBoardsByTitle", reflect.TypeOf((*MockIRepository)(nil).GetBoardsByTitle), title, last)
+}

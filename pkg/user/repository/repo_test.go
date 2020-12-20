@@ -1,14 +1,14 @@
 package repository
 
 import (
-	"context"
-	"fmt"
+	"errors"
+	//"context"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-park-mail-ru/2020_2_Eternity/api"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/stretchr/testify/assert"
-	"log"
-	"os"
+
+	//"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -18,33 +18,7 @@ var _ = func() bool {
 	return true
 }()
 
-var db *pgxpool.Pool
-
-func TestMain(m *testing.M) {
-	conf, err := pgxpool.ParseConfig(fmt.Sprintf(
-		"user=%s password=%s host=%s dbname=%s sslmode=%s pool_max_conns=%d",
-		config.Conf.Db.Postgres.Username,
-		config.Conf.Db.Postgres.Password,
-		config.Conf.Db.Postgres.Host,
-		config.Conf.Db.Postgres.DbName,
-		config.Conf.Db.Postgres.SslMode,
-		10,
-	))
-	if err != nil {
-		fmt.Println("Error ", err.Error())
-	}
-
-	db, err = pgxpool.ConnectConfig(context.Background(), conf)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-	defer db.Close()
-	code := m.Run()
-	os.Exit(code)
-}
-
-var u *api.SignUp = &api.SignUp{
+var u = &api.SignUp{
 	Username: "21savage",
 	Email:    "21sav@mail.ru",
 	Password: "12345678",
@@ -52,24 +26,40 @@ var u *api.SignUp = &api.SignUp{
 
 func TestRepository_CreateUser(t *testing.T) {
 	t.Helper()
-	r := NewRepo(db)
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+	rows := sqlmock.NewRows([]string{"id"}).
+		AddRow(1)
 
-	_, err := r.CreateUser(u)
-	assert.Equal(t, err, nil)
+	mock.ExpectQuery("insert into users ").WithArgs(u.Username, u.Email, u.Password,
+		u.Name, u.Surname, u.Description, u.BirthDate, sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnRows(rows)
+
+	r := NewRepo(db)
+	ur, err := r.CreateUser(u)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, ur.ID)
+
+	mock.ExpectQuery("insert into users ").WithArgs(u.Username, u.Email, u.Password,
+		u.Name, u.Surname, u.Description, u.BirthDate, sqlmock.AnyArg(), sqlmock.AnyArg()).
+		WillReturnError(errors.New("user exists"))
 
 	_, err = r.CreateUser(u)
-	assert.Error(t, err)
-
-	_, err = db.Exec(context.Background(), "delete from users where username = $1", u.Username)
-	assert.Equal(t, err, nil)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
 }
 
 func TestRepository_GetUser(t *testing.T) {
 	t.Helper()
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
 	r := NewRepo(db)
-
-	ru, err := r.CreateUser(u)
-	assert.Equal(t, err, nil)
 
 	user, err := r.GetUser(ru.ID)
 	assert.NoError(t, err)
@@ -84,12 +74,9 @@ func TestRepository_GetUser(t *testing.T) {
 
 	user, err = r.GetUserByName("test")
 	assert.Error(t, err)
-
-	_, err = db.Exec(context.Background(), "delete from users where username = $1", u.Username)
-	assert.Equal(t, err, nil)
 }
 
-func TestRepository_UpdateUser(t *testing.T) {
+/*func TestRepository_UpdateUser(t *testing.T) {
 	t.Helper()
 	r := NewRepo(db)
 
@@ -174,3 +161,4 @@ func TestRepository_Follow(t *testing.T) {
 	_, err = db.Exec(context.Background(), "delete from users where username = $1", second.Username)
 	assert.Equal(t, err, nil)
 }
+*/

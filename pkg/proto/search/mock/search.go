@@ -75,6 +75,26 @@ func (mr *MockSearchServiceClientMockRecorder) GetPinsByTitle(ctx, in interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPinsByTitle", reflect.TypeOf((*MockSearchServiceClient)(nil).GetPinsByTitle), varargs...)
 }
 
+// GetBoardsByTitle mocks base method
+func (m *MockSearchServiceClient) GetBoardsByTitle(ctx context.Context, in *search.BoardSearch, opts ...grpc.CallOption) (*search.Boards, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetBoardsByTitle", varargs...)
+	ret0, _ := ret[0].(*search.Boards)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBoardsByTitle indicates an expected call of GetBoardsByTitle
+func (mr *MockSearchServiceClientMockRecorder) GetBoardsByTitle(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBoardsByTitle", reflect.TypeOf((*MockSearchServiceClient)(nil).GetBoardsByTitle), varargs...)
+}
+
 // MockSearchServiceServer is a mock of SearchServiceServer interface
 type MockSearchServiceServer struct {
 	ctrl     *gomock.Controller
@@ -126,4 +146,19 @@ func (m *MockSearchServiceServer) GetPinsByTitle(arg0 context.Context, arg1 *sea
 func (mr *MockSearchServiceServerMockRecorder) GetPinsByTitle(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPinsByTitle", reflect.TypeOf((*MockSearchServiceServer)(nil).GetPinsByTitle), arg0, arg1)
+}
+
+// GetBoardsByTitle mocks base method
+func (m *MockSearchServiceServer) GetBoardsByTitle(arg0 context.Context, arg1 *search.BoardSearch) (*search.Boards, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBoardsByTitle", arg0, arg1)
+	ret0, _ := ret[0].(*search.Boards)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBoardsByTitle indicates an expected call of GetBoardsByTitle
+func (mr *MockSearchServiceServerMockRecorder) GetBoardsByTitle(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBoardsByTitle", reflect.TypeOf((*MockSearchServiceServer)(nil).GetBoardsByTitle), arg0, arg1)
 }
