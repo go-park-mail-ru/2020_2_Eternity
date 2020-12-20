@@ -23,13 +23,13 @@ web: {
   server: {
     address: "localhost",
     port: "8008",
-    host: "pinterest-tp.tk",
+    host: "pinteo.ru",
     protocol: "http",
   },
   chat_srv: {
     address: "localhost",
     port: "8000",
-    host: "pinterest-tp.tk",
+    host: "pinteo.ru",
     protocol: "http",
   },
   static: {
@@ -40,13 +40,13 @@ web: {
   search: {
     address: "localhost",
     port: "8001",
-    host: "pinterest-tp.tk",
+    host: "pinteo.ru",
     protocol: "tcp",
   },
   auth: {
     address: "localhost",
     port: "8002",
-    host: "pinterest-tp.tk",
+    host: "pinteo.ru",
     protocol: "tcp",
   },
 }
@@ -55,22 +55,22 @@ monitoring: {
   main: {
     address: "localhost",
     port: "7007",
-    host: "pinterest-tp.tk",
+    host: "pinteo.ru",
   },
   search: {
     address: "localhost",
     port: "7008",
-    host: "pinterest-tp.tk",
+    host: "pinteo.ru",
   },
   auth: {
     address: "localhost",
     port: "7009",
-    host: "pinterest-tp.tk",
+    host: "pinteo.ru",
   },
   chat: {
     address: "localhost",
     port: "7010",
-    host: "pinterest-tp.tk",
+    host: "pinteo.ru",
   },
 }
 
