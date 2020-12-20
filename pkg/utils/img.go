@@ -14,5 +14,5 @@ func GetUrlImg(imgName string) string {
 	//
 	//return imgUrl.String()
 
-	return filepath.Join(config.Conf.Web.Static.UrlImg, imgName)
+	return filepath.Join("/api/", config.Conf.Web.Static.UrlImg, imgName)
 }
