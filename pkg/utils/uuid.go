@@ -19,5 +19,5 @@ func RandomUuid() (string, error) {
 //}
 
 func GenerateUrlAvatar(filename string) string {
-	return "/images/avatar/" + filename
+	return "/api/images/avatar/" + filename
 }
