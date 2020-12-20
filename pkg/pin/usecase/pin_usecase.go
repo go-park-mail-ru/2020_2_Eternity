@@ -28,9 +28,15 @@ func (u *Usecase) CreatePin(pin *domain.PinReq, file *multipart.FileHeader, user
 		return domain.PinResp{}, err
 	}
 
-	h, w, err := u.fileStorage.SaveUploadedFile(file, fileName)
+	err = u.fileStorage.SaveUploadedFile(file, &fileName)
 	if err != nil {
 		config.Lg("pin_usecase", "CreatePin").Error("SaveUploadedFile: ", err.Error())
+		return domain.PinResp{}, err
+	}
+
+	h, w, err := u.fileStorage.GetImageSizes(fileName)
+	if err != nil {
+		config.Lg("pin_usecase", "CreatePin").Error(err.Error())
 		return domain.PinResp{}, err
 	}
 

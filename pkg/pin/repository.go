@@ -14,5 +14,6 @@ type IRepository interface {
 }
 
 type IStorage interface {
-	SaveUploadedFile(file *multipart.FileHeader, filename string) (int, int, error)
+	SaveUploadedFile(file *multipart.FileHeader, filename *string) error
+	GetImageSizes(filename string) (int, int, error)
 }
