@@ -36,7 +36,8 @@ func (r *Repository) GetBoard(id int) (*domain.Board, error) {
 	b := &domain.Board{
 		ID: id,
 	}
-	if err := r.dbConn.QueryRow("select title, content, username from boards join users on users.id = boards.user_id where boards.id = $1", b.ID).Scan(&b.Title, &b.Content, &b.Username); err != nil {
+	if err := r.dbConn.QueryRow("select title, content, username from boards join users "+
+		"on users.id = boards.user_id where boards.id = $1", b.ID).Scan(&b.Title, &b.Content, &b.Username); err != nil {
 		config.Lg("board", "GetBoard").Error(err.Error())
 		return b, errors.New("bad id")
 	}

@@ -1,7 +1,6 @@
 package http
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
@@ -131,8 +130,5 @@ func (h *Handler) GetPinsFromBoard(c *gin.Context) {
 func (h *Handler) sanitize(f *domain.PinReq) error {
 	f.Title = h.p.Sanitize(f.Title)
 	f.Content = h.p.Sanitize(f.Content)
-	if f.Title == "" && f.Content == "" {
-		return errors.New("empty pin")
-	}
 	return nil
 }

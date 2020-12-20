@@ -45,3 +45,33 @@ func TestHandler_FeedF(t *testing.T) {
 	assert.Error(t, err)
 	assert.Equal(t, []domain.PinResp([]domain.PinResp(nil)), pins)
 }
+
+func TestHandler_SubFeed(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	r := mock_feed.NewMockIRepository(ctrl)
+	uc := NewUseCase(r)
+
+	r.EXPECT().GetSubFeed(1, 234).Return([]domain.Pin{{Title: "12345"}}, nil)
+
+	pins, err := uc.GetSubFeed(1, 234)
+	assert.NoError(t, err)
+	assert.Equal(t, len(pins), 1)
+}
+
+func TestHandler_SubFeedF(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	r := mock_feed.NewMockIRepository(ctrl)
+	uc := NewUseCase(r)
+
+	r.EXPECT().GetSubFeed(1, 234).Return(nil, errors.New(""))
+
+	pins, err := uc.GetSubFeed(1, 234)
+	assert.Error(t, err)
+	assert.Equal(t, []domain.PinResp([]domain.PinResp(nil)), pins)
+}
