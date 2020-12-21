@@ -170,7 +170,8 @@ func (uc *Usecase) CreateNotes(iNote interface{}) error {
 		toUsers, err = uc.getDstNoteMessage(note)
 		uc.sendNotes(note, noteType, toUsers)
 	default:
-		config.Lg("notifications_usecase", "CreateNote").Error("Unknown notification type")
+		config.Lg("notifications_usecase", "CreateNote").
+			Errorf("Unknown notification type: %T", iNote)
 		return errors.New("Unknown notification type")
 	}
 
