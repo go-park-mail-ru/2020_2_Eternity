@@ -150,6 +150,7 @@ func ServeWs(s ws.IServer) func(c *gin.Context) {
 
 		//userId := 2 // Note: for tests
 
+
 		if err := s.RegisterClient(c.Writer, c.Request, userId); err != nil {
 			c.AbortWithStatus(http.StatusInternalServerError)
 			config.Lg("chat_http", "ServeWs").Error(err.Error())
