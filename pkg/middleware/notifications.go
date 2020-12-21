@@ -19,7 +19,7 @@ func SendNotification(uc notifications.IUsecase) gin.HandlerFunc {
 			return
 		}
 
-		if err := uc.CreateNotes(note); err != nil {
+		if err := uc.CreateNotes(&note); err != nil {
 			config.Lg("Middleware", "SendNotification").Error(err.Error())
 			return
 		}
@@ -38,7 +38,7 @@ func SendNotificationWs(uc notifications.IUsecase) func(c *ws.Context) {
 			return
 		}
 
-		if err := uc.CreateNotes(note); err != nil {
+		if err := uc.CreateNotes(&note); err != nil {
 			config.Lg("Middleware", "SendNotificationWs").Error(err.Error())
 			return
 		}

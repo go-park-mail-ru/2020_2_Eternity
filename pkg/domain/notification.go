@@ -37,24 +37,28 @@ type NoteResp struct {
 // Notification types
 
 type NotePin struct {
-	Id      int    `bson:"id"`
-	Title   string `bson:"title"`
-	ImgLink string `bson:"img_link"`
-	UserId  int    `bson:"user_id"`
+	Id      int    `json:"id"`
+	Title   string `json:"title"`
+	ImgLink string `json:"img_link"`
+	UserId  int    `json:"user_id"`
+	Username  string  `json:"username"`
 }
 
 type NoteComment struct {
-	Id      int 	`bson:"id"`
-	Path    []int32	`bson:"path"`
-	Content string  `bson:"content"`
-	PinId   int     `bson:"pin_id"`
-	UserId  int     `bson:"userid"`
+	Id      int 	`json:"id"`
+	Path    []int32	`json:"path"`
+	Content string  `json:"content"`
+	PinId   int     `json:"pin_id"`
+	PinTitle string `json:"pin_title"`
+	UserId  int     `json:"userid"`
+	Username  string  `json:"username"`
 }
 
 
 type NoteFollow struct {
 	FollowerId  int `bson:"follower_id"`
 	UserId  int `bson:"user_id"`
+	Username  string  `json:"username"`
 }
 
 

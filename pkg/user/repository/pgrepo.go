@@ -221,3 +221,14 @@ func (r *Repository) IsFollowing(id int, username string) error {
 	}
 	return nil
 }
+
+func (r *Repository) GetUsername(userId int) string {
+	username := ""
+	err := r.dbConn.QueryRow("SELECT username FROM users WHERE id = $1", userId).Scan(&username)
+	if err != nil {
+		config.Lg("user_repo", "GetUsername").Error(err.Error())
+		username = "username"
+	}
+
+	return username
+}
