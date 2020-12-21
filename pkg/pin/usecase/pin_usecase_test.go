@@ -76,17 +76,20 @@ func TestCreatePin(t *testing.T) {
 
 	uc := NewUsecase(mockRepo, mockStorage)
 
+	mockStorage.EXPECT().
+		SaveUploadedFile(gomock.Any(), gomock.Any()).
+		Return(nil).
+		Times(1)
+
+	mockStorage.EXPECT().GetImageSizes(gomock.Any()).
+		Return(200, 200, nil).Times(1)
+
 	mockRepo.EXPECT().
 		StorePin(gomock.Any()).
 		DoAndReturn(func(p *domain.Pin) error {
 			p.Id = pinId
 			return nil
 		}).
-		Times(1)
-
-	mockStorage.EXPECT().
-		SaveUploadedFile(gomock.Any(), gomock.Any()).
-		Return(nil).
 		Times(1)
 
 	pResp, err := uc.CreatePin(&pinReq, &multipart.FileHeader{}, userId)
@@ -103,11 +106,6 @@ func TestCreatePin(t *testing.T) {
 		Return(errors.New("")).
 		Times(1)
 
-	mockRepo.EXPECT().
-		StorePin(gomock.Any()).
-		Return(errors.New("")).
-		Times(0)
-
 	_, err = uc.CreatePin(&pinReq, &multipart.FileHeader{}, userId)
 	assert.NotNil(t, err)
 
@@ -117,6 +115,9 @@ func TestCreatePin(t *testing.T) {
 		SaveUploadedFile(gomock.Any(), gomock.Any()).
 		Return(nil).
 		Times(1)
+
+	mockStorage.EXPECT().GetImageSizes(gomock.Any()).
+		Return(200, 200, nil)
 
 	mockRepo.EXPECT().
 		StorePin(gomock.Any()).

@@ -1,17 +1,11 @@
 package repository
 
 import (
-	"context"
-	"fmt"
-	"github.com/go-park-mail-ru/2020_2_Eternity/api"
+	"errors"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
-	pin_postgres "github.com/go-park-mail-ru/2020_2_Eternity/pkg/pin/repository/postgres"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/repository"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/stretchr/testify/assert"
-	"log"
-	"os"
 	"testing"
 )
 
@@ -21,78 +15,106 @@ var _ = func() bool {
 	return true
 }()
 
-var db *pgxpool.Pool
+var user = &domain.User{
+	Username: "21savage",
+	Avatar:   "asdasda",
+	ID:       1,
+}
 
-var u *domain.User
-var pin *domain.Pin
-var b *domain.Board
-var ur *repository.Repository
-var pr *pin_postgres.Repository
+var pin = &domain.Pin{
+	Id:            1,
+	Title:         "test",
+	Content:       "another test",
+	PictureName:   "asdasdas",
+	PictureHeight: 220,
+	PictureWidth:  220,
+	UserId:        1,
+	Username:      "21savage",
+}
 
-func TestMain(m *testing.M) {
-	conf, err := pgxpool.ParseConfig(fmt.Sprintf(
-		"user=%s password=%s host=%s dbname=%s sslmode=%s pool_max_conns=%d",
-		config.Conf.Db.Postgres.Username,
-		config.Conf.Db.Postgres.Password,
-		config.Conf.Db.Postgres.Host,
-		config.Conf.Db.Postgres.DbName,
-		config.Conf.Db.Postgres.SslMode,
-		10,
-	))
+var board = &domain.Board{
+	ID:       1,
+	Title:    "doska",
+	Content:  "novaya",
+	Username: "21savage",
+}
+
+func TestRepository_GetUsersByName(t *testing.T) {
+	t.Helper()
+	db, mock, err := sqlmock.New()
 	if err != nil {
-		fmt.Println("Error ", err.Error())
-	}
-
-	db, err = pgxpool.ConnectConfig(context.Background(), conf)
-	if err != nil {
-		log.Fatal(err)
-		return
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
 
-	ur = repository.NewRepo(db)
-	pr = pin_postgres.NewRepo(db)
+	r := NewRepository(db)
 
-	code := m.Run()
-	os.Exit(code)
+	rows := sqlmock.NewRows([]string{"id", "username", "avatar"}).AddRow(user.ID, user.Username, user.Avatar)
+
+	mock.ExpectQuery("select ").WithArgs("21sav", 10000).WillReturnRows(rows)
+	users, err := r.GetUsersByName("21sav", 10000)
+	assert.NoError(t, err)
+	assert.Equal(t, len(users), 1)
+
+	mock.ExpectQuery("select ").WithArgs("22sav", 10000).WillReturnError(errors.New("no results"))
+	_, err = r.GetUsersByName("22sav", 10000)
+	assert.Error(t, err)
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
 }
 
-func TestRepository_Search(t *testing.T) {
-	u, err := ur.CreateUser(&api.SignUp{
-		Username: "21savage",
-		Password: "123321123",
-		Email:    "21@email.com",
-	})
-	assert.NoError(t, err)
-
-	u.Username = "21savage"
-
-	pin = &domain.Pin{
-		Title:   "album drop",
-		Content: "the savage mode",
-		UserId:  u.ID,
+func TestRepository_GetPinsByTitle(t *testing.T) {
+	t.Helper()
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
+	defer db.Close()
 
 	r := NewRepository(db)
-	err = pr.StorePin(pin)
-	assert.NoError(t, err)
 
-	users, err := r.GetUsersByName("21s", 10000000)
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(users))
+	rows := sqlmock.NewRows([]string{"id", "title", "content", "name", "user_id", "height", "width"}).
+		AddRow(pin.Id, pin.Title, pin.Content, pin.PictureName, pin.UserId, pin.PictureHeight, pin.PictureHeight)
 
-	users, err = r.GetUsersByName("future", 10000000)
+	mock.ExpectQuery("select ").WithArgs("test", 10000).WillReturnRows(rows)
+	pins, err := r.GetPinsByTitle("test", 10000)
 	assert.NoError(t, err)
-	assert.Equal(t, []domain.UserSearch(nil), users)
+	assert.Equal(t, len(pins), 1)
 
-	pins, err := r.GetPinsByTitle("album", 10000000)
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(pins))
+	mock.ExpectQuery("select ").WithArgs("what", 10000).WillReturnError(errors.New("no results"))
+	_, err = r.GetPinsByTitle("what", 10000)
+	assert.Error(t, err)
 
-	pins, err = r.GetPinsByTitle("idk", 10000000)
-	assert.NoError(t, err)
-	assert.Equal(t, []domain.Pin{}, pins)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
 
-	_, err = db.Exec(context.Background(), "delete from users where username = '21savage'")
+func TestRepository_GetBoardsByTitle(t *testing.T) {
+	t.Helper()
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	r := NewRepository(db)
+
+	rows := sqlmock.NewRows([]string{"id", "title", "content", "username"}).
+		AddRow(board.ID, board.Title, board.Content, board.Username)
+
+	mock.ExpectQuery("select ").WithArgs("doska", 10000).WillReturnRows(rows)
+	boards, err := r.GetBoardsByTitle("doska", 10000)
 	assert.NoError(t, err)
+	assert.Equal(t, len(boards), 1)
+
+	mock.ExpectQuery("select ").WithArgs("newd", 10000).WillReturnError(errors.New("no results"))
+	_, err = r.GetBoardsByTitle("newd", 10000)
+	assert.Error(t, err)
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
 }

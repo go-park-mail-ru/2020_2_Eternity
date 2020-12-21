@@ -117,17 +117,31 @@ func (m *MockIStorage) EXPECT() *MockIStorageMockRecorder {
 }
 
 // SaveUploadedFile mocks base method
-func (m *MockIStorage) SaveUploadedFile(file *multipart.FileHeader, filename string) (int, int, error) {
+func (m *MockIStorage) SaveUploadedFile(file *multipart.FileHeader, filename *string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SaveUploadedFile", file, filename)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(int)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // SaveUploadedFile indicates an expected call of SaveUploadedFile
 func (mr *MockIStorageMockRecorder) SaveUploadedFile(file, filename interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveUploadedFile", reflect.TypeOf((*MockIStorage)(nil).SaveUploadedFile), file, filename)
+}
+
+// GetImageSizes mocks base method
+func (m *MockIStorage) GetImageSizes(filename string) (int, int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetImageSizes", filename)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(int)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GetImageSizes indicates an expected call of GetImageSizes
+func (mr *MockIStorageMockRecorder) GetImageSizes(filename interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetImageSizes", reflect.TypeOf((*MockIStorage)(nil).GetImageSizes), filename)
 }

@@ -1,17 +1,11 @@
 package postgres
 
 import (
-	"context"
-	"fmt"
-	"github.com/go-park-mail-ru/2020_2_Eternity/api"
+	"errors"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	repository2 "github.com/go-park-mail-ru/2020_2_Eternity/pkg/board/repository"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/user/repository"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/stretchr/testify/assert"
-	"log"
-	"os"
 	"testing"
 )
 
@@ -21,88 +15,123 @@ var _ = func() bool {
 	return true
 }()
 
-var db *pgxpool.Pool
+var pin = &domain.Pin{
+	Title:         "album drop",
+	Content:       "the savage mode",
+	Id:            1,
+	PictureHeight: 200,
+	PictureWidth:  200,
+	UserId:        1,
+	Username:      "21savage",
+}
 
-var u *domain.User
-var pin *domain.Pin
 var b *domain.Board
-var ur *repository.Repository
-var br *repository2.Repository
 
-func TestMain(m *testing.M) {
-	conf, err := pgxpool.ParseConfig(fmt.Sprintf(
-		"user=%s password=%s host=%s dbname=%s sslmode=%s pool_max_conns=%d",
-		config.Conf.Db.Postgres.Username,
-		config.Conf.Db.Postgres.Password,
-		config.Conf.Db.Postgres.Host,
-		config.Conf.Db.Postgres.DbName,
-		config.Conf.Db.Postgres.SslMode,
-		10,
-	))
+func TestRepository_CreatePin(t *testing.T) {
+	t.Helper()
+	db, mock, err := sqlmock.New()
 	if err != nil {
-		fmt.Println("Error ", err.Error())
-	}
-
-	db, err = pgxpool.ConnectConfig(context.Background(), conf)
-	if err != nil {
-		log.Fatal(err)
-		return
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
 
-	ur = repository.NewRepo(db)
-	br = repository2.NewRepo(db)
-
-	code := m.Run()
-	os.Exit(code)
-}
-
-func TestRepository_Pin(t *testing.T) {
-	u, err := ur.CreateUser(&api.SignUp{
-		Username: "21savage",
-		Password: "123321123",
-		Email:    "21@email.com",
-	})
-	assert.NoError(t, err)
-
-	b, err = br.CreateBoard(u.ID, &api.CreateBoard{
-		Title:   "doska",
-		Content: "novaya",
-	})
-	assert.NoError(t, err)
-
-	u.Username = "21savage"
-
-	pin = &domain.Pin{
-		Title:   "album",
-		Content: "the savage mode",
-		UserId:  u.ID,
-	}
-
 	r := NewRepo(db)
+
+	rows := sqlmock.NewRows([]string{"id"}).AddRow(2)
+
+	mock.ExpectQuery("insert into pins").
+		WithArgs(pin.Title, pin.Content, pin.UserId, pin.PictureName, pin.PictureHeight, pin.PictureHeight).
+		WillReturnRows(rows)
 	err = r.StorePin(pin)
+	assert.Equal(t, 2, pin.Id)
 	assert.NoError(t, err)
 
-	p, err := r.GetPin(pin.Id)
-	assert.NoError(t, err)
-	assert.Equal(t, pin.Title, p.Title)
+	mock.ExpectQuery("insert into pins").
+		WithArgs(pin.Title, pin.Content, pin.UserId, pin.PictureName, pin.PictureHeight, pin.PictureHeight).WillReturnError(errors.New("err"))
 
-	_, err = r.GetPin(-1)
+	err = r.StorePin(pin)
 	assert.Error(t, err)
 
-	pins, err := r.GetPinList(u.Username)
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(pins))
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
 
-	err = br.AttachPin(b.ID, p.Id)
-	assert.NoError(t, err)
+func TestRepository_GetPin(t *testing.T) {
+	t.Helper()
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
 
-	pins, err = r.GetPinBoardList(b.ID)
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(pins))
+	r := NewRepo(db)
 
-	_, err = db.Exec(context.Background(), "delete from users where username = '21savage'")
+	rows := sqlmock.NewRows([]string{"p.pin_id", "title", "content", "p.name", "user_id", "height", "width", "username"}).
+		AddRow(pin.Id, pin.Title, pin.Content, pin.PictureName, pin.UserId, pin.PictureHeight, pin.PictureWidth, pin.Username)
+	mock.ExpectQuery("select ").WithArgs(1).WillReturnRows(rows)
+
+	p, err := r.GetPin(1)
 	assert.NoError(t, err)
-	_, err = db.Exec(context.Background(), "delete from boards where id = $1", b.ID)
+	assert.Equal(t, 1, p.Id)
+
+	mock.ExpectQuery("select ").WithArgs(3).WillReturnError(errors.New("not found pin"))
+	_, err = r.GetPin(3)
+	assert.Error(t, err)
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
+
+func TestRepository_GetPinList(t *testing.T) {
+	t.Helper()
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	r := NewRepo(db)
+
+	rows := sqlmock.NewRows([]string{"id", "title", "content", "name", "user_id", "height", "width"}).
+		AddRow(pin.Id, pin.Title, pin.Content, pin.PictureName, pin.UserId, pin.PictureHeight, pin.PictureWidth)
+	mock.ExpectQuery("select ").WithArgs(pin.Username).WillReturnRows(rows)
+
+	pins, err := r.GetPinList(pin.Username)
 	assert.NoError(t, err)
+	assert.Equal(t, len(pins), 1)
+
+	mock.ExpectQuery("select").WithArgs(pin.Username).WillReturnError(errors.New("error"))
+	_, err = r.GetPinList(pin.Username)
+	assert.Error(t, err)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
+
+func TestRepository_GetBoardPinList(t *testing.T) {
+	t.Helper()
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	r := NewRepo(db)
+
+	rows := sqlmock.NewRows([]string{"id", "title", "content", "name", "user_id", "height", "width"}).
+		AddRow(pin.Id, pin.Title, pin.Content, pin.PictureName, pin.UserId, pin.PictureHeight, pin.PictureWidth)
+	mock.ExpectQuery("select ").WithArgs(1).WillReturnRows(rows)
+
+	pins, err := r.GetPinBoardList(1)
+	assert.NoError(t, err)
+	assert.Equal(t, len(pins), 1)
+
+	mock.ExpectQuery("select").WithArgs(2).WillReturnError(errors.New("error"))
+	_, err = r.GetPinBoardList(2)
+	assert.Error(t, err)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
 }

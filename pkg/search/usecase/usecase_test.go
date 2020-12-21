@@ -62,3 +62,34 @@ func TestUsecase_GetPinsByTitleF(t *testing.T) {
 	_, err := usecase.GetPinsByTitle(title, last)
 	assert.Error(t, err)
 }
+
+func TestUsecase_GetBoardsByTitle(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	r := mock_search.NewMockIRepository(ctrl)
+	usecase := NewUsecase(r)
+
+	title := "21savage"
+	last := 234
+	r.EXPECT().GetBoardsByTitle(title, last).Return([]domain.Board{{Content: title}}, nil)
+	pins, err := usecase.GetBoardsByTitle(title, last)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(pins))
+}
+
+func TestUsecase_GetBoardsByTitleF(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	r := mock_search.NewMockIRepository(ctrl)
+	usecase := NewUsecase(r)
+
+	title := "21savage"
+	last := 234
+	r.EXPECT().GetBoardsByTitle(title, last).Return(nil, errors.New(""))
+	_, err := usecase.GetBoardsByTitle(title, last)
+	assert.Error(t, err)
+}

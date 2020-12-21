@@ -90,3 +90,42 @@ func TestSearchHandler_GetPinsByTitleF(t *testing.T) {
 	_, err := handler.GetPinsByTitle(context.Background(), ps)
 	assert.Error(t, err)
 }
+
+func TestSearchHandler_GetBoardsByTitle(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	uc := mock_search.NewMockIUsecase(ctrl)
+
+	handler := NewHandler(uc)
+
+	bs := &sc.BoardSearch{
+		Title: "test",
+		Last:  int32(234),
+	}
+	uc.EXPECT().GetBoardsByTitle(bs.Title, int(bs.Last)).Return([]domain.Board{{Title: "test"}}, nil)
+
+	boards, err := handler.GetBoardsByTitle(context.Background(), bs)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(boards.GetBoards()))
+}
+
+func TestSearchHandler_GetBoardsByTitleF(t *testing.T) {
+	t.Helper()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	uc := mock_search.NewMockIUsecase(ctrl)
+
+	handler := NewHandler(uc)
+
+	bs := &sc.BoardSearch{
+		Title: "test asdasd",
+		Last:  int32(234),
+	}
+	uc.EXPECT().GetBoardsByTitle(bs.Title, int(bs.Last)).Return(nil, errors.New(""))
+
+	_, err := handler.GetBoardsByTitle(context.Background(), bs)
+	assert.Error(t, err)
+}
