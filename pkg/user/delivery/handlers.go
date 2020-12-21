@@ -301,7 +301,7 @@ func (h *Handler) Follow(c *gin.Context) {
 	c.Set("status", 200)
 	c.Set("follow_id", followedUser)
 
-	c.Set(domain.NotificationKey, domain.NoteFollow{
+	c.Set(domain.NotificationKey, &domain.NoteFollow{
 		FollowerId: followingUser,
 		UserId:     followedUser,
 	})

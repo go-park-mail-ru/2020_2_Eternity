@@ -60,7 +60,7 @@ func (h *Handler) CreateComment(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, commentResp)
-	c.Set(domain.NotificationKey, domain.NoteComment{
+	c.Set(domain.NotificationKey, &domain.NoteComment{
 		Id:      commentResp.Id,
 		Path:    commentResp.Path,
 		Content: commentResp.Content,

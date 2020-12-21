@@ -55,7 +55,7 @@ func (h *Handler) CreateChat(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, resp)
-	//c.Set(domain.NotificationKey, domain.NoteChat{
+	//c.Set(domain.NotificationKey, &domain.NoteChat{
 	//	Id: resp.Id,
 	//	CreatorId: userId,
 	//	CreationTime: resp.CreationTime,

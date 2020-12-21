@@ -1,0 +1,10 @@
+language: go
+
+before_install:
+  - echo -e "machine github.com\n  login $GITHUB_TOKEN" > ~/.netrc
+  - git lfs pull
+
+branches:
+  only:
+    - master
+    - dev
