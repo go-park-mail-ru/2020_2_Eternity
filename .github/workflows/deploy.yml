@@ -1,0 +1,22 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ master, dev ]
+  pull_requests:
+    branches: [ master ]
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.14.x
+
+
+

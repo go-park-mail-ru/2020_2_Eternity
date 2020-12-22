@@ -32,3 +32,10 @@ build:
 .PHONY: protochat
 protochat:
 	protoc --go_out=plugins=grpc:. --go_opt=paths=source_relative pkg/proto/chat/chat.proto
+
+
+.PHONY: test
+test:
+	go test ./... -coverprofile=cover.out.tmp -coverpkg=./... -cover ./...
+	cat cover.out.tmp | grep -v "_easyjson.go"| grep -v "/mock/" | grep -v "proto" | grep -v "internal" | grep -v "cmd" | grep -v "ws"  > cover.out
+	go tool cover -func cover.out
