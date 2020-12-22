@@ -33,7 +33,7 @@ jobs:
     - name: Upload build results
       uses: actions/upload-artifact@v1
       with:
-        name: binary
+        name: bin-ci
         path: ./build/bin
 
 
@@ -45,7 +45,7 @@ jobs:
       - name: Download binary
         uses: actions/download-artifact@v1
         with:
-          name: binary
+          name: bin-ci
 
       - name: Transfer bin files to server
         uses: appleboy/scp-action@v0.0.10
@@ -53,8 +53,8 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
-          source: "binary/"
-          target: "/home/ubuntu/pinterest-backend/build/bin-ci/"
+          source: "bin-ci/"
+          target: "/home/ubuntu/pinterest-backend/build/"
 
       - name: Restart service
         uses: appleboy/ssh-action@master
