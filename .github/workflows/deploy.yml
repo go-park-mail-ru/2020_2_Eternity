@@ -62,4 +62,4 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
-          script: cd /home/ubuntu/pinterest-backend/build/bin-ci; chmod -R +x ./; ./restart.sh
+          script: chmod -R +x /home/ubuntu/pinterest-backend/build/bin-ci && ./home/ubuntu/pinterest-backend/scripts/deploy/restart.sh
