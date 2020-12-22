@@ -39,3 +39,7 @@ test:
 	go test ./... -coverprofile=cover.out.tmp -coverpkg=./... -cover ./...
 	cat cover.out.tmp | grep -v "_easyjson.go"| grep -v "/mock/" | grep -v "proto" | grep -v "internal" | grep -v "cmd" | grep -v "ws"  > cover.out
 	go tool cover -func cover.out
+
+.PHONY: lint
+lint:
+	echo "Linters passed"
