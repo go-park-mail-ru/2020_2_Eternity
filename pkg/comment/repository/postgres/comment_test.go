@@ -1,15 +1,105 @@
 package postgres
 
-//import (
-//	"context"
-//	"fmt"
-//	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-//	"github.com/stretchr/testify/assert"
-//
-//	"github.com/jackc/pgx/v4/pgxpool"
-//	"os"
-//	"testing"
-//)
+import (
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
+	"github.com/stretchr/testify/assert"
+	"os"
+	"testing"
+)
+
+var (
+	parentId int = 0
+
+	childPath = []int{parentId, 1}
+
+	childComment = domain.Comment{
+		Id: 1,
+		Content: "content",
+		PinId: 2,
+		UserId: 3,
+		Username: "username",
+	}
+)
+
+func TestMain(m *testing.M) {
+	config.Conf = config.NewConfigTst()
+	code := m.Run()
+	os.Exit(code)
+}
+
+
+func TestStoreChildComment(t *testing.T) {
+	db, mock, e := sqlmock.New()
+	if e != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", e)
+	}
+	defer db.Close()
+
+	// Query error
+
+	c := childComment
+	mock.ExpectQuery("insert into comments").
+		WithArgs(parentId, c.Content, c.PinId, c.UserId).
+		WillReturnRows(
+			sqlmock.NewRows([]string{"id", "path", "user_id"}))
+
+
+	r := NewRepo(db)
+	err := r.StoreChildComment(&c, int(parentId))
+
+	assert.NotNil(t, err)
+	assert.Nil(t, mock.ExpectationsWereMet())
+}
+
+func TestStoreRootComment(t *testing.T) {
+	db, mock, e := sqlmock.New()
+	if e != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", e)
+	}
+	defer db.Close()
+
+	// Query error
+
+	c := childComment
+	mock.ExpectQuery("insert into comments").
+		WithArgs(c.Content, c.PinId, c.UserId).
+		WillReturnRows(
+			sqlmock.NewRows([]string{"id", "path", "user_id"}))
+
+
+	r := NewRepo(db)
+	err := r.StoreRootComment(&c)
+
+	assert.NotNil(t, err)
+	assert.Nil(t, mock.ExpectationsWereMet())
+}
+
+
+func TestGetComment(t *testing.T) {
+	db, mock, e := sqlmock.New()
+	if e != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", e)
+	}
+	defer db.Close()
+
+	// Error
+
+	c := childComment
+	mock.ExpectQuery("select").
+		WithArgs(c.Id).
+		WillReturnRows(
+			sqlmock.NewRows([]string{"id", "path", "content", "pin_id", "user_id", "username"}))
+
+
+	r := NewRepo(db)
+	_, err := r.GetComment(c.Id)
+
+	assert.NotNil(t, err)
+	assert.Nil(t, mock.ExpectationsWereMet())
+}
+
 
 //var db *pgxpool.Pool
 //
