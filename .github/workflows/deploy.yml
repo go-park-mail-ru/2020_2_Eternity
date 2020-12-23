@@ -21,17 +21,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-#    - name: Run linters
-#      run: make lint
-#
     - name: Golangci-lint
       uses: golangci/golangci-lint-action@v2
       with:
         version: v1.29
-        #args: -c .golangci.yml
 
-#    - name: Run tests
-#      run: make test
+    - name: Run tests
+      run: make test
 
     - name: Build
       run: make build
