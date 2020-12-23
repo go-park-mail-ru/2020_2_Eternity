@@ -180,7 +180,7 @@ func (h *Handler) UpdatePassword(c *gin.Context) {
 		return
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(psswds.OldPassword)); err != nil {
+	if er := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(psswds.OldPassword)); er != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "bad password"})
 		return
 	}

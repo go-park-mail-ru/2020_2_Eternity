@@ -33,6 +33,7 @@ func (r *Repository) StoreChat(ch *domainChat.Chat, userId int, collocutorName s
 		if er != nil {
 			config.Lg("chat_repo", "StoreChat").
 				Error("Rollback: ", er.Error())
+
 		}
 	}()
 
@@ -114,6 +115,7 @@ func (r *Repository) GetUserChats(userId int) ([]domainChat.Chat, error) {
 		if er != nil {
 			config.Lg("chat_repo", "GetUserChats").
 				Error("Rollback: ", er.Error())
+
 		}
 	}()
 

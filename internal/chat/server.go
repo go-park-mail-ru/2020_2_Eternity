@@ -34,7 +34,12 @@ func New(db database.IDbConn) *Server {
 
 	go metric.RouterForMetrics(config.Conf.Monitoring.Chat.Address + ":" + config.Conf.Monitoring.Chat.Port)
 
-	m, _ := metric.CreateNewMetric("chat")
+
+	m, er := metric.CreateNewMetric("chat")
+	if er != nil {
+		config.Lg("chat_server", "New").Fatal("Failed to create metric: ", err.Error())
+	}
+
 	interceptor := metric.NewInterceptor(m)
 
 	repo := chatRepo.NewRepo(db)

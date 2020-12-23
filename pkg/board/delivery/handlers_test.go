@@ -58,7 +58,7 @@ func TestHandler_CreateBoard(t *testing.T) {
 
 	MockUsecase.EXPECT().CreateBoard(1, &b).Return(&domain.Board{}, nil)
 
-	req, err := http.NewRequest("POST", path, bytes.NewReader(body))
+	req, _ := http.NewRequest("POST", path, bytes.NewReader(body))
 
 	c, r := gin.CreateTestContext(w)
 	r.Use(mid())
@@ -115,7 +115,7 @@ func TestHandler_CreateBoardF(t *testing.T) {
 
 	MockUsecase.EXPECT().CreateBoard(1, &b).Return(&domain.Board{}, errors.New(""))
 
-	req, err := http.NewRequest("POST", path, bytes.NewReader(body))
+	req, _ := http.NewRequest("POST", path, bytes.NewReader(body))
 
 	c, r := gin.CreateTestContext(w)
 	r.Use(mid())

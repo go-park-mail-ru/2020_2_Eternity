@@ -33,8 +33,8 @@ func (h Handler) Login(ctx context.Context, req *auth.LoginReq) (*auth.LoginInfo
 		}, errors.New("invalid username")
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(req.Password)); err != nil {
-		config.Lg("Auth_serv", "Login").Error(err.Error())
+	if er := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(req.Password)); er != nil {
+		config.Lg("Auth_serv", "Login").Error(er.Error())
 		return &auth.LoginInfo{
 			Status: http.StatusBadRequest,
 			Error:  "bad password",

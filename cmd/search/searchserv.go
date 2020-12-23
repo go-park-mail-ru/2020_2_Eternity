@@ -20,7 +20,11 @@ func main() {
 
 	logger := config.Logger{}
 	logger.Init()
-	defer logger.Cleanup()
+	defer func() {
+		if err := logger.Cleanup(); err != nil {
+			config.Lg("searchserv", "main").Error(err.Error())
+		}
+	}()
 
 	dbConn := database.NewDB(&config.Conf.Db)
 	if err := dbConn.Open(); err != nil {

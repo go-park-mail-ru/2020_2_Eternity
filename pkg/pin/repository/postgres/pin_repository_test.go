@@ -25,8 +25,6 @@ var pin = &domain.Pin{
 	Username:      "21savage",
 }
 
-var b *domain.Board
-
 func TestRepository_CreatePin(t *testing.T) {
 	t.Helper()
 	db, mock, err := sqlmock.New()

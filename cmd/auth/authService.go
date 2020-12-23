@@ -19,7 +19,11 @@ func main() {
 
 	logger := config.Logger{}
 	logger.Init()
-	defer logger.Cleanup()
+	defer func() {
+		if err := logger.Cleanup(); err != nil {
+			config.Lg("authservice", "main").Error(err.Error())
+		}
+	}()
 
 	dbConn := database.NewDB(&config.Conf.Db)
 	if err := dbConn.Open(); err != nil {
@@ -32,6 +36,9 @@ func main() {
 	go metric.RouterForMetrics(config.Conf.Monitoring.Auth.Address + ":" + config.Conf.Monitoring.Auth.Port)
 
 	m, err := metric.CreateNewMetric("auth")
+	if err != nil {
+		config.Lg("authserv", "main").Fatal("create metric error" + err.Error())
+	}
 	interceptor := metric.NewInterceptor(m)
 
 	repo := repository.NewRepo(dbConn)
@@ -40,7 +47,7 @@ func main() {
 
 	lis, err := net.Listen(config.Conf.Web.Search.Protocol, config.Conf.Web.Auth.Address+":"+config.Conf.Web.Auth.Port)
 	if err != nil {
-		config.Lg("searchserv", "main").Fatal(err.Error())
+		config.Lg("authserv", "main").Fatal(err.Error())
 	}
 
 	server := grpc.NewServer(
