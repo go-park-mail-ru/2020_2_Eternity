@@ -74,7 +74,7 @@ func TestRepository_CreateUser(t *testing.T) {
 		u.Name, u.Surname, u.Description, u.BirthDate, sqlmock.AnyArg(), sqlmock.AnyArg()).
 		WillReturnError(errors.New("user exists"))
 
-	_, err = r.CreateUser(u)
+	_, _ = r.CreateUser(u)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}

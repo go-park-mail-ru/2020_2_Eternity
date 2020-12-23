@@ -6,16 +6,17 @@ import (
 	chatServer "github.com/go-park-mail-ru/2020_2_Eternity/internal/chat"
 )
 
-
 func main() {
 	config.Conf = config.NewConfig()
 	config.Db = config.NewDatabase(&config.Conf.Db).Open()
 
 	logger := config.Logger{}
 	logger.Init()
-	defer logger.Cleanup()
-
-
+	defer func() {
+		if err := logger.Cleanup(); err != nil {
+			config.Lg("chat", "main").Error(err.Error())
+		}
+	}()
 
 	dbConn := database.NewDB(&config.Conf.Db)
 	if err := dbConn.Open(); err != nil {

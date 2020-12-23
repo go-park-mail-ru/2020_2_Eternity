@@ -7,21 +7,20 @@ import (
 )
 
 type Usecase struct {
-	repository  comment.IRepository
+	repository comment.IRepository
 }
 
 func NewUsecase(r comment.IRepository) *Usecase {
 	return &Usecase{
-		repository:  r,
+		repository: r,
 	}
 }
-
 
 func (uc *Usecase) CreateComment(commentReq *domain.CommentCreateReq, userId int) (domain.CommentResp, error) {
 	modelComment := domain.Comment{
 		Content: commentReq.Content,
-		PinId: commentReq.PinId,
-		UserId: userId,
+		PinId:   commentReq.PinId,
+		UserId:  userId,
 	}
 
 	var err error
@@ -36,16 +35,8 @@ func (uc *Usecase) CreateComment(commentReq *domain.CommentCreateReq, userId int
 		return domain.CommentResp{}, err
 	}
 
-	return domain.CommentResp{
-		Id: modelComment.Id,
-		Path : modelComment.Path,
-		Content: modelComment.Content,
-		PinId: modelComment.PinId,
-		UserId: modelComment.UserId,
-		Username: modelComment.Username,
-	}, nil
+	return domain.CommentResp(modelComment), nil
 }
-
 
 func (uc *Usecase) GetPinComments(pinId int) ([]domain.CommentResp, error) {
 	modelComments, err := uc.repository.GetPinComments(pinId)
@@ -56,19 +47,11 @@ func (uc *Usecase) GetPinComments(pinId int) ([]domain.CommentResp, error) {
 
 	commentsResp := []domain.CommentResp{}
 	for _, mComment := range modelComments {
-		commentsResp = append(commentsResp, domain.CommentResp{
-			Id: mComment.Id,
-			Path : mComment.Path,
-			Content: mComment.Content,
-			PinId: mComment.PinId,
-			UserId: mComment.UserId,
-			Username: mComment.Username,
-		})
+		commentsResp = append(commentsResp, domain.CommentResp(mComment))
 	}
 
 	return commentsResp, nil
 }
-
 
 func (uc *Usecase) GetCommentById(commentId int) (domain.CommentResp, error) {
 	modelComment, err := uc.repository.GetComment(commentId)
@@ -77,12 +60,5 @@ func (uc *Usecase) GetCommentById(commentId int) (domain.CommentResp, error) {
 		return domain.CommentResp{}, err
 	}
 
-	return domain.CommentResp{
-		Id: modelComment.Id,
-		Path : modelComment.Path,
-		Content: modelComment.Content,
-		PinId: modelComment.PinId,
-		UserId: modelComment.UserId,
-		Username: modelComment.Username,
-	}, nil
+	return domain.CommentResp(modelComment), nil
 }

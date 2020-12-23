@@ -59,7 +59,7 @@ func TestDelivery_SignUpSuccess(t *testing.T) {
 
 	userMockUsecase.EXPECT().CreateUser(gomock.Any()).Return(respUser, nil)
 
-	req, err := http.NewRequest("POST", path, bytes.NewReader(body))
+	req, _ := http.NewRequest("POST", path, bytes.NewReader(body))
 
 	c, r := gin.CreateTestContext(w)
 
@@ -93,7 +93,7 @@ func TestDelivery_SignUpValidP(t *testing.T) {
 		return
 	}
 
-	req, err := http.NewRequest("POST", path, bytes.NewReader(body))
+	req, _ := http.NewRequest("POST", path, bytes.NewReader(body))
 	c, r := gin.CreateTestContext(w)
 	r.POST(path, userHandler.SignUp)
 	r.ServeHTTP(c.Writer, req)
@@ -124,7 +124,7 @@ func TestDelivery_LoginF(t *testing.T) {
 	}
 	userAs.EXPECT().Login(gomock.Any(), gomock.Any()).Return(nil, errors.New("Erorr"))
 
-	req, err := http.NewRequest("POST", path, bytes.NewReader(body))
+	req, _ := http.NewRequest("POST", path, bytes.NewReader(body))
 	_, r := gin.CreateTestContext(w)
 	r.POST(path, userHandler.Login)
 	r.ServeHTTP(w, req)
@@ -168,7 +168,7 @@ func TestDelivery_Login(t *testing.T) {
 		Tokens: &auth.Token{},
 	}, nil)
 
-	req, err := http.NewRequest("POST", path, bytes.NewReader(body))
+	req, _ := http.NewRequest("POST", path, bytes.NewReader(body))
 	_, r := gin.CreateTestContext(w)
 	r.POST(path, userHandler.Login)
 	r.ServeHTTP(w, req)
@@ -264,7 +264,7 @@ func TestDelivery_UpdateS(t *testing.T) {
 	respUser := &domain.User{}
 	userMockUsecase.EXPECT().UpdateUser(1, gomock.Any()).Return(respUser, nil)
 
-	req, err := http.NewRequest("PUT", path, bytes.NewReader(body))
+	req, _ := http.NewRequest("PUT", path, bytes.NewReader(body))
 
 	c, r := gin.CreateTestContext(w)
 
@@ -298,7 +298,7 @@ func TestDelivery_UpdateC(t *testing.T) {
 
 	userMockUsecase.EXPECT().UpdateUser(1, gomock.Any()).Return(nil, errors.New(""))
 
-	req, err := http.NewRequest("PUT", path, bytes.NewReader(body))
+	req, _ := http.NewRequest("PUT", path, bytes.NewReader(body))
 
 	c, r := gin.CreateTestContext(w)
 
@@ -349,7 +349,7 @@ func TestDelivery_UpdateUserFail(t *testing.T) {
 		return
 	}
 
-	req, err := http.NewRequest("PUT", path, bytes.NewReader(body))
+	req, _ := http.NewRequest("PUT", path, bytes.NewReader(body))
 
 	c, r := gin.CreateTestContext(w)
 
@@ -382,7 +382,7 @@ func TestDelivery_UpdatePasswordF(t *testing.T) {
 		return
 	}
 
-	req, err := http.NewRequest("PUT", path, bytes.NewReader(body))
+	req, _ := http.NewRequest("PUT", path, bytes.NewReader(body))
 
 	c, r := gin.CreateTestContext(w)
 	r.Use(mid())
@@ -425,7 +425,7 @@ func TestDelivery_UpdatePassword(t *testing.T) {
 	userMockUsecase.EXPECT().GetUser(gomock.Any()).Return(&u, nil)
 	userMockUsecase.EXPECT().UpdatePassword(gomock.Any(), gomock.Any()).Return(nil)
 
-	req, err := http.NewRequest("PUT", path, bytes.NewReader(body))
+	req, _ := http.NewRequest("PUT", path, bytes.NewReader(body))
 
 	c, r := gin.CreateTestContext(w)
 	r.Use(mid())
@@ -468,7 +468,7 @@ func TestDelivery_UpdatePasswordU(t *testing.T) {
 	userMockUsecase.EXPECT().GetUser(gomock.Any()).Return(&u, nil)
 	userMockUsecase.EXPECT().UpdatePassword(gomock.Any(), gomock.Any()).Return(errors.New(""))
 
-	req, err := http.NewRequest("PUT", path, bytes.NewReader(body))
+	req, _ := http.NewRequest("PUT", path, bytes.NewReader(body))
 
 	c, r := gin.CreateTestContext(w)
 	r.Use(mid())
@@ -504,7 +504,7 @@ func TestDelivery_UpdatePasswordG(t *testing.T) {
 
 	userMockUsecase.EXPECT().GetUser(gomock.Any()).Return(&u, errors.New(""))
 
-	req, err := http.NewRequest("PUT", path, bytes.NewReader(body))
+	req, _ := http.NewRequest("PUT", path, bytes.NewReader(body))
 
 	c, r := gin.CreateTestContext(w)
 	r.Use(mid())
@@ -535,7 +535,7 @@ func TestDelivery_UpdatePasswordAuth(t *testing.T) {
 		log.Fatal("cant marshal")
 		return
 	}
-	req, err := http.NewRequest("PUT", path, bytes.NewReader(body))
+	req, _ := http.NewRequest("PUT", path, bytes.NewReader(body))
 	c, r := gin.CreateTestContext(w)
 	r.PUT(path, userHandler.UpdatePassword)
 	r.ServeHTTP(c.Writer, req)
@@ -569,7 +569,7 @@ func TestDelivery_UpdatePasswordW(t *testing.T) {
 
 	userMockUsecase.EXPECT().GetUser(gomock.Any()).Return(&u, nil)
 
-	req, err := http.NewRequest("PUT", path, bytes.NewReader(body))
+	req, _ := http.NewRequest("PUT", path, bytes.NewReader(body))
 
 	c, r := gin.CreateTestContext(w)
 	r.Use(mid())
