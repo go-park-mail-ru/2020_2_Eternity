@@ -112,9 +112,7 @@ func NewRouter() *Router {
 }
 
 func (r *Router) SetHandler(msgType string, handlers ...func(c *Context))  {
-	for _, h := range handlers {
-		r.routes[msgType] = append(r.routes[msgType], h)
-	}
+	r.routes[msgType] = append(r.routes[msgType], handlers...)
 }
 
 

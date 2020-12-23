@@ -58,7 +58,7 @@ func typeIntToStr(noteType int) (string, error) {
 	case NoteMessage:
 		noteTypeWs = domain.NoteMessageRespType
 	default:
-		return "", errors.New(fmt.Sprintf("switch: Can't find needed note type, given: %d", noteType))
+		return "", fmt.Errorf("switch: Can't find needed note type, given: %d", noteType)
 	}
 
 	return noteTypeWs, nil

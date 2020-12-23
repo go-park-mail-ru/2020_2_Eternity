@@ -1,10 +1,5 @@
 package repository
 
-import (
-	"github.com/stretchr/testify/assert"
-	"testing"
-)
-
 /*var db *pgxpool.Pool
 
 func TestMain(m *testing.M) {
@@ -121,12 +116,12 @@ func TestMain(m *testing.M) {
 //	assert.Nil(t, err)
 //}
 
-func TestGeCollId(t *testing.T) {
-	r := NewRepo(db)
-
-	id, err := r.GetCollocutorId(2, 1)
-
-	fmt.Println(id)
-
-	assert.Nil(t, err)
-}
+//func TestGeCollId(t *testing.T) {
+//	r := NewRepo(db)
+//
+//	id, err := r.GetCollocutorId(2, 1)
+//
+//	fmt.Println(id)
+//
+//	assert.Nil(t, err)
+//}

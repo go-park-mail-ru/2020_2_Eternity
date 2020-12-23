@@ -34,7 +34,7 @@ func New(db database.IDbConn) *Server {
 
 	go metric.RouterForMetrics(config.Conf.Monitoring.Chat.Address + ":" + config.Conf.Monitoring.Chat.Port)
 
-	m, err := metric.CreateNewMetric("chat")
+	m, _ := metric.CreateNewMetric("chat")
 	interceptor := metric.NewInterceptor(m)
 
 	repo := chatRepo.NewRepo(db)
@@ -61,7 +61,7 @@ func (s *Server) Run() {
 	config.Lg("chat_server", "Run").Info("Server listening on " +
 		fmt.Sprintf("%s:%s", config.Conf.Web.Chat.Address, config.Conf.Web.Chat.Port))
 
-	quit := make(chan os.Signal)
+	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 

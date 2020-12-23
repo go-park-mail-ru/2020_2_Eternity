@@ -28,7 +28,13 @@ func (r *Repository) StoreChat(ch *domainChat.Chat, userId int, collocutorName s
 		return err
 	}
 
-	defer tx.Rollback()
+	defer func() {
+		er := tx.Rollback()
+		if er != nil {
+			config.Lg("chat_repo", "StoreChat").
+				Error("Rollback: ", er.Error())
+		}
+	}()
 
 	err = tx.QueryRow(
 		"INSERT INTO chats (creation_time) "+
@@ -103,7 +109,13 @@ func (r *Repository) GetUserChats(userId int) ([]domainChat.Chat, error) {
 		return nil, err
 	}
 
-	defer tx.Rollback()
+	defer func() {
+		er := tx.Rollback()
+		if er != nil {
+			config.Lg("chat_repo", "GetUserChats").
+				Error("Rollback: ", er.Error())
+		}
+	}()
 
 	records := 0
 	err = tx.QueryRow(

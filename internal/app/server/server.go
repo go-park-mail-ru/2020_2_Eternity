@@ -96,7 +96,7 @@ func (s *Server) Run() {
 	}()
 	config.Lg("server", "Run").Info("Server listening on " + s.server.Addr)
 
-	quit := make(chan os.Signal)
+	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 

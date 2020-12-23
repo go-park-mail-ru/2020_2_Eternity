@@ -100,20 +100,26 @@ func (c *Client) writePump() {
 	for {
 		select {
 		case message, ok := <-c.send:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := c.conn.SetWriteDeadline(time.Now().Add(writeWait)); err != nil {
+				config.Lg("ws", "writePump").Error(err.Error())
+			}
 			if err := c.sendMessages(message, ok); err != nil {
 				return
 			}
 
 		case <-ticker.C:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := c.conn.SetWriteDeadline(time.Now().Add(writeWait)); err != nil {
+				config.Lg("ws", "writePump").Error(err.Error())
+			}
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				config.Lg("ws", "writePump").Error("WritePing: ", err.Error())
 				return
 			}
 
 		case <-authTimer.C:
-			c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+			if err := c.conn.WriteMessage(websocket.CloseMessage, []byte{}); err != nil {
+				config.Lg("ws", "writePump").Error(err.Error())
+			}
 			config.Lg("ws", "writePump").Info("authTimer expired")
 			return
 		}
@@ -122,7 +128,9 @@ func (c *Client) writePump() {
 
 func (c *Client) sendMessages(message []byte, ok bool) error {
 	if !ok {
-		c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+		if err := c.conn.WriteMessage(websocket.CloseMessage, []byte{}); err != nil {
+			config.Lg("ws", "sendMessages").Error(err.Error())
+		}
 		config.Lg("ws", "sendMessages").Info("The hub closed the channel")
 		return errors.New("")
 	}
