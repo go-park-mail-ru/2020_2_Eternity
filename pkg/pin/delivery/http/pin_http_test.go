@@ -94,7 +94,7 @@ func createMultipartBody(pr domain.PinReq) (*bytes.Buffer, string, error) {
 		return nil, "", err
 	}
 
-	_, err = fmt.Fprintf(jsonPart, string(js))
+	_, err = fmt.Fprint(jsonPart, string(js))
 	if err != nil {
 		return nil, "", err
 	}

@@ -1,60 +1,53 @@
 package usecase
 
-import (
-	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
-	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
-	"os"
-	"testing"
-)
-
-var (
-	userId = 321
-	noteId = 432
-
-	toUsers = []int{2}
-
-	noteComment = domain.NoteComment{
-		Id: 1,
-		Path: []int32{1},
-		Content: "content",
-		PinId: 1,
-		UserId: 1,
-	}
-
-	notePin = domain.NotePin{
-		Id: 1,
-		Title: "title",
-		ImgLink: "link",
-		UserId: 1,
-	}
-
-	noteFollow = domain.NoteFollow{
-		FollowerId: 21,
-		UserId: 32,
-	}
-
-	noteRespMany = []domain.NoteResp {
-		{
-			Id: 12,
-			Type: NoteComment,
-			EncodedData: []byte("123123"),
-			IsRead: false,
-		},
-		{
-			Id: 13,
-			Type: NotePin,
-			EncodedData: []byte("1223"),
-			IsRead: false,
-		},
-	}
-)
-
-
-func TestMain(m *testing.M) {
-	config.Conf = config.NewConfigTst()
-	code := m.Run()
-	os.Exit(code)
-}
+//var (
+//	userId = 321
+//	noteId = 432
+//
+//	toUsers = []int{2}
+//
+//	noteComment = domain.NoteComment{
+//		Id: 1,
+//		Path: []int32{1},
+//		Content: "content",
+//		PinId: 1,
+//		UserId: 1,
+//	}
+//
+//	notePin = domain.NotePin{
+//		Id: 1,
+//		Title: "title",
+//		ImgLink: "link",
+//		UserId: 1,
+//	}
+//
+//	noteFollow = domain.NoteFollow{
+//		FollowerId: 21,
+//		UserId: 32,
+//	}
+//
+//	noteRespMany = []domain.NoteResp {
+//		{
+//			Id: 12,
+//			Type: NoteComment,
+//			EncodedData: []byte("123123"),
+//			IsRead: false,
+//		},
+//		{
+//			Id: 13,
+//			Type: NotePin,
+//			EncodedData: []byte("1223"),
+//			IsRead: false,
+//		},
+//	}
+//)
+//
+//
+//func TestMain(m *testing.M) {
+//	config.Conf = config.NewConfigTst()
+//	code := m.Run()
+//	os.Exit(code)
+//}
 
 //
 //func TestCreateNotesSuccess(t *testing.T) {

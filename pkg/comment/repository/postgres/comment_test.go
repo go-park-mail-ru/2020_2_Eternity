@@ -12,8 +12,6 @@ import (
 var (
 	parentId int = 0
 
-	childPath = []int{parentId, 1}
-
 	childComment = domain.Comment{
 		Id: 1,
 		Content: "content",
