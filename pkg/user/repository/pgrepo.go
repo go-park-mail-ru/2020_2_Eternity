@@ -221,3 +221,24 @@ func (r *Repository) IsFollowing(id int, username string) error {
 	}
 	return nil
 }
+
+func (r *Repository) GetPopularUsers(limit int) ([]domain.UserSearch, error) {
+	rows, err := r.dbConn.Query("select users.id, username, avatar, followers from users join "+
+		"stats on users.id = stats.id order by followers desc limit $1", limit)
+
+	if err != nil {
+		config.Lg("user", "GetPopularUsers").Error(err.Error())
+		return nil, err
+	}
+	defer rows.Close()
+	users := make([]domain.UserSearch, 0, limit)
+	u := domain.UserSearch{}
+	for rows.Next() {
+		if err := rows.Scan(&u.ID, &u.Username, &u.Avatar, &u.Followers); err != nil {
+			config.Lg("user", "GetPopularUsersScan").Error(err.Error())
+			return nil, err
+		}
+		users = append(users, u)
+	}
+	return users, nil
+}

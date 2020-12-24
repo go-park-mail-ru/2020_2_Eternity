@@ -392,3 +392,23 @@ func (h *Handler) IsFollowing(c *gin.Context) {
 	f.Following = true
 	c.JSON(http.StatusOK, f)
 }
+
+func (h *Handler) GetPopularUsers(c *gin.Context) {
+	limit, err := strconv.Atoi(c.Query("last"))
+	if err != nil {
+		limit = 15
+	}
+	if limit < 1 {
+		limit = 15
+	}
+
+	users, err := h.uc.GetPopularUsers(limit)
+
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.Error{
+			Error: "something bad happens",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, users)
+}

@@ -26,4 +26,5 @@ type IRepository interface {
 	GetFollowing(username string) ([]domain.User, error)
 
 	IsFollowing(id int, username string) error
+	GetPopularUsers(limit int) ([]domain.UserSearch, error)
 }

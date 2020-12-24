@@ -14,8 +14,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-
-func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, ac grpc.ClientConnInterface,  server ws.IServer) {
+func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, ac grpc.ClientConnInterface, server ws.IServer) {
 	rep := repository.NewRepo(db)
 	uc := usecase.NewUsecase(rep)
 	client := proto_auth.NewAuthServiceClient(ac)
@@ -29,6 +28,8 @@ func AddUserRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy, ac 
 	r.GET("/followers/:username", handler.GetFollowers)
 	r.GET("/following/:username", handler.GetFollowing)
 	r.GET("/userpage/:username", handler.GetUserPage)
+	r.GET("/user/popular", handler.GetPopularUsers)
+
 	authorized := r.Group("/")
 	authorized.Use(mw.AuthCheck()) // authorized.Use(csrf.CSRFCheck()) на фронте его еще нет, поэтому закомменчен
 	{

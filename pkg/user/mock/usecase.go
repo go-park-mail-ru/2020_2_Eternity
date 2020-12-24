@@ -223,3 +223,18 @@ func (mr *MockIUsecaseMockRecorder) IsFollowing(id, username interface{}) *gomoc
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsFollowing", reflect.TypeOf((*MockIUsecase)(nil).IsFollowing), id, username)
 }
+
+// GetPopularUsers mocks base method
+func (m *MockIUsecase) GetPopularUsers(limit int) ([]domain.UserSearch, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPopularUsers", limit)
+	ret0, _ := ret[0].([]domain.UserSearch)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPopularUsers indicates an expected call of GetPopularUsers
+func (mr *MockIUsecaseMockRecorder) GetPopularUsers(limit interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPopularUsers", reflect.TypeOf((*MockIUsecase)(nil).GetPopularUsers), limit)
+}

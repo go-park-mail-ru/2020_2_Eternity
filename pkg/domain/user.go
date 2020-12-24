@@ -17,7 +17,8 @@ type User struct {
 }
 
 type UserSearch struct {
-	ID       int    `json:"id"`
-	Username string `json:"username"`
-	Avatar   string `json:"avatar"`
+	ID        int    `json:"id"`
+	Username  string `json:"username"`
+	Avatar    string `json:"avatar"`
+	Followers int    `json:"followers,omitempty"`
 }

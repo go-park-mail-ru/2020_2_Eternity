@@ -52,6 +52,8 @@ func easyjsonD6aedbb7DecodeGithubComGoParkMailRu20202EternityPkgDomain(in *jlexe
 			out.UserId = int(in.Int())
 		case "username":
 			out.Username = string(in.String())
+		case "avatar":
+			out.Avatar = string(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -105,6 +107,11 @@ func easyjsonD6aedbb7EncodeGithubComGoParkMailRu20202EternityPkgDomain(out *jwri
 		const prefix string = ",\"username\":"
 		out.RawString(prefix)
 		out.String(string(in.Username))
+	}
+	{
+		const prefix string = ",\"avatar\":"
+		out.RawString(prefix)
+		out.String(string(in.Avatar))
 	}
 	out.RawByte('}')
 }
@@ -297,6 +304,10 @@ func easyjsonD6aedbb7DecodeGithubComGoParkMailRu20202EternityPkgDomain3(in *jlex
 			out.PictureWidth = int(in.Int())
 		case "user_id":
 			out.UserId = int(in.Int())
+		case "username":
+			out.Username = string(in.String())
+		case "avatar":
+			out.Avatar = string(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -345,6 +356,16 @@ func easyjsonD6aedbb7EncodeGithubComGoParkMailRu20202EternityPkgDomain3(out *jwr
 		const prefix string = ",\"user_id\":"
 		out.RawString(prefix)
 		out.Int(int(in.UserId))
+	}
+	if in.Username != "" {
+		const prefix string = ",\"username\":"
+		out.RawString(prefix)
+		out.String(string(in.Username))
+	}
+	if in.Avatar != "" {
+		const prefix string = ",\"avatar\":"
+		out.RawString(prefix)
+		out.String(string(in.Avatar))
 	}
 	out.RawByte('}')
 }

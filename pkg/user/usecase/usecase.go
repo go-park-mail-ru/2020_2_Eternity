@@ -63,3 +63,7 @@ func (uc *UserUsecase) GetFollowing(username string) ([]domain.User, error) {
 func (uc *UserUsecase) IsFollowing(id int, username string) error {
 	return uc.repo.IsFollowing(id, username)
 }
+
+func (uc *UserUsecase) GetPopularUsers(limit int) ([]domain.UserSearch, error) {
+	return uc.repo.GetPopularUsers(limit)
+}

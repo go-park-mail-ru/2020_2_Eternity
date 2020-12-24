@@ -42,6 +42,8 @@ func easyjson9e1087fdDecodeGithubComGoParkMailRu20202EternityPkgDomain(in *jlexe
 			out.Username = string(in.String())
 		case "avatar":
 			out.Avatar = string(in.String())
+		case "followers":
+			out.Followers = int(in.Int())
 		default:
 			in.SkipRecursive()
 		}
@@ -70,6 +72,11 @@ func easyjson9e1087fdEncodeGithubComGoParkMailRu20202EternityPkgDomain(out *jwri
 		const prefix string = ",\"avatar\":"
 		out.RawString(prefix)
 		out.String(string(in.Avatar))
+	}
+	if in.Followers != 0 {
+		const prefix string = ",\"followers\":"
+		out.RawString(prefix)
+		out.Int(int(in.Followers))
 	}
 	out.RawByte('}')
 }
