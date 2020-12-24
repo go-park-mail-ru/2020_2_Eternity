@@ -55,17 +55,6 @@ func (h *Handler) CreateChat(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, resp)
-	//c.Set(domain.NotificationKey, domain.NoteChat{
-	//	Id: resp.Id,
-	//	CreatorId: userId,
-	//	CreationTime: resp.CreationTime,
-	//	LastMsgContent: resp.LastMsgContent,
-	//	LastMsgUsername: resp.LastMsgUsername,
-	//	LastMsgTime: resp.LastMsgTime,
-	//	CollocutorName: resp.CollocutorName,
-	//	CollocutorAvatarLink: resp.CollocutorAvatarLink,
-	//	NewMessages: resp.NewMessages,
-	//})
 }
 
 func (h *Handler) GetChatById(c *gin.Context) {
