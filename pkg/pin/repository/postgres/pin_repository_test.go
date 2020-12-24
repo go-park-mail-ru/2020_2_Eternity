@@ -65,8 +65,8 @@ func TestRepository_GetPin(t *testing.T) {
 
 	r := NewRepo(db)
 
-	rows := sqlmock.NewRows([]string{"p.pin_id", "title", "content", "p.name", "user_id", "height", "width", "username"}).
-		AddRow(pin.Id, pin.Title, pin.Content, pin.PictureName, pin.UserId, pin.PictureHeight, pin.PictureWidth, pin.Username)
+	rows := sqlmock.NewRows([]string{"p.pin_id", "title", "content", "p.name", "user_id", "height", "width", "username", "avatar"}).
+		AddRow(pin.Id, pin.Title, pin.Content, pin.PictureName, pin.UserId, pin.PictureHeight, pin.PictureWidth, pin.Username, pin.Avatar)
 	mock.ExpectQuery("select ").WithArgs(1).WillReturnRows(rows)
 
 	p, err := r.GetPin(1)
