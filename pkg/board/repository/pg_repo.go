@@ -47,7 +47,8 @@ func (r *Repository) GetBoard(id int) (*domain.Board, error) {
 func (r *Repository) GetAllBoardsByUser(username string) ([]domain.Board, error) {
 	var boards []domain.Board
 
-	rows, err := r.dbConn.Query("select boards.id, title, content from boards join users on users.id = boards.user_id where lower(username) = lower($1)", username)
+	rows, err := r.dbConn.Query("select boards.id, title, content from boards join users on users.id = "+
+		"boards.user_id where lower(username) = lower($1)", username)
 	if err != nil {
 		config.Lg("board", "GetAllBoardsByUserId").Error(err.Error())
 		return boards, errors.New("bad id")
@@ -58,6 +59,27 @@ func (r *Repository) GetAllBoardsByUser(username string) ([]domain.Board, error)
 			Username: username,
 		}
 		if err := rows.Scan(&b.ID, &b.Title, &b.Content); err != nil {
+			config.Lg("board", "GetAllBoardsByUserId").Error(err.Error())
+			return nil, err
+		}
+		boards = append(boards, b)
+	}
+	return boards, nil
+}
+
+func (r *Repository) GetBoardsPinNotAttach(userId, pinId int) ([]domain.Board, error) {
+	var boards []domain.Board
+
+	rows, err := r.dbConn.Query("select id, title from boards where boards.id not in (select id from boards "+
+		"join boards_pins on boards.id = boards_pins.board_id where pin_id = $1) and user_id = $2", pinId, userId)
+	if err != nil {
+		config.Lg("board", "GetAllBoardsByUserId").Error(err.Error())
+		return boards, errors.New("bad id")
+	}
+	defer rows.Close()
+	for rows.Next() {
+		b := domain.Board{}
+		if err := rows.Scan(&b.ID, &b.Title); err != nil {
 			config.Lg("board", "GetAllBoardsByUserId").Error(err.Error())
 			return nil, err
 		}

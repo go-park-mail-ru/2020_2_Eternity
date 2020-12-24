@@ -38,3 +38,7 @@ func (uc *BoardUsecase) AttachPin(boardId int, pinId int) error {
 func (uc *BoardUsecase) DetachPin(boardId int, pinId int) error {
 	return uc.repo.DetachPin(boardId, pinId)
 }
+
+func (uc *BoardUsecase) GetBoardsPinNotAttach(userId, pinId int) ([]domain.Board, error) {
+	return uc.repo.GetBoardsPinNotAttach(userId, pinId)
+}

@@ -116,6 +116,28 @@ func (h *Handler) prepAtDet(c *gin.Context) (*api.AttachDetachPin, int, *utils.E
 	return &bp, http.StatusOK, nil
 }
 
+func (h *Handler) GetBoardsPinNotAttach(c *gin.Context) {
+	claimsId, ok := jwthelper.GetClaims(c)
+	if !ok {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.Error{Error: "invalid token"})
+		return
+	}
+
+	p := c.Param("pin_id")
+	id, err := strconv.Atoi(p)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "not id"})
+		return
+	}
+
+	boards, err := h.uc.GetBoardsPinNotAttach(claimsId, id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "id not found"})
+		return
+	}
+	c.JSON(http.StatusOK, boards)
+}
+
 func (h *Handler) sanitize(b *api.CreateBoard) error {
 	b.Content = h.p.Sanitize(b.Content)
 	b.Title = h.p.Sanitize(b.Title)

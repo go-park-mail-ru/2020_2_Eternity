@@ -120,3 +120,18 @@ func (mr *MockIUsecaseMockRecorder) DetachPin(boardId, pinId interface{}) *gomoc
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DetachPin", reflect.TypeOf((*MockIUsecase)(nil).DetachPin), boardId, pinId)
 }
+
+// GetBoardsPinNotAttach mocks base method
+func (m *MockIUsecase) GetBoardsPinNotAttach(userId, pinId int) ([]domain.Board, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBoardsPinNotAttach", userId, pinId)
+	ret0, _ := ret[0].([]domain.Board)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBoardsPinNotAttach indicates an expected call of GetBoardsPinNotAttach
+func (mr *MockIUsecaseMockRecorder) GetBoardsPinNotAttach(userId, pinId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBoardsPinNotAttach", reflect.TypeOf((*MockIUsecase)(nil).GetBoardsPinNotAttach), userId, pinId)
+}

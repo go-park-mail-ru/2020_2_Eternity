@@ -20,6 +20,7 @@ func AddBoardRoutes(r *gin.Engine, db database.IDbConn, p *bluemonday.Policy) {
 	authorized := r.Group("/", auth.AuthCheck()) // authorized.Use(csrf.CSRFCheck()) на фронте его еще нет, поэтому закомменчен
 	{
 		authorized.POST("/board", handler.CreateBoard)
+		authorized.GET("/boards_pin/:pin_id", handler.GetBoardsPinNotAttach)
 		authorized.POST("/attach", handler.AttachPinToBoard)
 		authorized.DELETE("/detach", handler.DetachPinFromBoard)
 	}

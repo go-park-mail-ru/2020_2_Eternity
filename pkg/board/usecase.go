@@ -14,4 +14,5 @@ type IUsecase interface {
 
 	AttachPin(boardId int, pinId int) error
 	DetachPin(boardId int, pinId int) error
+	GetBoardsPinNotAttach(userId, pinId int) ([]domain.Board, error)
 }
