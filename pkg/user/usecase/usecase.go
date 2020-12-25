@@ -46,7 +46,7 @@ func (uc *UserUsecase) GetAvatar(id int) (error, string) {
 	return uc.repo.GetAvatar(id)
 }
 
-func (uc *UserUsecase) Follow(following int, id int) error {
+func (uc *UserUsecase) Follow(following int, id int) (string, error) {
 	return uc.repo.Follow(following, id)
 }
 func (uc *UserUsecase) UnFollow(unfollowing int, id int) error {

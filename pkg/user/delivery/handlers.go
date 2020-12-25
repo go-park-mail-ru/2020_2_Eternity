@@ -293,7 +293,8 @@ func (h *Handler) Follow(c *gin.Context) {
 		c.AbortWithStatusJSON(status, utils.Error{Error: "Cannot self follow"})
 		return
 	}
-	if err := h.uc.Follow(followingUser, followedUser); err != nil {
+	username, er := h.uc.Follow(followingUser, followedUser)
+	if er != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Already Followed"})
 		return
 	}
@@ -302,8 +303,8 @@ func (h *Handler) Follow(c *gin.Context) {
 	c.Set("follow_id", followedUser)
 
 	c.Set(domain.NotificationKey, domain.NoteFollow{
-		FollowerId: followingUser,
-		UserId:     followedUser,
+		Follower: username,
+		UserId:   followedUser,
 	})
 }
 

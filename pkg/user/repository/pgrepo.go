@@ -131,12 +131,15 @@ func (r *Repository) GetAvatar(id int) (error, string) {
 	return nil, avatar
 }
 
-func (r *Repository) Follow(following int, id int) error {
-	if _, err := r.dbConn.Exec("insert into follows(id1, id2) values($1, $2)", following, id); err != nil {
+func (r *Repository) Follow(following int, id int) (string, error) {
+	row := r.dbConn.QueryRow("insert into follows(id1, id2) values($1, $2) "+
+		"returning (select username from users where id = $1)", following, id)
+	var username string
+	if err := row.Scan(&username); err != nil {
 		config.Lg("user", "Follow").Error("r.UpdatePassword: ", err.Error())
-		return err
+		return username, err
 	}
-	return nil
+	return username, nil
 }
 
 func (r *Repository) UnFollow(unfollowing int, id int) error {

@@ -18,7 +18,7 @@ type IUsecase interface {
 	UpdateAvatar(id int, avatar string) error
 	GetAvatar(id int) (error, string)
 
-	Follow(following int, id int) error
+	Follow(following int, id int) (string, error)
 	UnFollow(unfollowing int, id int) error
 
 	GetFollowers(username string) ([]domain.User, error)

@@ -435,8 +435,8 @@ func easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain4(in *jlexer
 			continue
 		}
 		switch key {
-		case "FollowerId":
-			out.FollowerId = int(in.Int())
+		case "Follower":
+			out.Follower = string(in.String())
 		case "UserId":
 			out.UserId = int(in.Int())
 		default:
@@ -454,9 +454,9 @@ func easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain4(out *jwrit
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"FollowerId\":"
+		const prefix string = ",\"Follower\":"
 		out.RawString(prefix[1:])
-		out.Int(int(in.FollowerId))
+		out.String(string(in.Follower))
 	}
 	{
 		const prefix string = ",\"UserId\":"
