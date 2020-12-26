@@ -71,7 +71,7 @@ func (r *Repository) GetBoardsPinNotAttach(userId, pinId int) ([]domain.Board, e
 	var boards []domain.Board
 
 	rows, err := r.dbConn.Query("select id, title from boards where boards.id not in (select id from boards "+
-		"join boards_pins on boards.id = boards_pins.board_id where pin_id = $1 and user_id = $2) where user_id = $2", pinId, userId)
+		"join boards_pins on boards.id = boards_pins.board_id where pin_id = $1 and user_id = $2) and user_id = $2", pinId, userId)
 	if err != nil {
 		config.Lg("board", "GetAllBoardsByUserId").Error(err.Error())
 		return boards, errors.New("bad id")
