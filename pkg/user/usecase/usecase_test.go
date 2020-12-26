@@ -171,19 +171,19 @@ func TestUserUsecase_GetAvatar(t *testing.T) {
 	}
 }
 
-func TestUserUsecase_Follow(t *testing.T) {
-	t.Helper()
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	userMockRepository := mock_user.NewMockIRepository(ctrl)
-	usecase := NewUsecase(userMockRepository)
-
-	userMockRepository.EXPECT().Follow(2, 1).Return(nil)
-	if err := usecase.Follow(2, 1); err != nil {
-		assert.Equal(t, err, nil)
-	}
-}
+//func TestUserUsecase_Follow(t *testing.T) {
+//	t.Helper()
+//	ctrl := gomock.NewController(t)
+//	defer ctrl.Finish()
+//
+//	userMockRepository := mock_user.NewMockIRepository(ctrl)
+//	usecase := NewUsecase(userMockRepository)
+//
+//	userMockRepository.EXPECT().Follow(2, 1).Return(nil)
+//	if err := usecase.Follow(2, 1); err != nil {
+//		assert.Equal(t, err, nil)
+//	}
+//}
 
 func TestUserUsecase_UnFollow(t *testing.T) {
 	t.Helper()

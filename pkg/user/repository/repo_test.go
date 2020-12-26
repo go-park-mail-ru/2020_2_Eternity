@@ -219,44 +219,44 @@ func TestRepository_GetAvatar(t *testing.T) {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
 }
-
-func TestRepository_Follow(t *testing.T) {
-	t.Helper()
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
-	defer db.Close()
-	r := NewRepo(db)
-
-	mock.ExpectExec("insert into follows").WithArgs(1, 2).
-		WillReturnResult(sqlmock.NewResult(1, 1))
-
-	err = r.Follow(1, 2)
-	assert.NoError(t, err)
-
-	mock.ExpectExec("insert into follows").WithArgs(1, 2).
-		WillReturnError(errors.New("already follows"))
-	err = r.Follow(1, 2)
-	assert.Error(t, err)
-
-	//unfollow
-
-	mock.ExpectExec("delete from follows").WithArgs(1, 2).
-		WillReturnResult(sqlmock.NewResult(1, 1))
-
-	err = r.UnFollow(1, 2)
-	assert.NoError(t, err)
-
-	mock.ExpectExec("delete from follows").WithArgs(1, 2).
-		WillReturnError(errors.New("already unfollows"))
-	err = r.UnFollow(1, 2)
-	assert.Error(t, err)
-
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
-}
+//
+//func TestRepository_Follow(t *testing.T) {
+//	t.Helper()
+//	db, mock, err := sqlmock.New()
+//	if err != nil {
+//		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+//	}
+//	defer db.Close()
+//	r := NewRepo(db)
+//
+//	mock.ExpectExec("insert into follows").WithArgs(1, 2).
+//		WillReturnResult(sqlmock.NewResult(1, 1))
+//
+//	err = r.Follow(1, 2)
+//	assert.NoError(t, err)
+//
+//	mock.ExpectExec("insert into follows").WithArgs(1, 2).
+//		WillReturnError(errors.New("already follows"))
+//	err = r.Follow(1, 2)
+//	assert.Error(t, err)
+//
+//	//unfollow
+//
+//	mock.ExpectExec("delete from follows").WithArgs(1, 2).
+//		WillReturnResult(sqlmock.NewResult(1, 1))
+//
+//	err = r.UnFollow(1, 2)
+//	assert.NoError(t, err)
+//
+//	mock.ExpectExec("delete from follows").WithArgs(1, 2).
+//		WillReturnError(errors.New("already unfollows"))
+//	err = r.UnFollow(1, 2)
+//	assert.Error(t, err)
+//
+//	if err := mock.ExpectationsWereMet(); err != nil {
+//		t.Errorf("there were unfulfilled expectations: %s", err)
+//	}
+//}
 
 func TestRepository_GetUserByNameWithFollowers(t *testing.T) {
 	t.Helper()
