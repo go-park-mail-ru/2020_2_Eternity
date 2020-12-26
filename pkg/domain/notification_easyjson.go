@@ -245,14 +245,16 @@ func easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain2(in *jlexer
 			continue
 		}
 		switch key {
-		case "Id":
+		case "id":
 			out.Id = int(in.Int())
-		case "Title":
+		case "title":
 			out.Title = string(in.String())
-		case "ImgLink":
+		case "img_link":
 			out.ImgLink = string(in.String())
-		case "UserId":
+		case "user_id":
 			out.UserId = int(in.Int())
+		case "username":
+			out.Username = string(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -268,24 +270,29 @@ func easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain2(out *jwrit
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"Id\":"
+		const prefix string = ",\"id\":"
 		out.RawString(prefix[1:])
 		out.Int(int(in.Id))
 	}
 	{
-		const prefix string = ",\"Title\":"
+		const prefix string = ",\"title\":"
 		out.RawString(prefix)
 		out.String(string(in.Title))
 	}
 	{
-		const prefix string = ",\"ImgLink\":"
+		const prefix string = ",\"img_link\":"
 		out.RawString(prefix)
 		out.String(string(in.ImgLink))
 	}
 	{
-		const prefix string = ",\"UserId\":"
+		const prefix string = ",\"user_id\":"
 		out.RawString(prefix)
 		out.Int(int(in.UserId))
+	}
+	{
+		const prefix string = ",\"username\":"
+		out.RawString(prefix)
+		out.String(string(in.Username))
 	}
 	out.RawByte('}')
 }
@@ -435,10 +442,12 @@ func easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain4(in *jlexer
 			continue
 		}
 		switch key {
-		case "Follower":
-			out.Follower = string(in.String())
+		case "FollowerId":
+			out.FollowerId = int(in.Int())
 		case "UserId":
 			out.UserId = int(in.Int())
+		case "username":
+			out.Username = string(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -454,14 +463,19 @@ func easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain4(out *jwrit
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"Follower\":"
+		const prefix string = ",\"FollowerId\":"
 		out.RawString(prefix[1:])
-		out.String(string(in.Follower))
+		out.Int(int(in.FollowerId))
 	}
 	{
 		const prefix string = ",\"UserId\":"
 		out.RawString(prefix)
 		out.Int(int(in.UserId))
+	}
+	{
+		const prefix string = ",\"username\":"
+		out.RawString(prefix)
+		out.String(string(in.Username))
 	}
 	out.RawByte('}')
 }
@@ -508,9 +522,9 @@ func easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain5(in *jlexer
 			continue
 		}
 		switch key {
-		case "Id":
+		case "id":
 			out.Id = int(in.Int())
-		case "Path":
+		case "path":
 			if in.IsNull() {
 				in.Skip()
 				out.Path = nil
@@ -533,12 +547,16 @@ func easyjson9806e1DecodeGithubComGoParkMailRu20202EternityPkgDomain5(in *jlexer
 				}
 				in.Delim(']')
 			}
-		case "Content":
+		case "content":
 			out.Content = string(in.String())
-		case "PinId":
+		case "pin_id":
 			out.PinId = int(in.Int())
-		case "UserId":
+		case "pin_title":
+			out.PinTitle = string(in.String())
+		case "userid":
 			out.UserId = int(in.Int())
+		case "username":
+			out.Username = string(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -554,12 +572,12 @@ func easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain5(out *jwrit
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"Id\":"
+		const prefix string = ",\"id\":"
 		out.RawString(prefix[1:])
 		out.Int(int(in.Id))
 	}
 	{
-		const prefix string = ",\"Path\":"
+		const prefix string = ",\"path\":"
 		out.RawString(prefix)
 		if in.Path == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
 			out.RawString("null")
@@ -575,19 +593,29 @@ func easyjson9806e1EncodeGithubComGoParkMailRu20202EternityPkgDomain5(out *jwrit
 		}
 	}
 	{
-		const prefix string = ",\"Content\":"
+		const prefix string = ",\"content\":"
 		out.RawString(prefix)
 		out.String(string(in.Content))
 	}
 	{
-		const prefix string = ",\"PinId\":"
+		const prefix string = ",\"pin_id\":"
 		out.RawString(prefix)
 		out.Int(int(in.PinId))
 	}
 	{
-		const prefix string = ",\"UserId\":"
+		const prefix string = ",\"pin_title\":"
+		out.RawString(prefix)
+		out.String(string(in.PinTitle))
+	}
+	{
+		const prefix string = ",\"userid\":"
 		out.RawString(prefix)
 		out.Int(int(in.UserId))
+	}
+	{
+		const prefix string = ",\"username\":"
+		out.RawString(prefix)
+		out.String(string(in.Username))
 	}
 	out.RawByte('}')
 }

@@ -225,6 +225,7 @@ func (r *Repository) IsFollowing(id int, username string) error {
 	return nil
 }
 
+
 func (r *Repository) GetPopularUsers(limit int) ([]domain.UserSearch, error) {
 	rows, err := r.dbConn.Query("select users.id, username, avatar, followers from users join "+
 		"stats on users.id = stats.id order by followers desc limit $1", limit)
@@ -244,4 +245,15 @@ func (r *Repository) GetPopularUsers(limit int) ([]domain.UserSearch, error) {
 		users = append(users, u)
 	}
 	return users, nil
+}
+
+func (r *Repository) GetUsername(userId int) string {
+	username := ""
+	err := r.dbConn.QueryRow("SELECT username FROM users WHERE id = $1", userId).Scan(&username)
+	if err != nil {
+		config.Lg("user_repo", "GetUsername").Error(err.Error())
+		username = "username"
+	}
+
+	return username
 }

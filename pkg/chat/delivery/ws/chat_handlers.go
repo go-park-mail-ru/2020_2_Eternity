@@ -40,7 +40,7 @@ func (h *Handler) CreateMessage(c *ws.Context) {
 	}
 
 	c.AddResponse(resp, domainChat.CreateMessageRespType, userId, http.StatusOK)
-	c.Set(domain.NotificationKey, domain.NoteMessage{
+	c.Set(domain.NotificationKey, &domain.NoteMessage{
 		Id: resp.Id,
 		CreatorId: userId,
 		Content: resp.Content,

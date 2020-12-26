@@ -146,28 +146,32 @@ func (uc *Usecase) CreateNotes(iNote interface{}) error {
 	var err error
 
 	switch note := iNote.(type) {
-	case domain.NoteComment:
+	case *domain.NoteComment:
 		noteType = NoteComment
-		toUsers, err = uc.getDstNoteComment(&note)
+		note.Username = uc.userRepo.GetUsername(note.UserId)
+		toUsers, err = uc.getDstNoteComment(note)
 		uc.sendNotes(note, noteType, toUsers)
-	case domain.NotePin:
+	case *domain.NotePin:
 		noteType = NotePin
-		toUsers, err = uc.getDstNotePin(&note)
+		note.Username = uc.userRepo.GetUsername(note.UserId)
+		toUsers, err = uc.getDstNotePin(note)
 		uc.sendNotes(note, noteType, toUsers)
-	case domain.NoteFollow:
+	case *domain.NoteFollow:
 		noteType = NoteFollow
-		toUsers, err = uc.getDstNoteFollow(&note)
+		//note.Username = uc.userRepo.GetUsername(note.UserId)
+		toUsers, err = uc.getDstNoteFollow(note)
 		uc.sendNotes(note, noteType, toUsers)
-	case domain.NoteChat:
+	case *domain.NoteChat:
 		noteType = NoteChat
-		toUsers, err = uc.getDstNoteChat(&note)
+		toUsers, err = uc.getDstNoteChat(note)
 		uc.sendNotes(note, noteType, toUsers)
-	case domain.NoteMessage:
+	case *domain.NoteMessage:
 		noteType = NoteMessage
-		toUsers, err = uc.getDstNoteMessage(&note)
+		toUsers, err = uc.getDstNoteMessage(note)
 		uc.sendNotes(note, noteType, toUsers)
 	default:
-		config.Lg("notifications_usecase", "CreateNote").Error("Unknown notification type")
+		config.Lg("notifications_usecase", "CreateNote").
+			Errorf("Unknown notification type: %T", iNote)
 		return errors.New("Unknown notification type")
 	}
 
@@ -187,6 +191,7 @@ func (uc *Usecase) CreateNotes(iNote interface{}) error {
 		Type: noteType,
 		EncodedData: encoded,
 	}
+
 	for _, id := range toUsers {
 		note.ToUserId = id
 		err = uc.noteRepo.StoreNote(&note)

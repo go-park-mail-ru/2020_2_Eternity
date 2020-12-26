@@ -71,7 +71,7 @@ func (h *Handler) CreatePin(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, pinResp)
-	c.Set(domain.NotificationKey, domain.NotePin{
+	c.Set(domain.NotificationKey, &domain.NotePin{
 		Id:      pinResp.Id,
 		Title:   pinResp.Title,
 		ImgLink: pinResp.ImgLink,
