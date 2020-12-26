@@ -662,73 +662,73 @@ func TestDelivery_GetAvatarFail(t *testing.T) {
 	assert.Equal(t, 400, c.Writer.Status())
 }
 
-func TestDelivery_Follow(t *testing.T) {
-	t.Helper()
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
-	userHandler := NewHandler(userMockUsecase, p, userAs)
-
-	f := api.UserAct{
-		Username: "21savage",
-	}
-
-	body, err := json.Marshal(f)
-	if err != nil {
-		log.Fatal("cant marshal")
-		return
-	}
-
-	u := &domain.User{Username: "21savage"}
-
-	userMockUsecase.EXPECT().GetUserByName(u.Username).Return(u, nil)
-	userMockUsecase.EXPECT().Follow(1, gomock.Any()).Return(nil)
-	w := httptest.NewRecorder()
-	path := "/follow"
-	req, _ := http.NewRequest("POST", path, bytes.NewReader(body))
-
-	c, r := gin.CreateTestContext(w)
-	r.Use(mid())
-	r.POST(path, userHandler.Follow)
-	r.ServeHTTP(c.Writer, req)
-	assert.Equal(t, 200, c.Writer.Status())
-}
-
-func TestDelivery_FollowE(t *testing.T) {
-	t.Helper()
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
-	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
-	userHandler := NewHandler(userMockUsecase, p, userAs)
-
-	f := api.UserAct{
-		Username: "21savage",
-	}
-
-	body, err := json.Marshal(f)
-	if err != nil {
-		log.Fatal("cant marshal")
-		return
-	}
-
-	u := &domain.User{Username: "21savage"}
-
-	userMockUsecase.EXPECT().GetUserByName(u.Username).Return(u, nil)
-	userMockUsecase.EXPECT().Follow(1, gomock.Any()).Return(errors.New(""))
-	w := httptest.NewRecorder()
-	path := "/follow"
-	req, _ := http.NewRequest("POST", path, bytes.NewReader(body))
-
-	c, r := gin.CreateTestContext(w)
-	r.Use(mid())
-	r.POST(path, userHandler.Follow)
-	r.ServeHTTP(c.Writer, req)
-	assert.Equal(t, 400, c.Writer.Status())
-}
+//func TestDelivery_Follow(t *testing.T) {
+//	t.Helper()
+//	ctrl := gomock.NewController(t)
+//	defer ctrl.Finish()
+//
+//	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
+//	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+//	userHandler := NewHandler(userMockUsecase, p, userAs)
+//
+//	f := api.UserAct{
+//		Username: "21savage",
+//	}
+//
+//	body, err := json.Marshal(f)
+//	if err != nil {
+//		log.Fatal("cant marshal")
+//		return
+//	}
+//
+//	u := &domain.User{Username: "21savage"}
+//
+//	userMockUsecase.EXPECT().GetUserByName(u.Username).Return(u, nil)
+//	userMockUsecase.EXPECT().Follow(1, gomock.Any()).Return(nil)
+//	w := httptest.NewRecorder()
+//	path := "/follow"
+//	req, _ := http.NewRequest("POST", path, bytes.NewReader(body))
+//
+//	c, r := gin.CreateTestContext(w)
+//	r.Use(mid())
+//	r.POST(path, userHandler.Follow)
+//	r.ServeHTTP(c.Writer, req)
+//	assert.Equal(t, 200, c.Writer.Status())
+//}
+//
+//func TestDelivery_FollowE(t *testing.T) {
+//	t.Helper()
+//	ctrl := gomock.NewController(t)
+//	defer ctrl.Finish()
+//
+//	userMockUsecase := mock_user.NewMockIUsecase(ctrl)
+//	userAs := mock_auth.NewMockAuthServiceClient(ctrl)
+//	userHandler := NewHandler(userMockUsecase, p, userAs)
+//
+//	f := api.UserAct{
+//		Username: "21savage",
+//	}
+//
+//	body, err := json.Marshal(f)
+//	if err != nil {
+//		log.Fatal("cant marshal")
+//		return
+//	}
+//
+//	u := &domain.User{Username: "21savage"}
+//
+//	userMockUsecase.EXPECT().GetUserByName(u.Username).Return(u, nil)
+//	userMockUsecase.EXPECT().Follow(1, gomock.Any()).Return(errors.New(""))
+//	w := httptest.NewRecorder()
+//	path := "/follow"
+//	req, _ := http.NewRequest("POST", path, bytes.NewReader(body))
+//
+//	c, r := gin.CreateTestContext(w)
+//	r.Use(mid())
+//	r.POST(path, userHandler.Follow)
+//	r.ServeHTTP(c.Writer, req)
+//	assert.Equal(t, 400, c.Writer.Status())
+//}
 
 func TestDelivery_FollowV(t *testing.T) {
 	t.Helper()
