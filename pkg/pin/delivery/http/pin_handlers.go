@@ -119,11 +119,15 @@ func (h *Handler) GetPinsFromBoard(c *gin.Context) {
 		return
 	}
 
-	limit, err := strconv.Atoi(c.Query("limit"))
-	if err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
-		config.Lg("pin_http", "GetPinsFromBoard").Error("GetIntParam: ", err.Error())
-		return
+	q := c.Query("limit")
+	limit := -1
+	if q != "" {
+		limit, err = strconv.Atoi(q)
+		if err != nil {
+			c.AbortWithStatus(http.StatusBadRequest)
+			config.Lg("pin_http", "GetPinsFromBoard").Error("GetIntParam: ", err.Error())
+			return
+		}
 	}
 
 	if limit < 0 {
