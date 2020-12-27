@@ -146,6 +146,8 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 	}
 
 	profile.Description = h.p.Sanitize(profile.Description)
+	profile.Surname = h.p.Sanitize(profile.Surname)
+	profile.Name = h.p.Sanitize(profile.Name)
 
 	u, err := h.uc.UpdateUser(claimsId, &profile)
 	if err != nil {
@@ -305,7 +307,7 @@ func (h *Handler) Follow(c *gin.Context) {
 	c.Set(domain.NotificationKey, &domain.NoteFollow{
 		FollowerId: followingUser,
 		UserId:     followedUser,
-		Username: username,
+		Username:   username,
 	})
 }
 
