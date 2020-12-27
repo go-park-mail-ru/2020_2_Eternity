@@ -91,7 +91,7 @@ func (h *Handler) Login(c *gin.Context) {
 	cookie := http.Cookie{
 		Name:     config.Conf.Token.CookieName,
 		Value:    u.Tokens.JwtT,
-		Expires:  time.Now().Add(45 * time.Minute),
+		Expires:  time.Now().Add(300 * time.Minute),
 		HttpOnly: true,
 		Path:     "/",
 	}
