@@ -119,7 +119,7 @@ func (r *Repository) GetUserNotesAmount(userId int) (int, error) {
 	n := 0
 	err := r.dbConn.QueryRow(
 		"SELECT COUNT(1) FROM notifications " +
-			"WHERE u.to_user_id = $1 AND is_read = false ",
+			"WHERE to_user_id = $1 AND is_read = false ",
 		userId).Scan(&n)
 
 	if err != nil {
