@@ -6,13 +6,15 @@ import (
 	domainChat "github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain/chat"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/middleware"
 	note_http "github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/delivery/http"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications/repository/postgres"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/ws"
 	"github.com/microcosm-cc/bluemonday"
 	"google.golang.org/grpc"
 )
 
 func AddChatWsRoutes(server ws.IServer, db database.IDbConn, conn grpc.ClientConnInterface) {
-	uc := usecase.NewUsecase(conn)
+	noteRepo := postgres.NewRepo(db)
+	uc := usecase.NewUsecase(conn, noteRepo)
 	handler := NewHandler(uc, bluemonday.UGCPolicy())
 
 	server.SetHandler(

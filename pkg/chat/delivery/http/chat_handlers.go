@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/chat"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
 	domainChat "github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain/chat"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/jwthelper"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/utils"
@@ -128,7 +129,7 @@ func (h *Handler) MarkAllMessagesRead(c *gin.Context) {
 
 
 
-func ServeWs(s ws.IServer) func(c *gin.Context) {
+func (h *Handler) ServeWs(s ws.IServer) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		userId, ok := jwthelper.GetClaims(c)
 		if !ok {
@@ -137,7 +138,6 @@ func ServeWs(s ws.IServer) func(c *gin.Context) {
 			return
 		}
 
-		//userId := 2 // Note: for tests
 
 
 		if err := s.RegisterClient(c.Writer, c.Request, userId); err != nil {
@@ -146,6 +146,14 @@ func ServeWs(s ws.IServer) func(c *gin.Context) {
 			return
 		}
 
-		c.Status(http.StatusOK)
+		nNotes, err := h.uc.GetUserNotesAmount(userId)
+		if err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+			config.Lg("chat_http", "ServeWs").
+				Error("GetUserNotesAmount", err.Error())
+			return
+		}
+
+		c.JSON(http.StatusOK, domain.WsResp{NotesAmount: nNotes})
 	}
 }
