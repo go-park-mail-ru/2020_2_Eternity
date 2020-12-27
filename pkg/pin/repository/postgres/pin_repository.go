@@ -4,6 +4,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	"github.com/go-park-mail-ru/2020_2_Eternity/internal/app/database"
 	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain"
+	"strconv"
 )
 
 type Repository struct {
@@ -77,11 +78,16 @@ func (r *Repository) GetPinList(username string) ([]domain.Pin, error) {
 	return pins, nil
 }
 
-func (r *Repository) GetPinBoardList(boardId int) ([]domain.Pin, error) {
-	rows, err := r.dbConn.Query(
-		"select res.id, title, content, name, user_id, height, width from (pins join boards_pins on pins.id = boards_pins.pin_id)"+
-			" res join pin_images on res.id = pin_images.pin_id"+
-			" where res.board_id=$1;", boardId)
+func (r *Repository) GetPinBoardList(boardId int, limit int) ([]domain.Pin, error) {
+	query := "select res.id, title, content, name, user_id, height, width from (pins join boards_pins on pins.id = boards_pins.pin_id)" +
+		" res join pin_images on res.id = pin_images.pin_id" +
+		" where res.board_id=$1"
+
+	if limit != 0 {
+		query += " limit " + strconv.Itoa(limit)
+	}
+
+	rows, err := r.dbConn.Query(query, boardId)
 	if err != nil {
 		config.Lg("pin", "pin.GetPinBoardList").Error(err.Error())
 		return nil, err

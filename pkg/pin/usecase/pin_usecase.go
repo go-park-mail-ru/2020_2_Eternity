@@ -100,7 +100,7 @@ func (u *Usecase) GetPinList(username string) ([]domain.PinResp, error) {
 		return nil, err
 	}
 
-	var pinsResp []domain.PinResp
+	pinsResp := make([]domain.PinResp, 0, len(pins))
 	for _, p := range pins {
 		pinsResp = append(pinsResp, domain.PinResp{
 			Id:            p.Id,
@@ -116,14 +116,14 @@ func (u *Usecase) GetPinList(username string) ([]domain.PinResp, error) {
 	return pinsResp, nil
 }
 
-func (u *Usecase) GetPinBoardList(boardId int) ([]domain.PinResp, error) {
-	pins, err := u.repository.GetPinBoardList(boardId)
+func (u *Usecase) GetPinBoardList(boardId int, limit int) ([]domain.PinResp, error) {
+	pins, err := u.repository.GetPinBoardList(boardId, limit)
 	if err != nil {
 		config.Lg("pin_usecase", "GetPinBoardList").Error("Repo: ", err.Error())
 		return nil, err
 	}
 
-	var pinsResp []domain.PinResp
+	pinsResp := make([]domain.PinResp, 0, len(pins))
 	for _, p := range pins {
 		pinsResp = append(pinsResp, domain.PinResp{
 			Id:            p.Id,

@@ -10,7 +10,7 @@ type IRepository interface {
 	GetPin(id int) (domain.Pin, error)
 	GetPinList(username string) ([]domain.Pin, error)
 
-	GetPinBoardList(boardId int) ([]domain.Pin, error)
+	GetPinBoardList(boardId int, limit int) ([]domain.Pin, error)
 }
 
 type IStorage interface {

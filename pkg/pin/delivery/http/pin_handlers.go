@@ -10,6 +10,7 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 	"mime/multipart"
 	"net/http"
+	"strconv"
 )
 
 const (
@@ -118,7 +119,18 @@ func (h *Handler) GetPinsFromBoard(c *gin.Context) {
 		return
 	}
 
-	pins, err := h.uc.GetPinBoardList(id)
+	limit, err := strconv.Atoi(c.Query("limit"))
+	if err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		config.Lg("pin_http", "GetPinsFromBoard").Error("GetIntParam: ", err.Error())
+		return
+	}
+
+	if limit < 0 {
+		limit = 0
+	}
+
+	pins, err := h.uc.GetPinBoardList(id, limit)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.Error{Error: "Cant show pins from board"})
 		config.Lg("pin_http", "GetPinsFromBoard").Error("Get pins: ", err.Error())
