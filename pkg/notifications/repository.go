@@ -8,4 +8,5 @@ type IRepository interface {
 	GetNotesToUser(userId int) ([]domain.Notification, error)
 	UpdateNoteIsRead(noteId int) error
 	UpdateUserNotes(userId int) error
+	GetUserNotesAmount(userId int) (int, error)
 }

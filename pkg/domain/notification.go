@@ -81,4 +81,8 @@ type NoteMessage struct {
 	UserAvatarLink string    `json:"avatar"`
 }
 
+type WsResp struct {
+	NotesAmount int `json:"notes_amount"`
+}
+
 // Notes for likes

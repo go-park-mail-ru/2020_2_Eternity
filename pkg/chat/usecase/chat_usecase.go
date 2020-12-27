@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/go-park-mail-ru/2020_2_Eternity/configs/config"
 	domainChat "github.com/go-park-mail-ru/2020_2_Eternity/pkg/domain/chat"
+	"github.com/go-park-mail-ru/2020_2_Eternity/pkg/notifications"
 	proto "github.com/go-park-mail-ru/2020_2_Eternity/pkg/proto/chat"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
@@ -12,12 +13,14 @@ import (
 type Usecase struct {
 	client  proto.ChatClient
 	conn grpc.ClientConnInterface
+	notesDb notifications.IRepository
 }
 
-func NewUsecase(conn grpc.ClientConnInterface) *Usecase {
+func NewUsecase(conn grpc.ClientConnInterface, db notifications.IRepository) *Usecase {
 	return &Usecase{
 		conn: conn,
 		client:  proto.NewChatClient(conn),
+		notesDb: db,
 	}
 }
 
@@ -217,4 +220,8 @@ func (uc *Usecase) errorHandle(err error) {
 	//case codes.Unavailable:
 	//
 	//}
+}
+
+func (uc *Usecase) GetUserNotesAmount(userId int) (int, error) {
+	return uc.notesDb.GetUserNotesAmount(userId)
 }

@@ -114,3 +114,19 @@ func (r *Repository) UpdateUserNotes(userId int) error {
 
 	return nil
 }
+
+func (r *Repository) GetUserNotesAmount(userId int) (int, error) {
+	n := 0
+	err := r.dbConn.QueryRow(
+		"SELECT COUNT(1) FROM notifications " +
+			"WHERE to_user_id = $1 AND is_read = false ",
+		userId).Scan(&n)
+
+	if err != nil {
+		config.Lg("notes_repo", "GetUserNotesAmount").Error(err.Error())
+		return 0, err
+	}
+
+	return n, nil
+}
+
