@@ -225,8 +225,8 @@ func (r *Repository) IsFollowing(id int, username string) error {
 	return nil
 }
 
-
 func (r *Repository) GetPopularUsers(limit int) ([]domain.UserSearch, error) {
+	limit = 8
 	rows, err := r.dbConn.Query("select users.id, username, avatar, followers from users join "+
 		"stats on users.id = stats.id order by followers desc limit $1", limit)
 

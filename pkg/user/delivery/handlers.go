@@ -400,10 +400,10 @@ func (h *Handler) IsFollowing(c *gin.Context) {
 func (h *Handler) GetPopularUsers(c *gin.Context) {
 	limit, err := strconv.Atoi(c.Query("last"))
 	if err != nil {
-		limit = 15
+		limit = 8
 	}
 	if limit < 1 {
-		limit = 15
+		limit = 8
 	}
 
 	users, err := h.uc.GetPopularUsers(limit)
